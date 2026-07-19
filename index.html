@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rob's Globe and ADMU Task and Events Tracker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        :root {
+            /* Dynamic variables controlled by JS */
+            --bg: #f4f4f9; 
+            --surface: #ffffff;
+            --text: #333333;       /* Outside Text (Title, section headers, tabs) */
+            --card-text: #333333;  /* Inside Box/Card Text */
+            --primary: #4a90e2; 
+            --todo-bg: #ffeaea;
+            --inprog-bg: #fffbe6;
+            --done-bg: #f6ffed;
+
+            /* Static structural variables */
+            --border: rgba(0, 0, 0, 0.1);
+            --danger: #e74c3c;
+            --warning: #e67e22;
+            --success: #2ecc71;
+            --text-muted: rgba(100, 100, 100, 0.8);
+        }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .container { max-width: 1000px; margin: auto; }
+        
+        /* Banner & Header Styles */
+        #bannerImage {
+            width: 100%; height: 150px; background-size: cover; background-position: center;
+            border-radius: 8px; margin-bottom: 20px; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #pageTitle {
+            display: inline-block; padding: 5px 10px; margin-left: -10px;
+            border-radius: 6px; outline: none; border: 1px dashed transparent; transition: border 0.2s;
+            color: var(--text);
+        }
+        #pageTitle:hover, #pageTitle:focus { border-color: var(--border); background: rgba(128, 128, 128, 0.1); }
+
+        /* ALL BOXES/CONTAINERS USE --card-text */
+        details.customize-menu, .form-card, .column, .control-panel, .event-card, .setting-item {
+            color: var(--card-text) !important;
+        }
+
+        /* Customization Menu */
+        details.customize-menu {
+            background: var(--surface); padding: 10px 20px 20px; border-radius: 8px;
+            margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border);
+        }
+        details.customize-menu summary { cursor: pointer; font-weight: bold; color: var(--card-text); user-select: none; outline: none; }
+        .settings-group { margin-top: 15px; }
+        .settings-group h4 { margin: 0 0 10px 0; font-size: 13px; text-transform: uppercase; color: var(--card-text); opacity: 0.7; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .setting-item { display: flex; flex-direction: column; gap: 5px; }
+        .setting-item label { font-size: 12px; font-weight: bold; color: var(--card-text); opacity: 0.8;}
+        .setting-item input[type="color"] { width: 100%; height: 35px; padding: 2px; cursor: pointer; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); }
+        .setting-item input[type="text"] { padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); color: var(--card-text); }
+        
+        .data-buttons { display: flex; gap: 10px; margin-top: 5px; }
+        .btn-alt { background: var(--surface); border: 1px solid var(--border); color: var(--card-text); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .btn-alt:hover { background: rgba(0,0,0,0.05); }
+
+        /* Form Styles */
+        .form-card {
+            background: var(--surface); padding: 20px; border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
+            display: flex; flex-direction: column; gap: 15px; border: 1px solid var(--border);
+        }
+        .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        
+        input:not([type="color"]):not([type="file"]):not([type="checkbox"]), select, textarea { 
+            padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; font-family: inherit; background: var(--surface); color: var(--card-text);
+        }
+        ::placeholder { color: var(--card-text); opacity: 0.5; }
+        
+        input[type="text"].flex-grow, input[type="url"].flex-grow { flex-grow: 1; min-width: 200px; }
+        textarea { width: 100%; box-sizing: border-box; resize: vertical; min-height: 60px; }
+        button { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; transition: background-color 0.3s; padding: 10px; border-radius: 4px; font-size: 14px;}
+        button:hover { opacity: 0.9; }
+        .input-label { font-size: 13px; color: var(--card-text); opacity: 0.8; margin-right: -5px; }
+
+        /* Control Panel (Search/Filter) */
+        .control-panel {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+            background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .control-panel input { flex-grow: 1; min-width: 200px; }
+        
+        /* View Switcher Tabs */
+        .view-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .view-tab { background: none; border: none; font-size: 14px; font-weight: bold; color: var(--text); opacity: 0.7; cursor: pointer; padding: 6px 12px; border-radius: 4px; transition: background 0.2s, color 0.2s; }
+        .view-tab:hover { background: rgba(0,0,0,0.05); opacity: 1; }
+        .view-tab.active { color: var(--primary); opacity: 1; background: rgba(74, 144, 226, 0.1); }
+
+        /* Board Styles */
+        .board { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .column { 
+            background: var(--surface); border-radius: 8px; padding: 15px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 2px solid var(--border); transition: border-color 0.2s, background-color 0.2s;
+            display: flex; flex-direction: column; min-height: 200px;
+        }
+        .column h3 { margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 10px; color: var(--card-text); display: flex; justify-content: space-between;}
+        .column.drag-over { border-color: var(--primary); background: rgba(0,0,0,0.02); border-style: dashed; }
+        .col-total { font-size: 14px; opacity: 0.7; font-weight: normal; }
+
+        .task-card { 
+            padding: 15px; border-radius: 6px; margin-bottom: 10px; position: relative;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.2s ease; border: 1px solid var(--border);
+            cursor: grab; color: var(--card-text);
+        }
+        .task-card:active { cursor: grabbing; transform: scale(0.98); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        .card-todo { background-color: var(--todo-bg); }
+        .card-inprogress { background-color: var(--inprog-bg); }
+        .card-done { background-color: var(--done-bg); }
+
+        /* Attachments & Events */
+        .task-photo { width: 100%; height: auto; max-height: 160px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 10px; display: block; }
+        .task-link { 
+            display: inline-block; font-size: 12px; font-weight: bold; color: var(--primary); text-decoration: none; 
+            margin-bottom: 10px; background: rgba(255,255,255,0.6); padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border);
+        }
+        .task-link:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Inline Editing Styles */
+        .editable { outline: none; border: 1px dashed transparent; border-radius: 4px; padding: 2px 4px; margin-left: -4px; transition: background-color 0.2s, border-color 0.2s; }
+        .editable:hover { border-color: rgba(0,0,0,0.2); }
+        .editable:focus { background-color: rgba(255,255,255,0.8); border-color: var(--primary); cursor: text; }
+        .editable:focus, input[type="checkbox"]:focus, button:focus { cursor: text; }
+
+        .task-title { font-weight: bold; margin-bottom: 5px; color: var(--card-text); }
+        .task-desc { font-size: 13px; color: var(--card-text); opacity: 0.9; margin-bottom: 10px; line-height: 1.4; min-height: 20px; }
+        .task-metric { font-size: 14px; font-weight: bold; color: var(--success); margin-bottom: 10px; }
+        
+        .task-meta { font-size: 12px; background: rgba(255, 255, 255, 0.3); padding: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid rgba(0,0,0,0.05); }
+        .task-meta p { margin: 3px 0; color: var(--card-text); }
+        
+        .subtasks-list { margin-bottom: 10px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+        .subtask-item { font-size: 12px; display: flex; align-items: flex-start; gap: 8px; color: var(--card-text); }
+        .subtask-item input[type="checkbox"] { cursor: pointer; margin: 3px 0 0 0; }
+        .subtask-text-container { flex-grow: 1; }
+        .subtask-item.completed .subtask-text-container { text-decoration: line-through; opacity: 0.6; }
+
+        .badges { display: flex; gap: 5px; margin-bottom: 10px; font-size: 12px; flex-wrap: wrap; }
+        .badge { background: rgba(255, 255, 255, 0.5); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); color: var(--card-text); }
+        .badge.high { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .badge.medium { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .badge.low { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        
+        .actions { display: flex; justify-content: space-between; }
+        .btn-small { padding: 5px 10px; font-size: 12px; background: rgba(255, 255, 255, 0.4); border: 1px solid var(--border); color: var(--card-text); border-radius: 4px; cursor: pointer; }
+        .btn-small:hover { background: rgba(255, 255, 255, 0.8); }
+        .btn-danger { background: none; color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+
+        /* Rich Text Floating Toolbar */
+        .format-toolbar {
+            position: absolute; display: none; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 6px; padding: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; gap: 4px;
+        }
+        .format-toolbar button {
+            background: transparent; color: var(--text); border: 1px solid transparent;
+            padding: 4px 8px; font-size: 14px; cursor: pointer; border-radius: 4px; font-weight: normal;
+        }
+        .format-toolbar button:hover { background: rgba(0,0,0,0.05); border-color: var(--border); }
+        /* Timer & Pomodoro Styles */
+        .timer-container { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: rgba(0,0,0,0.03); padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); }
+        .timer-display { font-family: monospace; font-size: 14px; font-weight: bold; color: var(--card-text); }
+        .btn-timer { background: var(--primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        .btn-timer.active { background: var(--danger); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        /* Schedule Styles */
+        .schedule-container { background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 20px; }
+        .schedule-grid { display: grid; grid-template-columns: 80px repeat(7, minmax(120px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+        .schedule-header { background: rgba(0,0,0,0.03); font-weight: bold; text-align: center; padding: 10px 5px; color: var(--card-text); font-size: 13px; }
+        .schedule-time { background: rgba(0,0,0,0.03); font-weight: bold; text-align: right; padding: 8px 5px; color: var(--card-text); opacity: 0.8; font-size: 11px; display: flex; align-items: flex-start; justify-content: flex-end; }
+        .schedule-cell { background: var(--surface); color: var(--card-text); padding: 6px; font-size: 12px; min-height: 35px; outline: none; transition: background 0.2s; word-wrap: break-word; cursor: text; }
+        .schedule-cell:focus { background: rgba(255,255,255,0.9); box-shadow: inset 0 0 0 2px var(--primary); }
+        /* Calendar Styles */
+        .calendar-container { background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: var(--card-text); }
+        .calendar-header h3 { margin: 0; font-size: 18px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .calendar-day-header { font-weight: bold; text-align: center; font-size: 13px; color: var(--card-text); opacity: 0.8; padding-bottom: 5px; }
+        .calendar-day { background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: 4px; min-height: 100px; padding: 5px; display: flex; flex-direction: column; gap: 4px; }
+        .calendar-day.today { background: rgba(74, 144, 226, 0.05); border-color: var(--primary); }
+        .calendar-date { font-size: 12px; font-weight: bold; color: var(--card-text); margin-bottom: 5px; text-align: right; opacity: 0.7; }
+        .calendar-task { background: var(--primary); color: white; font-size: 11px; padding: 4px 6px; border-radius: 4px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
+        .calendar-task.done { background: var(--success); opacity: 0.7; text-decoration: line-through; }
+        /* Section Dividers */
+        .section-divider { margin: 40px 0 20px 0; border: 0; border-top: 2px solid var(--border); }
+        .event-card { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px; color: var(--card-text); }
+        @media(max-width: 600px) { .event-card { flex-direction: column; align-items: flex-start; gap: 10px; } }
+
+        /* Login Overlay */
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 9999; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+
+        /* Toast notifications */
+        #toastNotification {
+            display: none; position: fixed; bottom: 20px; right: 20px; 
+            background: var(--primary); color: white; padding: 12px 20px; 
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            z-index: 10000; font-weight: bold; transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- WORKSPACE LOGIN SCREEN -->
+    <div id="loginOverlay">
+        <div class="form-card" style="max-width: 400px; text-align: center;">
+            <h2 style="color: var(--card-text);">Universal Cloud Sync</h2>
+            <p style="font-size: 14px; color: var(--card-text); opacity: 0.8; margin-bottom: 20px;">
+                Enter your personal sync passcode to access your board across your phone, tablet, and laptop.
+            </p>
+            <input type="password" id="workspaceInput" placeholder="Create a unique passcode..." style="width: 90%; margin-bottom: 15px;">
+            <button onclick="joinWorkspace()" style="width: 100%; font-size: 16px;">Access Workspace</button>
+            <p id="dbWarning" style="color: var(--danger); font-size: 12px; margin-top: 15px; display: none;">
+                ⚠️ Firebase Configuration Missing. Check the HTML code to paste your free Firebase config keys.
+            </p>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER (Hidden until logged in) -->
+    <div class="container" id="mainApp" style="display: none;">
+        
+        <div id="bannerImage"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 id="pageTitle" contenteditable="true" spellcheck="false" title="Click to edit title">Rob's Globe and ADMU Task and Events Tracker</h2>
+            <button class="btn-alt" onclick="logoutWorkspace()" style="font-size: 12px;">Unlink Device</button>
+        </div>
+
+        <!-- Floating Rich Text Toolbar -->
+        <div id="formatToolbar" class="format-toolbar">
+            <button onmousedown="event.preventDefault(); formatText('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button onmousedown="event.preventDefault(); formatText('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button onmousedown="event.preventDefault(); formatText('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+            <div style="display: flex; align-items: center; gap: 4px; border-left: 1px solid var(--border); padding-left: 4px; margin-left: 2px;">
+                <input type="color" id="highlightColor" value="#ffff00" style="width: 20px; height: 20px; padding: 0; border: none; cursor: pointer; background: transparent;" title="Pick Color">
+                <button onmousedown="event.preventDefault(); applyHighlight()" title="Highlight (Ctrl+Shift+H)">🖌️</button>
+            </div>
+            <button onmousedown="event.preventDefault(); formatText('removeFormat')" title="Clear Format">✕</button>
+
+            <!-- NEW SCHEDULE TOOLS -->
+            <div id="scheduleTools" style="display: none; align-items: center; gap: 4px; border-left: 1px solid var(--border); padding-left: 4px; margin-left: 2px;">
+                <input type="color" id="cellBgColor" value="#ffffff" style="width: 20px; height: 20px; padding: 0; border: none; cursor: pointer; background: transparent;" title="Fill Cell Color" oninput="applyCellColor(this.value)">
+                <button onmousedown="event.preventDefault(); mergeScheduleCells()" title="Merge Down">⬇️</button>
+                <button onmousedown="event.preventDefault(); unmergeScheduleCells()" title="Unmerge">⏏️</button>
+            </div>
+
+            <div style="border-left: 1px solid var(--border); margin-left: 2px; padding-left: 4px;">
+                <button onmousedown="event.preventDefault(); closeToolbar()" style="font-size: 12px; font-weight: bold; color: var(--primary);">Done</button>
+            </div>
+        </div>
+
+        <details class="customize-menu">
+            <summary>🎨 Customize & Data Management</summary>
+            <div class="settings-group">
+                <h4>Global UI Colors</h4>
+                <div class="settings-grid">
+                    <div class="setting-item"><label>App Background</label><input type="color" id="setBgColor"></div>
+                    <div class="setting-item"><label>Surface (Panels & Inputs)</label><input type="color" id="setSurfaceColor"></div>
+                    <div class="setting-item"><label>Outside Text Color</label><input type="color" id="setTextColor"></div>
+                    <div class="setting-item"><label>Card Text Color</label><input type="color" id="setCardTextColor"></div>
+                    <div class="setting-item"><label>Accent & Buttons</label><input type="color" id="setPrimaryColor"></div>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h4>Task Card Colors</h4>
+                <div class="settings-grid">
+                    <div class="setting-item"><label>To Do</label><input type="color" id="setTodoColor"></div>
+                    <div class="setting-item"><label>In Progress</label><input type="color" id="setInprogColor"></div>
+                    <div class="setting-item"><label>Done</label><input type="color" id="setDoneColor"></div>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h4>Banner Image</h4>
+                <div class="setting-item" style="grid-column: 1 / -1;">
+                    <input type="text" id="setBannerUrl" placeholder="Paste an image URL here...">
+                </div>
+            </div>
+            <div class="settings-group">
+                <h4>📊 Productivity Analytics</h4>
+                <div class="settings-grid" style="text-align: center; gap: 10px;">
+                    <div class="setting-item" style="background: rgba(46, 204, 113, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(46, 204, 113, 0.3);">
+                        <label>Total Value Earned</label>
+                        <div id="stat-value" style="font-size: 16px; font-weight: bold; color: var(--success); margin-top: 5px;">₱0.00</div>
+                    </div>
+                    <div class="setting-item" style="background: rgba(74, 144, 226, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(74, 144, 226, 0.3);">
+                        <label>Tasks Finished</label>
+                        <div id="stat-finished" style="font-size: 16px; font-weight: bold; color: var(--primary); margin-top: 5px;">0</div>
+                    </div>
+                    <div class="setting-item" style="background: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(231, 76, 60, 0.3);">
+                        <label>Tasks Overdue</label>
+                        <div id="stat-overdue" style="font-size: 16px; font-weight: bold; color: var(--danger); margin-top: 5px;">0</div>
+                    </div>
+                    <div class="setting-item" style="background: rgba(243, 156, 18, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(243, 156, 18, 0.3);">
+                        <label>7-Day Velocity</label>
+                        <div id="stat-velocity" style="font-size: 16px; font-weight: bold; color: var(--warning); margin-top: 5px;">0 / day</div>
+                    </div>
+                    <div class="setting-item" style="background: rgba(155, 89, 182, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(155, 89, 182, 0.3);">
+                        <label>Total Time Tracked</label>
+                        <div id="stat-time" style="font-size: 16px; font-weight: bold; color: #9b59b6; margin-top: 5px;">0h 0m</div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h4>Data Backup</h4>
+                <div class="data-buttons">
+                    <button class="btn-alt" onclick="exportTasks()">⬇️ Export JSON</button>
+                    <button class="btn-alt" onclick="document.getElementById('importFile').click()">⬆️ Import JSON</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importTasks(event)">
+                </div>
+            </div>
+        </details>
+
+        <!-- View Switcher Tabs -->
+        <div class="view-tabs">
+            <button class="view-tab active" id="tab-all" onclick="setView('all')">Kanban Board</button>
+            <button class="view-tab" id="tab-today" onclick="setView('today')">Today's Focus</button>
+            <button class="view-tab" id="tab-backlog" onclick="setView('backlog')">Backlog</button>
+            <button class="view-tab" id="tab-schedule" onclick="setView('schedule')">📅 Weekly Schedule</button>
+            <button class="view-tab" id="tab-calendar" onclick="setView('calendar')">📆 Calendar</button>
+        </div>
+
+        <!-- Weekly Schedule Container (Hidden by default) -->
+        <div id="schedule-container" class="schedule-container" style="display: none;">
+            <div id="schedule-grid" class="schedule-grid"></div>
+        </div>
+
+        <!-- Monthly Calendar Container (Hidden by default) -->
+        <div id="calendar-container" class="calendar-container" style="display: none;">
+            <div class="calendar-header">
+                <button class="btn-alt" onclick="changeMonth(-1)">◀ Prev</button>
+                <h3 id="calendar-month-year"></h3>
+                <button class="btn-alt" onclick="changeMonth(1)">Next ▶</button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+        </div>
+
+        <div class="control-panel">
+            <input type="text" id="searchInput" placeholder="🔍 Search tasks..." oninput="renderTasks()">
+            <select id="categoryFilter" onchange="renderTasks()">
+                <option value="All">All Categories</option>
+            </select>
+            <select id="assigneeFilter" onchange="renderTasks()">
+                <option value="All">All Assignees</option>
+            </select>
+        </div>
+
+        <!-- Add Task Form -->
+        <div class="form-card">
+            <div class="form-row">
+                <input type="text" id="taskTitle" class="flex-grow" placeholder="What needs to be done?" required>
+                <input type="text" id="taskCategory" placeholder="Category">
+                <select id="taskPriority">
+                    <option value="Low">Low Priority</option>
+                    <option value="Medium" selected>Medium Priority</option>
+                    <option value="High">High Priority</option>
+                </select>
+                <input type="number" id="taskBudget" placeholder="Budget / Profit (₱)" step="0.01">
+            </div>
+            <textarea id="taskDescription" placeholder="Add a description or notes..."></textarea>
+            <div class="form-row">
+                <input type="text" id="taskSubtasks" class="flex-grow" placeholder="Subtasks (comma separated)">
+            </div>
+            <div class="form-row">
+                <input type="url" id="taskPhotoUrl" class="flex-grow" placeholder="Photo URL (e.g., https://imgur.com/...png)">
+                <input type="url" id="taskLinkUrl" class="flex-grow" placeholder="Reference Link (e.g., https://shopify.com/...)">
+            </div>
+            <div class="form-row">
+                <input type="text" id="taskAssignee" placeholder="Assignee">
+                <span class="input-label">Assigned:</span><input type="date" id="taskDateAssigned">
+                <span class="input-label">Due:</span><input type="date" id="taskDueDate"><input type="time" id="taskDueTime">
+                <select id="taskBlockedBy" style="flex-grow: 1; min-width: 150px;">
+                    <option value="">No Dependencies</option>
+                </select>
+                <button onclick="addTask()" style="margin-left: auto;">Add Task</button>
+            </div>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="board">
+            <div class="column" id="col-todo" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event, 'todo')">
+                <h3>To Do <span class="col-total" id="total-todo"></span></h3>
+                <div id="todo-list"></div>
+            </div>
+            <div class="column" id="col-inprogress" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event, 'inprogress')">
+                <h3>In Progress <span class="col-total" id="total-inprogress"></span></h3>
+                <div id="inprogress-list"></div>
+            </div>
+            <div class="column" id="col-done" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event, 'done')">
+                <h3>Done <span class="col-total" id="total-done"></span></h3>
+                <div id="done-list"></div>
+            </div>
+        </div>
+
+        <!-- EVENTS SECTION -->
+        <hr class="section-divider">
+        <h2>Upcoming Events</h2>
+        <div class="form-card">
+            <div class="form-row">
+                <input type="text" id="eventTitle" placeholder="Event Title" required>
+                <input type="date" id="eventDate" required>
+                <input type="time" id="eventTime">
+                <input type="url" id="eventLink" class="flex-grow" placeholder="Link (e.g., Zoom link, Maps location)">
+                <button onclick="addEvent()">Add Event</button>
+            </div>
+        </div>
+        <div id="events-list"></div>
+    </div>
+
+    <!-- Floating Toast Element -->
+    <div id="toastNotification"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration (loaded directly from your app dashboard)
+        const myFirebaseConfig = {
+            apiKey: "AIzaSyAOzHxHzVdHZrioqmVqPMd6wOvdUQL9zS8",
+            authDomain: "soloflow-41bfb.firebaseapp.com",
+            projectId: "soloflow-41bfb",
+            storageBucket: "soloflow-41bfb.firebasestorage.app",
+            messagingSenderId: "642151949374",
+            appId: "1:642151949374:web:ed2f6d8b6fcb2675029d6f",
+            measurementId: "G-4CPG3SZ1XS"
+        };
+
+        let firebaseConfig = myFirebaseConfig;
+        if (typeof __firebase_config !== 'undefined' && Object.keys(myFirebaseConfig).length === 0) {
+            firebaseConfig = JSON.parse(__firebase_config);
+        }
+
+        window.tasks = [];
+        window.events = [];
+        window.currentWorkspace = localStorage.getItem('workspaceKey') || null;
+        
+        let db, auth, user, appId;
+        let unsubscribeTasks = null;
+        let unsubscribeEvents = null;
+        let unsubscribeSchedule = null;
+        let unsubscribeSettings = null;
+
+        window.applySettings();
+
+        if (window.currentWorkspace) {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+        }
+
+        if (Object.keys(firebaseConfig).length > 0) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'vercel-tracker';
+
+                const initAuth = async () => {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                };
+                initAuth();
+
+                onAuthStateChanged(auth, (u) => {
+                    user = u;
+                    if (user && window.currentWorkspace) {
+                        loadCloudData();
+                    }
+                });
+            } catch (e) { console.error("Firebase init failed:", e); }
+        }
+
+        window.joinWorkspace = () => {
+            const key = document.getElementById('workspaceInput').value.trim();
+            if (!key) { window.showToast('Please enter a sync passcode'); return; }
+            
+            if (Object.keys(firebaseConfig).length === 0) {
+                document.getElementById('dbWarning').style.display = 'block';
+                return;
+            }
+
+            window.currentWorkspace = key;
+            localStorage.setItem('workspaceKey', key);
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            if (user) loadCloudData();
+        };
+
+        window.logoutWorkspace = () => {
+            localStorage.removeItem('workspaceKey');
+            location.reload();
+        };
+
+        // --- REALTIME FIRESTORE LISTENER MANAGER ---
+        function loadCloudData() {
+            if (!user || !window.currentWorkspace) return;
+
+            // Load Tasks
+            const tasksRef = collection(db, 'artifacts', appId, 'public', 'data', `tasks_${window.currentWorkspace}`);
+            if (unsubscribeTasks) unsubscribeTasks();
+            unsubscribeTasks = onSnapshot(tasksRef, (snapshot) => {
+                window.tasks = [];
+                snapshot.forEach(d => window.tasks.push(d.data()));
+                window.renderTasks();
+            }, (err) => console.error("Tasks Error:", err));
+
+            // Load Events
+            const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', `events_${window.currentWorkspace}`);
+            if (unsubscribeEvents) unsubscribeEvents();
+            unsubscribeEvents = onSnapshot(eventsRef, (snapshot) => {
+                window.events = [];
+                snapshot.forEach(d => window.events.push(d.data()));
+                window.renderEvents();
+            }, (err) => console.error("Events Error:", err));
+
+            // Load Weekly Schedule
+            const scheduleRef = doc(db, 'artifacts', appId, 'public', 'data', `weeklySchedule_${window.currentWorkspace}`);
+            if (unsubscribeSchedule) unsubscribeSchedule();
+            unsubscribeSchedule = onSnapshot(scheduleRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    window.scheduleData = snapshot.data();
+                    localStorage.setItem('weeklySchedule', JSON.stringify(window.scheduleData));
+                    if (currentView === 'schedule') {
+                        document.getElementById('schedule-grid').innerHTML = ''; // Force redraw
+                        window.renderSchedule();
+                    }
+                }
+            }, (err) => console.error("Schedule Error:", err));
+
+            // Load App Theme Settings
+            const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', `settings_${window.currentWorkspace}`);
+            if (unsubscribeSettings) unsubscribeSettings();
+            unsubscribeSettings = onSnapshot(settingsRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    window.settings = { ...window.defaultSettings, ...snapshot.data() };
+                    localStorage.setItem('trackerSettings', JSON.stringify(window.settings));
+                    window.applySettings();
+                }
+            }, (err) => console.error("Settings Error:", err));
+        }
+
+        // --- CLOUD WRITE FUNCTIONS ---
+        window.saveTaskToCloud = async (task) => {
+            if (!user || !window.currentWorkspace) return;
+            const taskRef = doc(db, 'artifacts', appId, 'public', 'data', `tasks_${window.currentWorkspace}`, task.id);
+            await setDoc(taskRef, task);
+        };
+
+        window.deleteTaskFromCloud = async (taskId) => {
+            if (!user || !window.currentWorkspace) return;
+            const taskRef = doc(db, 'artifacts', appId, 'public', 'data', `tasks_${window.currentWorkspace}`, taskId);
+            await deleteDoc(taskRef);
+        };
+
+        window.saveEventToCloud = async (ev) => {
+            if (!user || !window.currentWorkspace) return;
+            const evRef = doc(db, 'artifacts', appId, 'public', 'data', `events_${window.currentWorkspace}`, ev.id);
+            await setDoc(evRef, ev);
+        };
+
+        window.deleteEventFromCloud = async (evId) => {
+            if (!user || !window.currentWorkspace) return;
+            const evRef = doc(db, 'artifacts', appId, 'public', 'data', `events_${window.currentWorkspace}`, evId);
+            await deleteDoc(evRef);
+        };
+
+        window.saveScheduleToCloud = async (sched) => {
+            if (!user || !window.currentWorkspace) return;
+            const scheduleRef = doc(db, 'artifacts', appId, 'public', 'data', `weeklySchedule_${window.currentWorkspace}`);
+            await setDoc(scheduleRef, sched);
+        };
+
+        window.saveSettingsToCloud = async (set) => {
+            if (!user || !window.currentWorkspace) return;
+            const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', `settings_${window.currentWorkspace}`);
+            await setDoc(settingsRef, set);
+        };
+
+        // --- ATTACHING UI FUNCTIONS TO WINDOW ---
+        window.addTask = async () => {
+            const title = document.getElementById('taskTitle').value.trim();
+            if (!title) return;
+
+            const subtasksRaw = document.getElementById('taskSubtasks').value;
+            let subtasksArr = [];
+            if(subtasksRaw.trim()) {
+                subtasksArr = subtasksRaw.split(',').map(s => ({text: s.trim(), completed: false})).filter(s => s.text);
+            }
+
+            const newTask = {
+                id: Date.now().toString(),
+                title: title,
+                category: document.getElementById('taskCategory').value.trim() || 'General',
+                priority: document.getElementById('taskPriority').value,
+                budget: document.getElementById('taskBudget').value,
+                description: document.getElementById('taskDescription').value.trim(),
+                subtasks: subtasksArr,
+                photoUrl: document.getElementById('taskPhotoUrl').value.trim(),
+                linkUrl: document.getElementById('taskLinkUrl').value.trim(),
+                assignee: document.getElementById('taskAssignee').value.trim(),
+                dateAssigned: document.getElementById('taskDateAssigned').value,
+                dueDate: document.getElementById('taskDueDate').value,
+                dueTime: document.getElementById('taskDueTime').value,
+                blockedBy: document.getElementById('taskBlockedBy').value,
+                status: 'todo'
+            };
+
+            await window.saveTaskToCloud(newTask);
+            
+            ['taskTitle','taskCategory','taskBudget','taskDescription','taskSubtasks','taskPhotoUrl','taskLinkUrl','taskAssignee','taskDateAssigned','taskDueDate','taskDueTime','taskBlockedBy'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+        };
+
+        window.moveTask = async (id, newStatus) => {
+            const task = window.tasks.find(t => t.id === id);
+            if (task) { 
+                task.status = newStatus; 
+                await window.saveTaskToCloud(task); 
+            }
+        };
+
+        window.deleteTask = async (id) => {
+            await window.deleteTaskFromCloud(id);
+        };
+
+        window.syncTaskToCalendar = async (taskId) => {
+            const task = window.tasks.find(t => t.id === taskId);
+            if (!task || !task.dueDate) {
+                window.showToast("This task needs a Due Date to sync to your calendar.");
+                return;
+            }
+            task.syncedToCalendar = !task.syncedToCalendar;
+            await window.saveTaskToCloud(task);
+        };
+
+        window.toggleSubtask = async (taskId, subIdx) => {
+            const task = window.tasks.find(t => t.id === taskId);
+            if(task && task.subtasks[subIdx]) {
+                task.subtasks[subIdx].completed = !task.subtasks[subIdx].completed;
+                await window.saveTaskToCloud(task);
+            }
+        };
+
+        window.addEvent = async () => {
+            const title = document.getElementById('eventTitle').value.trim();
+            const date = document.getElementById('eventDate').value;
+            const time = document.getElementById('eventTime').value;
+            const link = document.getElementById('eventLink').value.trim();
+            
+            if(!title || !date) return;
+            
+            const newEv = { id: Date.now().toString(), title, date, time, link };
+            await window.saveEventToCloud(newEv);
+            
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventDate').value = '';
+            document.getElementById('eventTime').value = '';
+            document.getElementById('eventLink').value = '';
+        };
+
+        window.deleteEvent = async (id) => {
+            await window.deleteEventFromCloud(id);
+        };
+
+        window.updateTaskField = async (taskId, field, element, subtaskIdx = null) => {
+            const task = window.tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const newValue = element.innerHTML.trim();
+            if (subtaskIdx !== null) {
+                 if(newValue === '') task.subtasks.splice(subtaskIdx, 1);
+                 else task.subtasks[subtaskIdx].text = newValue;
+            } else {
+                if (field === 'title' && element.innerText.trim() === '') {
+                    element.innerHTML = task.title;
+                    return;
+                }
+                task[field] = newValue;
+            }
+            await window.saveTaskToCloud(task);
+        };
+
+        window.importTasks = async (event) => {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(Array.isArray(imported)) {
+                        for (const task of imported) {
+                            await window.saveTaskToCloud(task);
+                        }
+                        window.showToast('Tasks imported to cloud successfully!');
+                    } else { window.showToast('Invalid file format.'); }
+                } catch(err) { window.showToast('Failed to parse JSON.'); }
+                event.target.value = ''; 
+            };
+            reader.readAsText(file);
+        };
+    </script>
+
+    <script>
+        // --- CUSTOM TOAST NOTIFICATION ---
+        window.showToast = function(message) {
+            const toast = document.getElementById('toastNotification');
+            toast.innerText = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        };
+
+        // --- SETTINGS LOGIC ---
+        window.defaultSettings = {
+            title: "Rob's Globe and ADMU Task and Events Tracker", bgColor: '#f4f4f9', surfaceColor: '#ffffff',
+            textColor: '#333333', cardTextColor: '#333333', primaryColor: '#4a90e2', todoBg: '#ffeaea',
+            inprogBg: '#fffbe6', doneBg: '#f6ffed', bannerUrl: ''
+        };
+
+        window.settings = { ...window.defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
+
+        window.applySettings = function() {
+            if(!window.settings) return;
+            document.getElementById('pageTitle').innerText = window.settings.title;
+            const root = document.documentElement;
+            root.style.setProperty('--bg', window.settings.bgColor);
+            root.style.setProperty('--surface', window.settings.surfaceColor);
+            root.style.setProperty('--text', window.settings.textColor);
+            root.style.setProperty('--card-text', window.settings.cardTextColor);
+            root.style.setProperty('--primary', window.settings.primaryColor);
+            root.style.setProperty('--todo-bg', window.settings.todoBg);
+            root.style.setProperty('--inprog-bg', window.settings.inprogBg);
+            root.style.setProperty('--done-bg', window.settings.doneBg);
+            
+            const bannerDiv = document.getElementById('bannerImage');
+            if (window.settings.bannerUrl.trim()) {
+                bannerDiv.style.backgroundImage = `url('${window.settings.bannerUrl}')`;
+                bannerDiv.style.display = 'block';
+            } else { bannerDiv.style.display = 'none'; }
+
+            document.getElementById('setBgColor').value = window.settings.bgColor;
+            document.getElementById('setSurfaceColor').value = window.settings.surfaceColor;
+            document.getElementById('setTextColor').value = window.settings.textColor;
+            document.getElementById('setCardTextColor').value = window.settings.cardTextColor;
+            document.getElementById('setPrimaryColor').value = window.settings.primaryColor;
+            document.getElementById('setTodoColor').value = window.settings.todoBg;
+            document.getElementById('setInprogColor').value = window.settings.inprogBg;
+            document.getElementById('setDoneColor').value = window.settings.doneBg;
+            document.getElementById('setBannerUrl').value = window.settings.bannerUrl;
+        }
+
+        function saveSettings() {
+            window.settings = {
+                title: document.getElementById('pageTitle').innerText.trim() || "Rob's Globe and ADMU Task and Events Tracker",
+                bgColor: document.getElementById('setBgColor').value,
+                surfaceColor: document.getElementById('setSurfaceColor').value,
+                textColor: document.getElementById('setTextColor').value,
+                cardTextColor: document.getElementById('setCardTextColor').value,
+                primaryColor: document.getElementById('setPrimaryColor').value,
+                todoBg: document.getElementById('setTodoColor').value,
+                inprogBg: document.getElementById('setInprogColor').value,
+                doneBg: document.getElementById('setDoneColor').value,
+                bannerUrl: document.getElementById('setBannerUrl').value.trim()
+            };
+            localStorage.setItem('trackerSettings', JSON.stringify(window.settings));
+            window.applySettings();
+            if (window.saveSettingsToCloud) {
+                window.saveSettingsToCloud(window.settings);
+            }
+        }
+
+        document.getElementById('pageTitle').addEventListener('blur', saveSettings);
+        ['Bg','Surface','Text','CardText','Primary','Todo','Inprog','Done'].forEach(id => {
+            document.getElementById('set' + id + 'Color').addEventListener('input', saveSettings);
+        });
+        document.getElementById('setBannerUrl').addEventListener('input', saveSettings);
+
+        // --- INLINE EDIT & FORMATTING LOGIC ---
+        function formatText(command, value = null) {
+            document.execCommand(command, false, value);
+        }
+
+        function applyHighlight() {
+            const color = document.getElementById('highlightColor').value;
+            formatText('backColor', color);
+        }
+
+        function closeToolbar() {
+            document.getElementById('formatToolbar').style.display = 'none';
+            if (document.activeElement && document.activeElement.classList.contains('editable')) {
+                document.activeElement.blur();
+            }
+        }
+
+        window.activeScheduleCell = null;
+
+        document.addEventListener('focusin', function(e) {
+            if(e.target.classList && e.target.classList.contains('editable')) {
+                const toolbar = document.getElementById('formatToolbar');
+                const schedTools = document.getElementById('scheduleTools');
+                
+                if(e.target.classList.contains('schedule-cell')) {
+                    window.activeScheduleCell = e.target;
+                    schedTools.style.display = 'flex';
+                } else {
+                    window.activeScheduleCell = null;
+                    schedTools.style.display = 'none';
+                }
+
+                toolbar.style.display = 'flex';
+                const rect = e.target.getBoundingClientRect();
+                toolbar.style.top = (window.scrollY + rect.top - 45) + 'px';
+                toolbar.style.left = (window.scrollX + rect.left) + 'px';
+            }
+        });
+
+        document.addEventListener('focusout', function(e) {
+            if(e.target.classList && e.target.classList.contains('editable')) {
+                setTimeout(() => {
+                    if (!document.activeElement.classList.contains('editable') && !document.activeElement.closest('#formatToolbar')) {
+                        document.getElementById('formatToolbar').style.display = 'none';
+                    }
+                }, 150);
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.target.classList && e.target.classList.contains('editable')) {
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'h') {
+                    e.preventDefault();
+                    applyHighlight();
+                }
+            }
+        });
+
+        function handleDragStart(e, id) {
+            if (e.target.isContentEditable || e.target.type === 'checkbox' || e.target.tagName === 'BUTTON' || e.target.tagName === 'A') {
+                e.preventDefault();
+                return;
+            }
+            e.dataTransfer.setData('text/plain', id);
+        }
+
+        function preventEnter(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.target.blur(); 
+            }
+        }
+
+        // --- DRAG AND DROP LOGIC ---
+        function allowDrop(e) { e.preventDefault(); }
+        function dragEnter(e) { e.currentTarget.classList.add('drag-over'); }
+        function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+        function drop(e, newStatus) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const id = e.dataTransfer.getData('text/plain');
+            if(id && window.moveTask) window.moveTask(id, newStatus);
+        }
+
+        function exportTasks() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.tasks));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "my_tracker_backup.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        // --- STREAMING_CHUNK: Multi-view Calendar and Weekly scheduler logic ---
+        let currentView = 'all';
+
+        window.setView = function(view) {
+            currentView = view;
+            document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`tab-${view}`).classList.add('active');
+            
+            const scheduleContainer = document.getElementById('schedule-container');
+            const calendarContainer = document.getElementById('calendar-container');
+            const kanbanControls = document.querySelector('.control-panel');
+            const kanbanForm = document.querySelector('.form-card');
+            const kanbanBoard = document.querySelector('.board');
+
+            scheduleContainer.style.display = 'none';
+            calendarContainer.style.display = 'none';
+            kanbanControls.style.display = 'none';
+            kanbanForm.style.display = 'none';
+            kanbanBoard.style.display = 'none';
+
+            if (view === 'schedule') {
+                scheduleContainer.style.display = 'block';
+                window.renderSchedule();
+            } else if (view === 'calendar') {
+                calendarContainer.style.display = 'block';
+                window.renderCalendar();
+            } else {
+                kanbanControls.style.display = 'flex';
+                kanbanForm.style.display = 'flex';
+                kanbanBoard.style.display = 'grid';
+                window.renderTasks();
+            }
+        };
+
+        // --- CALENDAR LOGIC ---
+        let currentCalendarDate = new Date();
+
+        window.changeMonth = function(offset) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+            window.renderCalendar();
+        };
+
+        window.renderCalendar = function() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay(); 
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            dayNames.forEach(day => grid.innerHTML += `<div class="calendar-day-header">${day}</div>`);
+
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div class="calendar-day" style="background: transparent; border: none;"></div>`;
+            }
+
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                
+                let dayHtml = `<div class="calendar-day ${isToday ? 'today' : ''}">
+                    <div class="calendar-date">${day}</div>`;
+                
+                window.events.forEach(ev => {
+                    if (ev.date === dateStr) {
+                        dayHtml += `<div class="calendar-task" style="background: var(--warning); color: #000;" title="${ev.title}">${ev.time ? formatTime(ev.time) + ' ' : ''}⭐ ${ev.title}</div>`;
+                    }
+                });
+
+                window.tasks.forEach(task => {
+                    if (task.syncedToCalendar && task.dueDate === dateStr) {
+                        const statusClass = task.status === 'done' ? 'done' : '';
+                        dayHtml += `<div class="calendar-task ${statusClass}" title="${task.title}" onclick="window.setView('all')">${task.dueTime ? formatTime(task.dueTime) + ' ' : ''}📋 ${task.title}</div>`;
+                    }
+                });
+
+                dayHtml += `</div>`;
+                grid.innerHTML += dayHtml;
+            }
+        };
+
+        // --- WEEKLY SCHEDULE LOGIC ---
+        window.scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
+
+        function saveSchedule() {
+            localStorage.setItem('weeklySchedule', JSON.stringify(window.scheduleData));
+            if (window.saveScheduleToCloud) {
+                window.saveScheduleToCloud(window.scheduleData);
+            }
+        }
+
+        window.updateScheduleCell = function(day, time, element) {
+            const key = `${day}-${time}`;
+            let data = window.scheduleData[key];
+            
+            if (typeof data !== 'object' || data === null) {
+                data = { text: '', bg: '', span: 1, hidden: false };
+            }
+
+            data.text = element.innerHTML.trim();
+
+            if (!data.text && !data.bg && data.span === 1 && !data.hidden) {
+                delete window.scheduleData[key];
+            } else {
+                window.scheduleData[key] = data;
+            }
+            saveSchedule();
+        };
+
+        window.renderSchedule = function() {
+            const grid = document.getElementById('schedule-grid');
+            if (grid.children.length > 0) return; 
+
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const times = [];
+            
+            for (let h = 7; h <= 20; h++) {
+                const hour12 = h > 12 ? h - 12 : h;
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                times.push(`${hour12}:00 ${ampm}`);
+                if (h !== 20) times.push(`${hour12}:30 ${ampm}`);
+            }
+
+            let html = `<div class="schedule-header" style="grid-row: 1; grid-column: 1;">Time</div>`;
+            days.forEach((day, dIdx) => {
+                html += `<div class="schedule-header" style="grid-row: 1; grid-column: ${dIdx + 2};">${day}</div>`;
+            });
+
+            times.forEach((time, tIdx) => {
+                const row = tIdx + 2; 
+                html += `<div class="schedule-time" style="grid-row: ${row}; grid-column: 1;">${time}</div>`;
+                
+                days.forEach((day, dIdx) => {
+                    const col = dIdx + 2;
+                    const key = `${day}-${time}`;
+                    let data = window.scheduleData[key];
+                    
+                    if (typeof data === 'string') {
+                        data = { text: data, bg: '', span: 1, hidden: false };
+                        window.scheduleData[key] = data;
+                    }
+                    
+                    const content = data ? data.text : '';
+                    const bg = data && data.bg ? data.bg : '';
+                    const span = data && data.span ? data.span : 1;
+                    const hidden = data && data.hidden ? 'display: none;' : '';
+
+                    html += `<div class="schedule-cell editable" contenteditable="true" spellcheck="false" 
+                        id="cell-${day}-${tIdx}"
+                        data-day="${day}" data-time="${time}" data-tidx="${tIdx}" data-row="${row}" data-col="${col}"
+                        style="grid-row: ${row} / span ${span}; grid-column: ${col}; background-color: ${bg}; ${hidden}"
+                        onblur="window.updateScheduleCell('${day}', '${time}', this)">${content}</div>`;
+                });
+            });
+
+            grid.innerHTML = html;
+        };
+
+        // --- SCHEDULE MERGING & COLOR LOGIC ---
+        window.applyCellColor = function(color) {
+            if (!window.activeScheduleCell) return;
+            const cell = window.activeScheduleCell;
+            cell.style.backgroundColor = color; 
+
+            const day = cell.dataset.day;
+            const time = cell.dataset.time;
+            const key = `${day}-${time}`;
+
+            if(typeof window.scheduleData[key] !== 'object') {
+                window.scheduleData[key] = { text: cell.innerHTML, bg: '', span: 1, hidden: false };
+            }
+            window.scheduleData[key].bg = color;
+            saveSchedule();
+        };
+
+        window.mergeScheduleCells = function() {
+            if (!window.activeScheduleCell) return;
+            const cell = window.activeScheduleCell;
+            const day = cell.dataset.day;
+            const tIdx = parseInt(cell.dataset.tidx);
+            
+            const currentSpan = parseInt(cell.style.gridRowEnd ? cell.style.gridRowEnd.replace('span ', '') : 1) || 1;
+            const nextTidx = tIdx + currentSpan;
+            const nextCell = document.getElementById(`cell-${day}-${nextTidx}`);
+
+            if (!nextCell) {
+                window.showToast("Cannot merge past the end of the schedule.");
+                return; 
+            }
+
+            const newSpan = currentSpan + 1;
+            cell.style.gridRow = `${cell.dataset.row} / span ${newSpan}`;
+            nextCell.style.display = 'none';
+
+            if (nextCell.innerHTML.trim() && nextCell.innerHTML !== '<br>') {
+                cell.innerHTML += '<br>' + nextCell.innerHTML;
+                nextCell.innerHTML = '';
+            }
+
+            const key1 = `${day}-${cell.dataset.time}`;
+            if(typeof window.scheduleData[key1] !== 'object') window.scheduleData[key1] = {text: cell.innerHTML, bg: cell.style.backgroundColor, span: 1, hidden: false};
+            window.scheduleData[key1].span = newSpan;
+            window.scheduleData[key1].text = cell.innerHTML; 
+
+            const key2 = `${day}-${nextCell.dataset.time}`;
+            if(typeof window.scheduleData[key2] !== 'object') window.scheduleData[key2] = {text: '', bg: '', span: 1, hidden: false};
+            window.scheduleData[key2].hidden = true;
+            window.scheduleData[key2].text = '';
+
+            saveSchedule();
+            cell.focus(); 
+        };
+
+        window.unmergeScheduleCells = function() {
+            if (!window.activeScheduleCell) return;
+            const cell = window.activeScheduleCell;
+            const day = cell.dataset.day;
+            const tIdx = parseInt(cell.dataset.tidx);
+            
+            const currentSpan = parseInt(cell.style.gridRowEnd ? cell.style.gridRowEnd.replace('span ', '') : 1) || 1;
+            if (currentSpan <= 1) return; 
+
+            cell.style.gridRow = `${cell.dataset.row} / span 1`;
+            const key1 = `${day}-${cell.dataset.time}`;
+            if(window.scheduleData[key1]) window.scheduleData[key1].span = 1;
+
+            for(let i = 1; i < currentSpan; i++) {
+                const hiddenTidx = tIdx + i;
+                const hiddenCell = document.getElementById(`cell-${day}-${hiddenTidx}`);
+                if (hiddenCell) {
+                    hiddenCell.style.display = ''; 
+                    const hiddenKey = `${day}-${hiddenCell.dataset.time}`;
+                    if(window.scheduleData[hiddenKey]) window.scheduleData[hiddenKey].hidden = false;
+                }
+            }
+
+            saveSchedule();
+            cell.focus();
+        };
+
+        // --- STREAMING_CHUNK: Dynamic task rendering and timer engines ---
+        function updateDropdowns() {
+            const catSelect = document.getElementById('categoryFilter');
+            const assignSelect = document.getElementById('assigneeFilter');
+            const currentCat = catSelect.value;
+            const currentAssign = assignSelect.value;
+
+            const categories = new Set(['All']);
+            const assignees = new Set(['All']);
+            
+            if(window.tasks) {
+                window.tasks.forEach(t => {
+                    if(t.category) categories.add(t.category);
+                    if(t.assignee) assignees.add(t.assignee);
+                });
+            }
+
+            catSelect.innerHTML = Array.from(categories).map(c => `<option value="${c}">${c === 'All' ? 'All Categories' : c}</option>`).join('');
+            assignSelect.innerHTML = Array.from(assignees).map(a => `<option value="${a}">${a === 'All' ? 'All Assignees' : a}</option>`).join('');
+            
+            if(categories.has(currentCat)) catSelect.value = currentCat;
+            if(assignees.has(currentAssign)) assignSelect.value = currentAssign;
+
+            const blockedSelect = document.getElementById('taskBlockedBy');
+            if (blockedSelect) {
+                const currentBlocked = blockedSelect.value;
+                let blockedOptions = '<option value="">No Dependencies</option>';
+                window.tasks.forEach(t => {
+                    if (t.status !== 'done') {
+                        blockedOptions += `<option value="${t.id}">Block with: ${t.title}</option>`;
+                    }
+                });
+                blockedSelect.innerHTML = blockedOptions;
+                blockedSelect.value = currentBlocked;
+            }
+        }
+
+        window.calculateAnalytics = function() {
+            let totalValue = 0;
+            let finishedCount = 0;
+            let overdueCount = 0;
+            let totalSecondsTracked = 0;
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            if(window.tasks) {
+                window.tasks.forEach(task => {
+                    if (task.timeSpent) {
+                        totalSecondsTracked += task.timeSpent;
+                    }
+
+                    if (task.status === 'done') {
+                        finishedCount++;
+                        if (task.budget) totalValue += parseFloat(task.budget);
+                    } 
+                    else if (task.dueDate && task.status !== 'done') {
+                        const due = new Date(task.dueDate);
+                        due.setHours(0,0,0,0);
+                        if (due < today) overdueCount++;
+                    }
+                });
+            }
+
+            const hrs = Math.floor(totalSecondsTracked / 3600);
+            const mins = Math.floor((totalSecondsTracked % 3600) / 60);
+
+            document.getElementById('stat-value').innerText = `₱${totalValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('stat-finished').innerText = finishedCount;
+            document.getElementById('stat-overdue').innerText = overdueCount;
+            document.getElementById('stat-velocity').innerText = `${(finishedCount / 7).toFixed(1)} / day`;
+            document.getElementById('stat-time').innerText = `${hrs}h ${mins}m`;
+        }
+
+        window.renderEvents = function() {
+            const container = document.getElementById('events-list');
+            container.innerHTML = '';
+            
+            if(!window.events) return;
+
+            const sortedEvents = [...window.events].sort((a,b) => new Date(a.date) - new Date(b.date));
+            
+            sortedEvents.forEach(ev => {
+                const eDate = new Date(ev.date);
+                const today = new Date();
+                eDate.setHours(0,0,0,0); today.setHours(0,0,0,0);
+                const diffDays = Math.ceil((eDate - today) / (1000 * 60 * 60 * 24));
+                
+                let timeStr = '';
+                if (diffDays === 0) timeStr = '<span style="color: var(--warning); font-weight: bold;">Today</span>';
+                else if (diffDays === 1) timeStr = 'Tomorrow';
+                else if (diffDays < 0) timeStr = `${Math.abs(diffDays)} days ago`;
+                else timeStr = `In ${diffDays} days`;
+                
+                const displayTime = ev.time ? ` at ${formatTime(ev.time)}` : '';
+                const linkHtml = ev.link ? `<a href="${ev.link}" target="_blank" class="task-link" style="margin: 0;">🔗 Open Link</a>` : '';
+                
+                container.innerHTML += `
+                    <div class="event-card">
+                        <div>
+                            <div style="font-weight: bold; font-size: 16px; color: var(--card-text);">${ev.title}</div>
+                            <div style="font-size: 13px; color: var(--card-text); opacity: 0.8; margin-top: 3px;">📅 ${ev.date}${displayTime} &nbsp;|&nbsp; ${timeStr}</div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+                            ${linkHtml}
+                            <button class="btn-small btn-danger" onclick="deleteEvent('${ev.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.renderTasks = function() {
+            updateDropdowns();
+
+            document.getElementById('todo-list').innerHTML = '';
+            document.getElementById('inprogress-list').innerHTML = '';
+            document.getElementById('done-list').innerHTML = '';
+
+            if(!window.tasks) return;
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterCat = document.getElementById('categoryFilter').value;
+            const filterAssign = document.getElementById('assigneeFilter').value;
+
+            let totals = { todo: 0, inprogress: 0, done: 0 };
+
+            const filteredTasks = window.tasks.filter(task => {
+                const matchSearch = task.title.toLowerCase().includes(searchTerm) || (task.description && task.description.toLowerCase().includes(searchTerm));
+                const matchCat = filterCat === 'All' || task.category === filterCat;
+                const matchAssign = filterAssign === 'All' || task.assignee === filterAssign;
+                
+                let matchView = true;
+                if (currentView === 'today') {
+                    const localToday = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                    matchView = (task.dueDate === localToday || task.priority === 'High') && task.status !== 'done';
+                } 
+                else if (currentView === 'backlog') {
+                    matchView = !task.dueDate && task.status !== 'done';
+                }
+
+                return matchSearch && matchCat && matchAssign && matchView;
+            });
+
+            filteredTasks.forEach(task => {
+                if(task.budget) totals[task.status] += parseFloat(task.budget);
+
+                const card = document.createElement('div');
+                card.className = `task-card card-${task.status}`;
+                
+                let isBlocked = false;
+                let blockedBadgeHtml = '';
+                if (task.blockedBy) {
+                    const blockingTask = window.tasks.find(t => t.id === task.blockedBy);
+                    if (blockingTask && blockingTask.status !== 'done') {
+                        isBlocked = true;
+                        blockedBadgeHtml = `<div style="background: rgba(231, 76, 60, 0.1); color: var(--danger); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px dashed var(--danger);">🔒 Blocked by: ${blockingTask.title}</div>`;
+                    }
+                }
+
+                card.draggable = !isBlocked;
+                if (isBlocked) card.style.opacity = '0.65';
+                card.ondragstart = (e) => handleDragStart(e, task.id);
+                
+                let actionBtns = '';
+                if (isBlocked) {
+                    actionBtns = `<span style="font-size: 12px; color: var(--danger); font-weight: bold; padding: 5px 0;">🔒 Locked</span>`;
+                } else {
+                    if (task.status === 'todo') {
+                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">Start →</button>`;
+                    } else if (task.status === 'inprogress') {
+                        actionBtns = `
+                            <button class="btn-small" onclick="moveTask('${task.id}', 'todo')">← Back</button>
+                            <button class="btn-small" onclick="moveTask('${task.id}', 'done')">Complete →</button>
+                        `;
+                    } else {
+                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">← Reopen</button>`;
+                    }
+                }
+
+                const photoHtml = task.photoUrl ? `<img src="${task.photoUrl}" class="task-photo" alt="Attached photo" onerror="this.style.display='none'">` : '';
+                const linkHtml = task.linkUrl ? `<a href="${task.linkUrl}" target="_blank" class="task-link">🔗 View Reference Link</a>` : '';
+                const budgetHtml = task.budget ? `<div class="task-metric">₱${parseFloat(task.budget).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>` : '';
+                
+                const descText = task.description || '';
+                const descHtml = `<div class="task-desc editable" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${descText}</div>`;
+                
+                let subtasksHtml = '';
+                if(task.subtasks && task.subtasks.length > 0) {
+                    subtasksHtml = '<div class="subtasks-list">';
+                    task.subtasks.forEach((st, idx) => {
+                        const checked = st.completed ? 'checked' : '';
+                        const strikeClass = st.completed ? 'completed' : '';
+                        subtasksHtml += `
+                            <div class="subtask-item ${strikeClass}">
+                                <input type="checkbox" ${checked} onchange="toggleSubtask('${task.id}', ${idx})">
+                                <div class="subtask-text-container editable" contenteditable="true" spellcheck="false" 
+                                    onkeydown="preventEnter(event)" 
+                                    onblur="updateTaskField('${task.id}', 'subtasks', this, ${idx})">${st.text}</div>
+                            </div>
+                        `;
+                    });
+                    subtasksHtml += '</div>';
+                }
+
+                let dueBadgeHtml = '';
+                if (task.dueDate && task.status !== 'done') {
+                    const due = new Date(task.dueDate);
+                    const today = new Date();
+                    due.setHours(0,0,0,0); today.setHours(0,0,0,0); 
+                    
+                    const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays < 0) {
+                        dueBadgeHtml = `<p style="color: var(--danger); font-weight: bold;">⚠️ Overdue by ${Math.abs(diffDays)} days</p>`;
+                    } else if (diffDays === 0) {
+                        dueBadgeHtml = `<p style="color: var(--warning); font-weight: bold;">⏰ Due Today</p>`;
+                    } else {
+                        dueBadgeHtml = `<p style="color: var(--card-text); opacity: 0.8;">⏳ ${diffDays} days left</p>`;
+                    }
+                }
+
+                let metaHtml = '';
+                if (task.assignee || task.dateAssigned || task.dueDate || dueBadgeHtml) {
+                    metaHtml += `<div class="task-meta">`;
+                    if (task.assignee) metaHtml += `<p><strong>Assigned to:</strong> ${task.assignee}</p>`;
+                    if (task.dateAssigned) metaHtml += `<p><strong>Assigned:</strong> ${task.dateAssigned}</p>`;
+                    if (task.dueDate) {
+                        const displayTime = task.dueTime ? ` at ${formatTime(task.dueTime)}` : '';
+                        metaHtml += `<p><strong>Due:</strong> ${task.dueDate}${displayTime}</p>`;
+                        if(dueBadgeHtml) metaHtml += dueBadgeHtml;
+                    }
+                    metaHtml += `</div>`;
+                }
+
+                // Pomodoro layout details
+                const totalSeconds = task.timeSpent || 0;
+                const hrs = Math.floor(totalSeconds / 3600);
+                const mins = Math.floor((totalSeconds % 3600) / 60);
+                const secs = totalSeconds % 60;
+                const timeString = `${hrs > 0 ? hrs + 'h ' : ''}${mins}m ${secs}s`;
+                
+                const isTimerActive = (window.activeTaskId === task.id);
+                const timerBtnClass = isTimerActive ? 'btn-timer active' : 'btn-timer';
+                const timerBtnText = isTimerActive ? '⏹ Stop' : '▶ Pomodoro';
+
+                let timerHtml = '';
+                if (!isBlocked) {
+                    timerHtml = `
+                        <div class="timer-container">
+                            <button class="${timerBtnClass}" onclick="toggleTimer('${task.id}')" id="btn-timer-${task.id}">${timerBtnText}</button>
+                            <span class="timer-display" id="display-timer-${task.id}">⏱ ${timeString}</span>
+                        </div>
+                    `;
+                }
+
+                const syncText = task.syncedToCalendar ? "🗓️ Synced" : "📅 Sync";
+                const syncColor = task.syncedToCalendar ? "var(--success)" : "var(--primary)";
+
+                card.innerHTML = `
+                    ${photoHtml}
+                    <div class="task-title editable" contenteditable="true" spellcheck="false" 
+                        onkeydown="preventEnter(event)" 
+                        onblur="updateTaskField('${task.id}', 'title', this)">${task.title}</div>
+                    ${linkHtml}
+                    ${blockedBadgeHtml}
+                    ${budgetHtml}
+                    ${descHtml}
+                    ${subtasksHtml}
+                    ${metaHtml}
+                    ${timerHtml}
+                    <div class="badges">
+                        <span class="badge ${task.priority.toLowerCase()}">${task.priority}</span>
+                        <span class="badge">${task.category}</span>
+                    </div>
+                    <div class="actions">
+                        <div style="display: flex; gap: 5px;">
+                            ${actionBtns}
+                            ${task.dueDate ? `<button class="btn-small" style="color: ${syncColor}; border-color: ${syncColor}; font-weight: bold;" onclick="syncTaskToCalendar('${task.id}')">${syncText}</button>` : ''}
+                        </div>
+                        <button class="btn-small btn-danger" onclick="deleteTask('${task.id}')">Delete</button>
+                    </div>
+                `;
+
+                const descEl = card.querySelector('.task-desc');
+                if (!task.description) {
+                    descEl.style.opacity = '0.5';
+                    descEl.style.fontStyle = 'italic';
+                    descEl.innerText = "Add description...";
+                    descEl.addEventListener('focus', function() {
+                        if (this.innerText === "Add description...") {
+                            this.innerText = '';
+                            this.style.opacity = '1';
+                            this.style.fontStyle = 'normal';
+                        }
+                    });
+                    descEl.addEventListener('blur', function() {
+                         if (this.innerText.trim() === '') {
+                            this.style.opacity = '0.5';
+                            this.style.fontStyle = 'italic';
+                            this.innerText = "Add description...";
+                         }
+                    });
+                }
+
+                document.getElementById(`${task.status}-list`).appendChild(card);
+            });
+
+            document.getElementById('total-todo').innerText = totals.todo > 0 ? `(₱${totals.todo.toLocaleString()})` : '';
+            document.getElementById('total-inprogress').innerText = totals.inprogress > 0 ? `(₱${totals.inprogress.toLocaleString()})` : '';
+            document.getElementById('total-done').innerText = totals.done > 0 ? `(₱${totals.done.toLocaleString()})` : '';
+            
+            window.calculateAnalytics();
+        }
+
+        // --- POMODORO CLOCK ENGINE ---
+        window.activeTaskId = null;
+        window.timerInterval = null;
+
+        window.toggleTimer = function(taskId) {
+            if (window.activeTaskId) {
+                clearInterval(window.timerInterval);
+                const oldTaskId = window.activeTaskId;
+                window.activeTaskId = null;
+                
+                const oldBtn = document.getElementById(`btn-timer-${oldTaskId}`);
+                if (oldBtn) {
+                    oldBtn.className = 'btn-timer';
+                    oldBtn.innerText = '▶ Pomodoro';
+                }
+                const oldTask = window.tasks.find(t => t.id === oldTaskId);
+                if (oldTask && window.saveTaskToCloud) {
+                    window.saveTaskToCloud(oldTask);
+                }
+                
+                if (oldTaskId === taskId) return;
+            }
+
+            window.activeTaskId = taskId;
+            const task = window.tasks.find(t => t.id === taskId);
+            if (!task.timeSpent) task.timeSpent = 0;
+
+            const newBtn = document.getElementById(`btn-timer-${taskId}`);
+            if (newBtn) {
+                newBtn.className = 'btn-timer active';
+                newBtn.innerText = '⏹ Stop';
+            }
+
+            window.timerInterval = setInterval(() => {
+                task.timeSpent += 1;
+                
+                const display = document.getElementById(`display-timer-${taskId}`);
+                if (display) {
+                    const hrs = Math.floor(task.timeSpent / 3600);
+                    const mins = Math.floor((task.timeSpent % 3600) / 60);
+                    const secs = task.timeSpent % 60;
+                    display.innerText = `⏱ ${hrs > 0 ? hrs + 'h ' : ''}${mins}m${secs}s`;
+                }
+                
+                if (task.timeSpent % 5 === 0 && window.saveTaskToCloud) {
+                    window.saveTaskToCloud(task);
+                }
+            }, 1000);
+        }
+
+        // Startup triggers
+        window.renderTasks();
+        window.renderEvents();
+     </script>
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAOzHxHzVdHZrioqmVqPmD6wOvdUQL9zS8",
+    authDomain: "soloflow-41bfb.firebaseapp.com",
+    projectId: "soloflow-41bfb",
+    storageBucket: "soloflow-41bfb.firebasestorage.app",
+    messagingSenderId: "642151949374",
+    appId: "1:642151949374:web:ed2f6d8b6fcb2675029d6f",
+    measurementId: "G-4CPG3SZ1XS"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+    </script>
+</body>
+</html>
