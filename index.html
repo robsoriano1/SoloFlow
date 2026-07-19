@@ -206,7 +206,6 @@
             margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; color: var(--card-text);
         }
 
-        /* Custom Notification Toast */
         #notification-toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: var(--primary); color: white; padding: 12px 24px; border-radius: 8px;
@@ -222,7 +221,7 @@
         
         <div id="auth-banner">
             <span id="auth-status">Verifying sync availability...</span>
-            <button id="auth-btn" style="padding: 6px 12px; margin: 0; background: var(--success); cursor: default;" disabled>Securing Sync...</button>
+            <button id="auth-btn" style="padding: 6px 12px; margin: 0; display: none;">Sign In with Google</button>
         </div>
         
         <div id="bannerImage"></div>
@@ -414,34 +413,21 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Global Immersive App Identifiers
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        
-        let app = null;
-        let auth = null;
-        let db = null;
-        let currentUser = null;
-        let firebaseEnabled = false;
-
-        // SAFELY verify if valid config exists so the app doesn't crash on boot
-        try {
-            const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-            if (configStr) {
-                const firebaseConfig = JSON.parse(configStr);
-                if (firebaseConfig.apiKey) {
-                    app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
-                    firebaseEnabled = true;
-                }
-            }
-        } catch (e) {
-            console.warn("Could not parse Firebase config. Falling back to local offline mode.");
-        }
+        // Your Hardcoded Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOzHxHzVdHZrioqmVqPmD6wOvdUQL9zS8",
+            authDomain: "soloflow-41bfb.firebaseapp.com",
+            databaseURL: "https://soloflow-41bfb-default-rtdb.firebaseio.com", 
+            projectId: "soloflow-41bfb",
+            storageBucket: "soloflow-41bfb.firebasestorage.app",
+            messagingSenderId: "642151949374",
+            appId: "1:642151949374:web:ed2f6d8b6fcb2675029d6f",
+            measurementId: "G-4CPG3SZ1XS"
+        };
 
         const defaultSettings = {
             title: "Rob's Globe and ADMU Task and Events Tracker", bgColor: '#f4f4f9', surfaceColor: '#ffffff',
@@ -449,12 +435,16 @@
             inprogBg: '#fffbe6', doneBg: '#f6ffed', bannerUrl: ''
         };
 
+        let app, auth, db, provider;
+        let currentUser = null;
+        let isFirebaseActive = false;
+
         let settings = { ...defaultSettings };
         let tasks = [];
         let events = [];
         let scheduleData = {};
-        
-        // Custom UI Notification
+
+        // Custom Notification 
         window.showNotification = function(msg) {
             const toast = document.getElementById('notification-toast');
             toast.innerText = msg;
@@ -466,17 +456,72 @@
             }, 3000);
         };
 
-        // Local Storage Helpers
-        const getLocal = (key, def) => { try { return JSON.parse(localStorage.getItem(key)) || def; } catch(e) { return def; } };
-        const setLocal = (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) { } };
+        const authBtn = document.getElementById('auth-btn');
+        const authStatus = document.getElementById('auth-status');
 
-        // Local Fallback Loader
-        function loadFromLocal() {
-            settings = getLocal('trackerSettings', defaultSettings);
-            tasks = getLocal('trackerTasks', []);
-            events = getLocal('trackerEvents', []);
-            scheduleData = getLocal('trackerSchedule', {});
+        // Safe Initialization Block
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getDatabase(app);
+            provider = new GoogleAuthProvider();
+            isFirebaseActive = true;
+        } catch (error) {
+            console.error("Firebase init failed:", error);
+            fallbackToLocal("⚠️ Offline Local Mode (Firebase init failed)");
+        }
+
+        if (isFirebaseActive) {
+            authBtn.addEventListener('click', () => {
+                if (currentUser) {
+                    signOut(auth).then(() => { window.location.reload(); });
+                } else {
+                    signInWithPopup(auth, provider).catch(err => {
+                        console.error("Auth Error", err);
+                        window.showNotification("Sign-In popup blocked or failed.");
+                    });
+                }
+            });
+
+            onAuthStateChanged(auth, (user) => {
+                authBtn.style.display = 'inline-block';
+                if (user) {
+                    currentUser = user;
+                    authStatus.innerHTML = `🟢 Synced via: <strong>${user.displayName || 'Google Account'}</strong>`;
+                    authBtn.innerText = "Sign Out";
+
+                    // Sync Data Listeners (Realtime DB)
+                    const userRef = ref(db, 'users/' + user.uid);
+                    onValue(userRef, (snapshot) => {
+                        const data = snapshot.val() || {};
+                        tasks = data.tasks || [];
+                        events = data.events || [];
+                        scheduleData = data.weeklySchedule || {};
+                        settings = { ...defaultSettings, ...(data.settings || {}) };
+
+                        applySettings();
+                        renderTasks();
+                        renderEvents();
+                        if (currentView === 'schedule') renderSchedule();
+                        if (currentView === 'calendar') renderCalendar();
+                    });
+                } else {
+                    currentUser = null;
+                    authBtn.innerText = "Sign In with Google";
+                    fallbackToLocal("⚠️ Local Mode (Sign in to sync across devices)");
+                }
+            });
+        }
+
+        function fallbackToLocal(message) {
+            authStatus.innerHTML = message;
+            authBtn.style.display = 'inline-block';
             
+            settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
+            tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
+            scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
+
             applySettings();
             renderTasks();
             renderEvents();
@@ -484,140 +529,33 @@
             if (currentView === 'calendar') renderCalendar();
         }
 
-        // --- AUTHENTICATION INIT ---
-        async function initializePlatformAuth() {
-            const authBtn = document.getElementById('auth-btn');
-            const statusEl = document.getElementById('auth-status');
-
-            if (!firebaseEnabled) {
-                statusEl.innerHTML = `⚠️ Running in Offline Local Mode`;
-                authBtn.innerText = "No Cloud Available";
-                authBtn.style.background = "var(--border)";
-                authBtn.style.color = "var(--text)";
-                loadFromLocal();
-                return;
-            }
-
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                currentUser = auth.currentUser;
-                
-                statusEl.innerHTML = `🟢 Live Sync Active`;
-                authBtn.innerText = "Securely Synced";
-                authBtn.style.background = "var(--success)";
-
-                startRealtimeSync();
-            } catch (err) {
-                console.error("Authentication Error", err);
-                statusEl.innerHTML = `🔴 Sync Failed`;
-                authBtn.innerText = "Offline";
-                authBtn.style.background = "var(--danger)";
-                window.showNotification("Unable to connect to sync server. Using Local Storage.");
-                
-                firebaseEnabled = false; // Disable cloud saves
-                loadFromLocal();
-            }
-        }
-
-        // Helper path generator
-        const getColPath = (colName) => `artifacts/${appId}/users/${currentUser.uid}/${colName}`;
-
-        // --- REALTIME FIRESTORE SYNC LOGIC ---
-        function startRealtimeSync() {
-            if (!currentUser || !firebaseEnabled) return;
-
-            onSnapshot(doc(db, getColPath('settings'), 'global'), (docSnap) => {
-                if (docSnap.exists()) {
-                    settings = { ...defaultSettings, ...docSnap.data() };
-                }
-                applySettings();
-            }, (err) => console.error(err));
-
-            onSnapshot(collection(db, getColPath('tasks')), (snapshot) => {
-                tasks = snapshot.docs.map(d => d.data());
-                renderTasks();
-            }, (err) => console.error(err));
-
-            onSnapshot(collection(db, getColPath('events')), (snapshot) => {
-                events = snapshot.docs.map(d => d.data());
-                renderEvents();
-            }, (err) => console.error(err));
-
-            onSnapshot(doc(db, getColPath('schedule'), 'weekly'), (docSnap) => {
-                if (docSnap.exists()) {
-                    scheduleData = docSnap.data();
-                } else {
-                    scheduleData = {};
-                }
-                if (currentView === 'schedule') renderSchedule();
-            }, (err) => console.error(err));
-        }
-
-        // --- STREAMING_CHUNK:Safe Database Writes ---
-        async function saveSettingsToDB() {
-            if (firebaseEnabled && currentUser) {
-                try { await setDoc(doc(db, getColPath('settings'), 'global'), settings); } catch(e){ console.error(e); }
+        function syncDataNode(nodeKey, localBackupKey, dataPayload) {
+            if (currentUser && isFirebaseActive) {
+                set(ref(db, `users/${currentUser.uid}/${nodeKey}`), dataPayload).catch(e => console.error(e));
             } else {
-                setLocal('trackerSettings', settings);
+                localStorage.setItem(localBackupKey, JSON.stringify(dataPayload));
             }
         }
 
-        async function saveTaskToDB(taskObj) {
-            if (firebaseEnabled && currentUser) {
-                try { await setDoc(doc(db, getColPath('tasks'), taskObj.id), taskObj); } catch(e){ console.error(e); }
-            } else {
-                const idx = tasks.findIndex(t => t.id === taskObj.id);
-                if(idx > -1) tasks[idx] = taskObj; else tasks.push(taskObj);
-                setLocal('trackerTasks', tasks);
-                renderTasks(); // Trigger UI rebuild for local
-            }
+        function saveTasks() {
+            syncDataNode('tasks', 'tasks', tasks);
+            if (!currentUser) { renderTasks(); calculateAnalytics(); }
         }
 
-        async function deleteTaskFromDB(id) {
-            if (firebaseEnabled && currentUser) {
-                try { await deleteDoc(doc(db, getColPath('tasks'), id)); } catch(e){ console.error(e); }
-            } else {
-                tasks = tasks.filter(t => t.id !== id);
-                setLocal('trackerTasks', tasks);
-                renderTasks();
-            }
+        function saveEvents() {
+            syncDataNode('events', 'trackerEvents', events);
+            if (!currentUser) { renderEvents(); }
         }
 
-        async function saveEventToDB(eventObj) {
-            if (firebaseEnabled && currentUser) {
-                try { await setDoc(doc(db, getColPath('events'), eventObj.id), eventObj); } catch(e){ console.error(e); }
-            } else {
-                const idx = events.findIndex(e => e.id === eventObj.id);
-                if(idx > -1) events[idx] = eventObj; else events.push(eventObj);
-                setLocal('trackerEvents', events);
-                renderEvents();
-            }
+        function saveScheduleToDB() {
+            syncDataNode('weeklySchedule', 'weeklySchedule', scheduleData);
         }
 
-        async function deleteEventFromDB(id) {
-            if (firebaseEnabled && currentUser) {
-                try { await deleteDoc(doc(db, getColPath('events'), id)); } catch(e){ console.error(e); }
-            } else {
-                events = events.filter(e => e.id !== id);
-                setLocal('trackerEvents', events);
-                renderEvents();
-            }
-        }
-
-        async function saveScheduleToDB() {
-            if (firebaseEnabled && currentUser) {
-                try { await setDoc(doc(db, getColPath('schedule'), 'weekly'), scheduleData); } catch(e){ console.error(e); }
-            } else {
-                setLocal('trackerSchedule', scheduleData);
-            }
+        function saveSettingsToDB() {
+            syncDataNode('settings', 'trackerSettings', settings);
         }
 
 
-        // --- STREAMING_CHUNK:App Utilities & Time Format ---
         function formatTime(time24) {
             if (!time24) return '';
             const [hours, minutes] = time24.split(':');
@@ -657,7 +595,7 @@
             document.getElementById('setBannerUrl').value = settings.bannerUrl;
         }
 
-        function saveSettings() {
+        window.saveSettings = function() {
             settings = {
                 title: document.getElementById('pageTitle').innerText.trim() || defaultSettings.title,
                 bgColor: document.getElementById('setBgColor').value,
@@ -671,15 +609,15 @@
                 bannerUrl: document.getElementById('setBannerUrl').value.trim()
             };
             saveSettingsToDB();
-        }
+            if (!currentUser) applySettings();
+        };
 
-        document.getElementById('pageTitle').addEventListener('blur', saveSettings);
+        document.getElementById('pageTitle').addEventListener('blur', window.saveSettings);
         ['Bg','Surface','Text','CardText','Primary','Todo','Inprog','Done'].forEach(id => {
-            document.getElementById('set' + id + 'Color').addEventListener('input', saveSettings);
+            document.getElementById('set' + id + 'Color').addEventListener('input', window.saveSettings);
         });
-        document.getElementById('setBannerUrl').addEventListener('input', saveSettings);
+        document.getElementById('setBannerUrl').addEventListener('input', window.saveSettings);
 
-        // --- STREAMING_CHUNK:Tasks Manipulation Logic ---
         window.addTask = function() {
             const title = document.getElementById('taskTitle').value.trim();
             if (!title) return;
@@ -709,7 +647,8 @@
                 timeSpent: 0
             };
             
-            saveTaskToDB(newTask);
+            tasks.push(newTask);
+            saveTasks();
             
             ['taskTitle','taskCategory','taskBudget','taskDescription','taskSubtasks','taskPhotoUrl','taskLinkUrl','taskAssignee','taskDateAssigned','taskDueDate','taskDueTime','taskBlockedBy'].forEach(id => {
                 document.getElementById(id).value = '';
@@ -718,18 +657,19 @@
 
         window.moveTask = function(id, newStatus) {
             const task = tasks.find(t => t.id === id);
-            if (task) { task.status = newStatus; saveTaskToDB(task); }
+            if (task) { task.status = newStatus; saveTasks(); }
         };
 
         window.deleteTask = function(id) {
-            deleteTaskFromDB(id);
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
         };
 
         window.toggleSubtask = function(taskId, subIdx) {
             const task = tasks.find(t => t.id === taskId);
             if(task && task.subtasks[subIdx]) {
                 task.subtasks[subIdx].completed = !task.subtasks[subIdx].completed;
-                saveTaskToDB(task);
+                saveTasks();
             }
         };
 
@@ -748,7 +688,7 @@
                 }
                 task[field] = newValue;
             }
-            saveTaskToDB(task);
+            saveTasks();
         }
 
         function preventEnter(e) {
@@ -758,7 +698,6 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Events Logic ---
         window.addEvent = function() {
             const title = document.getElementById('eventTitle').value.trim();
             const date = document.getElementById('eventDate').value;
@@ -767,8 +706,8 @@
             
             if(!title || !date) return;
             
-            const ev = { id: Date.now().toString(), title, date, time, link };
-            saveEventToDB(ev);
+            events.push({ id: Date.now().toString(), title, date, time, link });
+            saveEvents();
             
             document.getElementById('eventTitle').value = '';
             document.getElementById('eventDate').value = '';
@@ -777,7 +716,8 @@
         };
 
         window.deleteEvent = function(id) {
-            deleteEventFromDB(id);
+            events = events.filter(e => e.id !== id);
+            saveEvents();
         };
 
         function renderEvents() {
@@ -816,7 +756,6 @@
             });
         }
 
-        // --- INLINE EDIT & FORMATTING LOGIC ---
         window.formatText = function(command, value = null) {
             document.execCommand(command, false, value);
         };
@@ -882,7 +821,6 @@
             e.dataTransfer.setData('text/plain', id);
         };
 
-        // --- STREAMING_CHUNK:Drag and Drop ---
         window.allowDrop = function(e) { e.preventDefault(); };
         window.dragEnter = function(e) { e.currentTarget.classList.add('drag-over'); };
         window.dragLeave = function(e) { e.currentTarget.classList.remove('drag-over'); };
@@ -893,7 +831,6 @@
             if(id) window.moveTask(id, newStatus);
         };
 
-        // --- EXPORT / IMPORT LOGIC ---
         window.exportTasks = function() {
             const payload = {
                 settings: settings,
@@ -914,19 +851,17 @@
             const file = event.target.files[0];
             if(!file) return;
             const reader = new FileReader();
-            reader.onload = async function(e) {
+            reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
                     if(imported && imported.tasks && Array.isArray(imported.tasks)) {
-                        // Import all aspects to DB
-                        if(imported.settings) { settings = imported.settings; await saveSettingsToDB(); }
-                        if(imported.scheduleData) { scheduleData = imported.scheduleData; await saveScheduleToDB(); }
-                        for(let t of imported.tasks) await saveTaskToDB(t);
-                        if(imported.events) { for(let ev of imported.events) await saveEventToDB(ev); }
+                        if(imported.settings) { settings = imported.settings; saveSettingsToDB(); }
+                        if(imported.scheduleData) { scheduleData = imported.scheduleData; saveScheduleToDB(); }
+                        tasks = imported.tasks; saveTasks();
+                        if(imported.events) { events = imported.events; saveEvents(); }
                         window.showNotification('Backup data imported successfully!');
                     } else if (Array.isArray(imported)) {
-                        // Backwards compatible old task import
-                        for(let t of imported) await saveTaskToDB(t);
+                        tasks = imported; saveTasks();
                         window.showNotification('Legacy tasks imported successfully!');
                     } else { 
                         window.showNotification('Invalid file format.'); 
@@ -937,7 +872,6 @@
             reader.readAsText(file);
         };
 
-        // --- STREAMING_CHUNK:Views & Render Logic ---
         let currentView = 'all';
 
         window.setView = function(view) {
@@ -975,7 +909,7 @@
             const task = tasks.find(t => t.id === taskId);
             if (!task) return;
             task.syncedToCalendar = !task.syncedToCalendar; 
-            saveTaskToDB(task);
+            saveTasks();
         };
 
         let currentCalendarDate = new Date();
@@ -1031,7 +965,6 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Render Kanban & Analytics ---
         function updateDropdowns() {
             const catSelect = document.getElementById('categoryFilter');
             const assignSelect = document.getElementById('assigneeFilter');
@@ -1324,7 +1257,6 @@
             calculateAnalytics();
         }
 
-        // --- STREAMING_CHUNK:Pomodoro Logic ---
         window.activeTaskId = null;
         window.timerInterval = null;
 
@@ -1340,8 +1272,7 @@
                     oldBtn.innerText = '▶ Pomodoro';
                 }
                 
-                const task = tasks.find(t => t.id === oldTaskId);
-                if(task) saveTaskToDB(task); // Final save on pause
+                saveTasks(); // Final save on pause
                 
                 if (oldTaskId === taskId) return;
             }
@@ -1368,12 +1299,11 @@
                 }
                 
                 if (task.timeSpent % 10 === 0) { // save to db every 10 secs
-                    saveTaskToDB(task);
+                    saveTasks();
                 }
             }, 1000);
         };
 
-        // --- STREAMING_CHUNK:Schedule Logic ---
         function updateScheduleCell(day, time, element) {
             const key = `${day}-${time}`;
             let data = scheduleData[key];
@@ -1529,9 +1459,6 @@
             saveScheduleToDB();
             cell.focus();
         };
-
-        // --- STREAMING_CHUNK:App Execution Bootstrapper ---
-        initializePlatformAuth();
 
     </script>
 </body>
