@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rob's Globe and ADMU Task and Events Tracker</title>
@@ -174,12 +176,14 @@
             padding: 4px 8px; font-size: 14px; cursor: pointer; border-radius: 4px; font-weight: normal;
         }
         .format-toolbar button:hover { background: rgba(0,0,0,0.05); border-color: var(--border); }
+        
         /* Timer & Pomodoro Styles */
         .timer-container { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: rgba(0,0,0,0.03); padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); }
         .timer-display { font-family: monospace; font-size: 14px; font-weight: bold; color: var(--card-text); }
         .btn-timer { background: var(--primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
         .btn-timer.active { background: var(--danger); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        
         /* Schedule Styles */
         .schedule-container { background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 20px; }
         .schedule-grid { display: grid; grid-template-columns: 80px repeat(7, minmax(120px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
@@ -187,6 +191,7 @@
         .schedule-time { background: rgba(0,0,0,0.03); font-weight: bold; text-align: right; padding: 8px 5px; color: var(--card-text); opacity: 0.8; font-size: 11px; display: flex; align-items: flex-start; justify-content: flex-end; }
         .schedule-cell { background: var(--surface); color: var(--card-text); padding: 6px; font-size: 12px; min-height: 35px; outline: none; transition: background 0.2s; word-wrap: break-word; cursor: text; }
         .schedule-cell:focus { background: rgba(255,255,255,0.9); box-shadow: inset 0 0 0 2px var(--primary); }
+        
         /* Calendar Styles */
         .calendar-container { background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: var(--card-text); }
@@ -198,6 +203,7 @@
         .calendar-date { font-size: 12px; font-weight: bold; color: var(--card-text); margin-bottom: 5px; text-align: right; opacity: 0.7; }
         .calendar-task { background: var(--primary); color: white; font-size: 11px; padding: 4px 6px; border-radius: 4px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
         .calendar-task.done { background: var(--success); opacity: 0.7; text-decoration: line-through; }
+        
         /* Section Dividers */
         .section-divider { margin: 40px 0 20px 0; border: 0; border-top: 2px solid var(--border); }
         .event-card { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px; color: var(--card-text); }
@@ -208,13 +214,36 @@
             background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); 
             margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; color: var(--card-text);
         }
-    </style></head><body>
+        
+        /* Custom Notification Toast */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
     <div class="container">
         
         <!-- Synchronization Status Dashboard Banner -->
         <div id="auth-banner">
             <span id="auth-status">Verifying sync availability...</span>
-            <button id="auth-btn" style="padding: 6px 12px; margin: 0;">Sign In via Google</button>
+            <button id="auth-btn" style="padding: 6px 12px; margin: 0; display:none;">Sign In</button>
         </div>
         
         <div id="bannerImage"></div>
@@ -311,7 +340,6 @@
             </div>
         </details>
 
-       
        <!-- View Switcher Tabs -->
         <div class="view-tabs">
             <button class="view-tab active" id="tab-all" onclick="setView('all')">Kanban Board</button>
@@ -346,7 +374,6 @@
             </select>
         </div>
 
-        <!-- Add Task Form -->
         <div class="form-card">
             <div class="form-row">
                 <input type="text" id="taskTitle" class="flex-grow" placeholder="What needs to be done?" required>
@@ -413,29 +440,11 @@
 
     </div>
 
-    <!-- Script updated to ES Modules format to facilitate importing Firebase dependencies natively -->
     <script type="module">
-        // --- FIREBASE INFRASTRUCTURE SETUP ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-        // Native injection of your custom configuration parameters
-        const firebaseConfig = {
-            apiKey: "AIzaSyAOzHxHzVdHZrioqmVqPmD6wOvdUQL9zS8",
-            authDomain: "soloflow-41bfb.firebaseapp.com",
-            databaseURL: "https://soloflow-41bfb-default-rtdb.firebaseio.com", // Formatted default Realtime Database URL string template
-            projectId: "soloflow-41bfb",
-            storageBucket: "soloflow-41bfb.firebasestorage.app",
-            messagingSenderId: "642151949374",
-            appId: "1:642151949374:web:ed2f6d8b6fcb2675029d6f",
-            measurementId: "G-4CPG3SZ1XS"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const provider = new GoogleAuthProvider();
+        // Import Modern Firebase Dependencies
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- GLOBAL RUNTIME STORAGE DECLARATIONS ---
         const defaultSettings = {
@@ -449,63 +458,124 @@
         let events = [];
         let scheduleData = {};
         let currentUser = null;
+        let db = null;
+        let auth = null;
 
-        // --- AUTHENTICATION INTERACTION LOGIC ---
-        const authBtn = document.getElementById('auth-btn');
-        const authStatus = document.getElementById('auth-status');
+        // Custom UI Notification Replacements (Replaces blocking `alert`)
+        function showNotification(msg, isError = false) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerText = msg;
+            if (isError) toast.style.backgroundColor = 'var(--danger)';
+            document.body.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
-        authBtn.addEventListener('click', () => {
-            if (currentUser) {
-                signOut(auth).then(() => { window.location.reload(); });
-            } else {
-                signInWithPopup(auth, provider).catch(err => alert("Authorization Failed: " + err.message));
+        // --- REGISTER GLOBAL WINDOW FUNCTIONS FIRST ---
+        // Doing this before any async operations prevents the HTML buttons from breaking
+        window.setView = setView;
+        window.changeMonth = changeMonth;
+        window.exportTasks = exportTasks;
+        window.importTasks = importTasks;
+        window.applyCellColor = applyCellColor;
+        window.mergeScheduleCells = mergeScheduleCells;
+        window.unmergeScheduleCells = unmergeScheduleCells;
+        window.addTask = addTask;
+        window.addEvent = addEvent;
+        window.formatText = formatText;
+        window.applyHighlight = applyHighlight;
+        window.closeToolbar = closeToolbar;
+        window.allowDrop = allowDrop;
+        window.dragEnter = dragEnter;
+        window.dragLeave = dragLeave;
+        window.drop = drop;
+        window.deleteEvent = deleteEvent;
+
+        // Load preliminary local storage data to show immediately
+        settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
+        tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
+        scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
+        applySettings();
+        renderTasks();
+        renderEvents();
+
+        // --- FIREBASE INITIALIZATION & SYNC ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        
+        async function initializeCloudSync() {
+            const authStatus = document.getElementById('auth-status');
+            if (!firebaseConfig) {
+                authStatus.innerHTML = `⚠️ Isolated Mode (Cloud variables missing)`;
+                return;
             }
-        });
 
-        // Track user login state to toggle between Realtime Database or localized storage backups
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                authStatus.innerHTML = `🟢 Synchronized via account: <strong>${user.displayName}</strong>`;
-                authBtn.innerText = "Sign Out";
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
 
-                // Establish continuous sync listener on user specific branch path
-                const userRef = ref(db, 'users/' + user.uid);
-                onValue(userRef, (snapshot) => {
-                    const data = snapshot.val() || {};
-                    tasks = data.tasks || [];
-                    events = data.events || [];
-                    scheduleData = data.weeklySchedule || {};
-                    settings = { ...defaultSettings, ...(data.settings || {}) };
+                // Setup authentication using strict environment tokens
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
 
-                    applySettings();
-                    renderTasks();
-                    renderEvents();
-                    if (currentView === 'schedule') renderSchedule();
-                    if (currentView === 'calendar') renderCalendar();
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        authStatus.innerHTML = `🟢 Cloud Sync Active`;
+                        
+                        // Listen for Realtime Updates from Cloud
+                        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'appData', 'main');
+                        onSnapshot(docRef, (docSnap) => {
+                            if (docSnap.exists()) {
+                                const data = docSnap.data();
+                                if (data.tasks) tasks = data.tasks;
+                                if (data.events) events = data.events;
+                                if (data.scheduleData) scheduleData = data.scheduleData;
+                                if (data.settings) settings = { ...defaultSettings, ...data.settings };
+
+                                applySettings();
+                                renderTasks();
+                                renderEvents();
+                                if (currentView === 'schedule') renderSchedule();
+                                if (currentView === 'calendar') renderCalendar();
+                            }
+                        }, (error) => {
+                            console.error("Cloud listening error:", error);
+                        });
+                    }
                 });
-            } else {
-                currentUser = null;
-                authStatus.innerHTML = `⚠️ Isolated Mode (Sign in to pull synced data across devices)`;
-                authBtn.innerText = "Sign In with Google";
-
-                // Rollback cleanly to standard localStorage arrays on guest mode
-                settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
-                tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-                events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
-                scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
-
-                applySettings();
-                renderTasks();
-                renderEvents();
+            } catch (err) {
+                authStatus.innerHTML = `⚠️ Cloud Sync Error`;
+                console.error("Sync init failed", err);
             }
-        });
+        }
+        
+        // Start Sync
+        initializeCloudSync();
 
-        function syncDataNode(nodeKey, localBackupKey, dataPayload) {
-            if (currentUser) {
-                set(ref(db, `users/${currentUser.uid}/${nodeKey}`), dataPayload);
-            } else {
-                localStorage.setItem(localBackupKey, JSON.stringify(dataPayload));
+        async function syncDataNode(nodeKey, localBackupKey, dataPayload) {
+            // Always keep local backup
+            localStorage.setItem(localBackupKey, JSON.stringify(dataPayload));
+            
+            // Sync to Firestore if logged in
+            if (currentUser && db) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'appData', 'main');
+                    await setDoc(docRef, { [nodeKey]: dataPayload }, { merge: true });
+                } catch(e) {
+                    console.error("Failed pushing to cloud", e);
+                }
             }
         }
 
@@ -519,7 +589,7 @@
             return `${h}:${minutes} ${ampm}`;
         }
 
-        // --- SETTINGS LOGIC ---
+        // --- STREAMING_CHUNK: Settings Management Logic ---
         function applySettings() {
             document.getElementById('pageTitle').innerText = settings.title;
             const root = document.documentElement;
@@ -533,7 +603,7 @@
             root.style.setProperty('--done-bg', settings.doneBg);
             
             const bannerDiv = document.getElementById('bannerImage');
-            if (settings.bannerUrl.trim()) {
+            if (settings.bannerUrl && settings.bannerUrl.trim()) {
                 bannerDiv.style.backgroundImage = `url('${settings.bannerUrl}')`;
                 bannerDiv.style.display = 'block';
             } else { bannerDiv.style.display = 'none'; }
@@ -546,7 +616,7 @@
             document.getElementById('setTodoColor').value = settings.todoBg;
             document.getElementById('setInprogColor').value = settings.inprogBg;
             document.getElementById('setDoneColor').value = settings.doneBg;
-            document.getElementById('setBannerUrl').value = settings.bannerUrl;
+            document.getElementById('setBannerUrl').value = settings.bannerUrl || '';
         }
 
         function saveSettings() {
@@ -568,12 +638,13 @@
 
         document.getElementById('pageTitle').addEventListener('blur', saveSettings);
         ['Bg','Surface','Text','CardText','Primary','Todo','Inprog','Done'].forEach(id => {
-            document.getElementById('set' + id + 'Color').addEventListener('input', saveSettings);
+            const el = document.getElementById('set' + id + 'Color');
+            if (el) el.addEventListener('input', saveSettings);
         });
-        document.getElementById('setBannerUrl').addEventListener('input', saveSettings);
+        const bannerUrlInput = document.getElementById('setBannerUrl');
+        if (bannerUrlInput) bannerUrlInput.addEventListener('input', saveSettings);
 
-
-        // --- TASK TRACKER LOGIC ---
+        // --- STREAMING_CHUNK: Task Tracking Logic ---
         function saveTasks() {
             syncDataNode('tasks', 'tasks', tasks);
             if (!currentUser) { renderTasks(); calculateAnalytics(); }
@@ -610,7 +681,8 @@
             tasks.push(newTask);
             
             ['taskTitle','taskCategory','taskBudget','taskDescription','taskSubtasks','taskPhotoUrl','taskLinkUrl','taskAssignee','taskDateAssigned','taskDueDate','taskDueTime','taskBlockedBy'].forEach(id => {
-                document.getElementById(id).value = '';
+                const el = document.getElementById(id);
+                if (el) el.value = '';
             });
             saveTasks();
         }
@@ -663,6 +735,7 @@
 
         function renderEvents() {
             const container = document.getElementById('events-list');
+            if(!container) return;
             container.innerHTML = '';
             
             const sortedEvents = [...events].sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -690,22 +763,14 @@
                         </div>
                         <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
                             ${linkHtml}
-                            <button class="btn-small btn-danger" id="del-ev-${ev.id}">Delete</button>
+                            <button class="btn-small btn-danger" onclick="deleteEvent('${ev.id}')">Delete</button>
                         </div>
                     </div>
                 `;
             });
-            
-            // Attach individual events safely
-            sortedEvents.forEach(ev => {
-                const targetBtn = document.getElementById(`del-ev-${ev.id}`);
-                if (targetBtn) {
-                    targetBtn.addEventListener('click', () => deleteEvent(ev.id));
-                }
-            });
         }
 
-        // --- INLINE EDIT & FORMATTING LOGIC ---
+        // --- STREAMING_CHUNK: Formatting Logic ---
         function formatText(command, value = null) {
             document.execCommand(command, false, value);
         }
@@ -729,7 +794,6 @@
                 const toolbar = document.getElementById('formatToolbar');
                 const schedTools = document.getElementById('scheduleTools');
                 
-                // Show schedule specific tools only if clicking a schedule cell
                 if(e.target.classList.contains('schedule-cell')) {
                     window.activeScheduleCell = e.target;
                     schedTools.style.display = 'flex';
@@ -748,7 +812,6 @@
         document.addEventListener('focusout', function(e) {
             if(e.target.classList && e.target.classList.contains('editable')) {
                 setTimeout(() => {
-                    // Check if focus moved to a color picker or button inside the toolbar
                     if (!document.activeElement.classList.contains('editable') && !document.activeElement.closest('#formatToolbar')) {
                         document.getElementById('formatToolbar').style.display = 'none';
                     }
@@ -830,15 +893,15 @@
                     if(Array.isArray(imported)) {
                         tasks = imported; 
                         saveTasks();
-                        alert('Tasks imported successfully!');
-                    } else { alert('Invalid file format. Must be a JSON array.'); }
-                } catch(err) { alert('Failed to parse JSON file.'); }
+                        showNotification('Tasks imported successfully!');
+                    } else { showNotification('Invalid file format. Must be a JSON array.', true); }
+                } catch(err) { showNotification('Failed to parse JSON file.', true); }
                 event.target.value = ''; 
             };
             reader.readAsText(file);
         }
 
-        // --- RENDER LOGIC ---
+        // --- STREAMING_CHUNK: View Rendering Logic ---
         let currentView = 'all';
 
         function setView(view) {
@@ -852,7 +915,6 @@
             const kanbanForm = document.querySelector('.form-card');
             const kanbanBoard = document.querySelector('.board');
 
-            // Hide everything first
             scheduleContainer.style.display = 'none';
             calendarContainer.style.display = 'none';
             kanbanControls.style.display = 'none';
@@ -873,12 +935,10 @@
             }
         }
 
-        // --- INTERNAL CALENDAR SYNC & RENDER LOGIC ---
         function syncTaskToCalendar(taskId) {
             const task = tasks.find(t => t.id === taskId);
             if (!task) return;
-            
-            task.syncedToCalendar = !task.syncedToCalendar; // Toggle True/False
+            task.syncedToCalendar = !task.syncedToCalendar;
             saveTasks();
         }
 
@@ -905,7 +965,6 @@
             const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             dayNames.forEach(day => grid.innerHTML += `<div class="calendar-day-header">${day}</div>`);
 
-            // Blank days before month starts
             for (let i = 0; i < firstDay; i++) {
                 grid.innerHTML += `<div class="calendar-day" style="background: transparent; border: none;"></div>`;
             }
@@ -918,14 +977,12 @@
                 let dayHtml = `<div class="calendar-day ${isToday ? 'today' : ''}">
                     <div class="calendar-date">${day}</div>`;
                 
-                // Add Upcoming Events to Calendar
                 events.forEach(ev => {
                     if (ev.date === dateStr) {
                         dayHtml += `<div class="calendar-task" style="background: var(--warning); color: #000;" title="${ev.title}">${ev.time ? formatTime(ev.time) + ' ' : ''}⭐ ${ev.title}</div>`;
                     }
                 });
 
-                // Add Synced Tasks to Calendar
                 tasks.forEach(task => {
                     if (task.syncedToCalendar && task.dueDate === dateStr) {
                         const statusClass = task.status === 'done' ? 'done' : '';
@@ -937,7 +994,6 @@
                 grid.innerHTML += dayHtml;
             }
 
-            // Map interaction events safely
             tasks.forEach(task => {
                 if (task.syncedToCalendar && task.dueDate) {
                     const el = document.getElementById(`cal-task-${task.id}`);
@@ -949,6 +1005,7 @@
         function updateDropdowns() {
             const catSelect = document.getElementById('categoryFilter');
             const assignSelect = document.getElementById('assigneeFilter');
+            if(!catSelect || !assignSelect) return;
             const currentCat = catSelect.value;
             const currentAssign = assignSelect.value;
 
@@ -966,7 +1023,6 @@
             if(categories.has(currentCat)) catSelect.value = currentCat;
             if(assignees.has(currentAssign)) assignSelect.value = currentAssign;
 
-            // Populate Blocked By Dropdown
             const blockedSelect = document.getElementById('taskBlockedBy');
             if (blockedSelect) {
                 const currentBlocked = blockedSelect.value;
@@ -1006,7 +1062,6 @@
                 }
             });
 
-            // Format Total Time
             const hrs = Math.floor(totalSecondsTracked / 3600);
             const mins = Math.floor((totalSecondsTracked % 3600) / 60);
 
@@ -1017,16 +1072,21 @@
             document.getElementById('stat-time').innerText = `${hrs}h ${mins}m`;
         }
 
+        // --- STREAMING_CHUNK: Main Task Layout Loop ---
         function renderTasks() {
             updateDropdowns();
+            const todoList = document.getElementById('todo-list');
+            const inprogList = document.getElementById('inprogress-list');
+            const doneList = document.getElementById('done-list');
+            
+            if (!todoList || !inprogList || !doneList) return;
+            todoList.innerHTML = '';
+            inprogList.innerHTML = '';
+            doneList.innerHTML = '';
 
-            document.getElementById('todo-list').innerHTML = '';
-            document.getElementById('inprogress-list').innerHTML = '';
-            document.getElementById('done-list').innerHTML = '';
-
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filterCat = document.getElementById('categoryFilter').value;
-            const filterAssign = document.getElementById('assigneeFilter').value;
+            const searchTerm = (document.getElementById('searchInput')?.value || "").toLowerCase();
+            const filterCat = document.getElementById('categoryFilter')?.value || "All";
+            const filterAssign = document.getElementById('assigneeFilter')?.value || "All";
 
             let totals = { todo: 0, inprogress: 0, done: 0 };
 
@@ -1053,7 +1113,6 @@
                 const card = document.createElement('div');
                 card.className = `task-card card-${task.status}`;
                 
-                // Check if the task is blocked
                 let isBlocked = false;
                 let blockedBadgeHtml = '';
                 if (task.blockedBy) {
@@ -1138,7 +1197,6 @@
                     metaHtml += `</div>`;
                 }
 
-                // --- POMODORO TIMER UI LOGIC ---
                 const totalSeconds = task.timeSpent || 0;
                 const hrs = Math.floor(totalSeconds / 3600);
                 const mins = Math.floor((totalSeconds % 3600) / 60);
@@ -1210,7 +1268,7 @@
                 document.getElementById(`${task.status}-list`).appendChild(card);
             });
 
-            // Post-rendering event assignment to accommodate ES Module strictness isolation scope constraints
+            // Post-rendering event mapping for buttons
             filteredTasks.forEach(task => {
                 document.getElementById(`task-title-edit-${task.id}`).addEventListener('keydown', preventEnter);
                 document.getElementById(`task-title-edit-${task.id}`).addEventListener('blur', (e) => updateTaskField(task.id, 'title', e.target));
@@ -1224,27 +1282,25 @@
                     });
                 }
 
-                if (window.activeTaskId !== task.id) {
-                    const timerBtn = document.getElementById(`timer-toggle-btn-${task.id}`);
-                    if (timerBtn) timerBtn.addEventListener('click', () => toggleTimer(task.id));
-                } else {
-                    const timerBtn = document.getElementById(`timer-toggle-btn-${task.id}`);
-                    if (timerBtn) timerBtn.addEventListener('click', () => toggleTimer(task.id));
-                }
+                const timerBtn = document.getElementById(`timer-toggle-btn-${task.id}`);
+                if (timerBtn) timerBtn.addEventListener('click', () => toggleTimer(task.id));
 
                 if (task.dueDate) {
                     document.getElementById(`sync-cal-btn-${task.id}`).addEventListener('click', () => syncTaskToCalendar(task.id));
                 }
                 document.getElementById(`delete-task-btn-${task.id}`).addEventListener('click', () => deleteTask(task.id));
 
-                // Context-specific operational buttons placement logic assignment mappings
                 if (task.status === 'todo') {
-                    document.getElementById(`move-inprog-${task.id}`).addEventListener('click', () => moveTask(task.id, 'inprogress'));
+                    const btn = document.getElementById(`move-inprog-${task.id}`);
+                    if (btn) btn.addEventListener('click', () => moveTask(task.id, 'inprogress'));
                 } else if (task.status === 'inprogress') {
-                    document.getElementById(`move-todo-${task.id}`).addEventListener('click', () => moveTask(task.id, 'todo'));
-                    document.getElementById(`move-done-${task.id}`).addEventListener('click', () => moveTask(task.id, 'done'));
+                    const btnT = document.getElementById(`move-todo-${task.id}`);
+                    const btnD = document.getElementById(`move-done-${task.id}`);
+                    if (btnT) btnT.addEventListener('click', () => moveTask(task.id, 'todo'));
+                    if (btnD) btnD.addEventListener('click', () => moveTask(task.id, 'done'));
                 } else if (task.status === 'done') {
-                    document.getElementById(`move-reopen-${task.id}`).addEventListener('click', () => moveTask(task.id, 'inprogress'));
+                    const btn = document.getElementById(`move-reopen-${task.id}`);
+                    if (btn) btn.addEventListener('click', () => moveTask(task.id, 'inprogress'));
                 }
             });
 
@@ -1303,7 +1359,7 @@
 
         // --- WEEKLY SCHEDULE LOGIC ---
         function saveSchedule() {
-            syncDataNode('weeklySchedule', 'weeklySchedule', scheduleData);
+            syncDataNode('scheduleData', 'weeklySchedule', scheduleData);
         }
 
         function updateScheduleCell(day, time, element) {
@@ -1371,7 +1427,6 @@
 
             grid.innerHTML = html;
 
-            // Bind contextual updates inside schedule blocks dynamically
             times.forEach((time, tIdx) => {
                 days.forEach((day) => {
                     const cellEl = document.getElementById(`cell-${day}-${tIdx}`);
@@ -1382,7 +1437,6 @@
             });
         }
 
-        // --- SCHEDULE MERGING & COLOR LOGIC ---
         function applyCellColor(color) {
             if (!window.activeScheduleCell) return;
             const cell = window.activeScheduleCell;
@@ -1410,7 +1464,7 @@
             const nextCell = document.getElementById(`cell-${day}-${nextTidx}`);
 
             if (!nextCell) {
-                alert("Cannot merge past the end of the schedule.");
+                showNotification("Cannot merge past the end of the schedule.", true);
                 return; 
             }
 
@@ -1464,34 +1518,6 @@
             cell.focus();
         }
 
-        // --- ATTACH BASE ELEMENT TRIGGERS EXTENSION GLOBAL MAPPINGS ---
-        window.setView = setView;
-        window.changeMonth = changeMonth;
-        window.exportTasks = exportTasks;
-        window.importTasks = importTasks;
-        window.applyCellColor = applyCellColor;
-        window.mergeScheduleCells = mergeScheduleCells;
-        window.unmergeScheduleCells = unmergeScheduleCells;
-        window.addTask = addTask;
-        window.addEvent = addEvent;
-        window.formatText = formatText;
-        window.applyHighlight = applyHighlight;
-        window.closeToolbar = closeToolbar;
-
-        // Register drag-drop global listeners to the structural columns
-        ['todo', 'inprogress', 'done'].forEach(colId => {
-            const el = document.getElementById(`col-${colId}`);
-            if (el) {
-                el.addEventListener('dragover', allowDrop);
-                el.addEventListener('dragenter', dragEnter);
-                el.addEventListener('dragleave', dragLeave);
-                el.addEventListener('drop', (e) => drop(e, colId));
-            }
-        });
-
-        // Initialize App UI defaults
-        renderTasks();
-        renderEvents();
     </script>
 </body>
 </html>
