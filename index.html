@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rob's Globe and ADMU Task and Events Tracker</title>
@@ -66,9 +68,14 @@
         .setting-item input[type="color"] { width: 100%; height: 35px; padding: 2px; cursor: pointer; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); }
         .setting-item input[type="text"] { padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); color: var(--card-text); }
         
-        .data-buttons { display: flex; gap: 10px; margin-top: 5px; }
+        .data-buttons { display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
         .btn-alt { background: var(--surface); border: 1px solid var(--border); color: var(--card-text); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
         .btn-alt:hover { background: rgba(0,0,0,0.05); }
+        
+        /* Auth Styles */
+        .auth-status { font-size: 12px; padding: 10px; border-radius: 4px; background: rgba(0,0,0,0.05); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .btn-google { background: #4285f4; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .btn-google:hover { background: #3367d6; }
 
         /* Form Styles */
         .form-card {
@@ -97,7 +104,7 @@
         .control-panel input { flex-grow: 1; min-width: 200px; }
         
         /* View Switcher Tabs */
-        .view-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .view-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; white-space: nowrap;}
         .view-tab { background: none; border: none; font-size: 14px; font-weight: bold; color: var(--text); opacity: 0.7; cursor: pointer; padding: 6px 12px; border-radius: 4px; transition: background 0.2s, color 0.2s; }
         .view-tab:hover { background: rgba(0,0,0,0.05); opacity: 1; }
         .view-tab.active { color: var(--primary); opacity: 1; background: rgba(74, 144, 226, 0.1); }
@@ -174,12 +181,14 @@
             padding: 4px 8px; font-size: 14px; cursor: pointer; border-radius: 4px; font-weight: normal;
         }
         .format-toolbar button:hover { background: rgba(0,0,0,0.05); border-color: var(--border); }
+        
         /* Timer & Pomodoro Styles */
         .timer-container { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: rgba(0,0,0,0.03); padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); }
         .timer-display { font-family: monospace; font-size: 14px; font-weight: bold; color: var(--card-text); }
         .btn-timer { background: var(--primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
         .btn-timer.active { background: var(--danger); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        
         /* Schedule Styles */
         .schedule-container { background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 20px; }
         .schedule-grid { display: grid; grid-template-columns: 80px repeat(7, minmax(120px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
@@ -187,6 +196,7 @@
         .schedule-time { background: rgba(0,0,0,0.03); font-weight: bold; text-align: right; padding: 8px 5px; color: var(--card-text); opacity: 0.8; font-size: 11px; display: flex; align-items: flex-start; justify-content: flex-end; }
         .schedule-cell { background: var(--surface); color: var(--card-text); padding: 6px; font-size: 12px; min-height: 35px; outline: none; transition: background 0.2s; word-wrap: break-word; cursor: text; }
         .schedule-cell:focus { background: rgba(255,255,255,0.9); box-shadow: inset 0 0 0 2px var(--primary); }
+        
         /* Calendar Styles */
         .calendar-container { background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: var(--card-text); }
@@ -198,17 +208,25 @@
         .calendar-date { font-size: 12px; font-weight: bold; color: var(--card-text); margin-bottom: 5px; text-align: right; opacity: 0.7; }
         .calendar-task { background: var(--primary); color: white; font-size: 11px; padding: 4px 6px; border-radius: 4px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
         .calendar-task.done { background: var(--success); opacity: 0.7; text-decoration: line-through; }
+        
         /* Section Dividers */
         .section-divider { margin: 40px 0 20px 0; border: 0; border-top: 2px solid var(--border); }
         .event-card { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px; color: var(--card-text); }
+        
+        /* Toast Notifications */
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface); color: var(--card-text); padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid var(--border); z-index: 9999; transition: opacity 0.3s, transform 0.3s; transform: translateY(100px); opacity: 0; font-weight: 500; font-size: 14px; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
         @media(max-width: 600px) { .event-card { flex-direction: column; align-items: flex-start; gap: 10px; } }
-    </style></head><body>
+    </style>
+</head>
+<body>
     <div class="container">
         
         <div id="bannerImage"></div>
         <h2 id="pageTitle" contenteditable="true" spellcheck="false" title="Click to edit title">Rob's Globe and ADMU Task and Events Tracker</h2>
 
-       <!-- Floating Rich Text Toolbar -->
+        <!-- Floating Rich Text Toolbar -->
         <div id="formatToolbar" class="format-toolbar">
             <button onmousedown="event.preventDefault(); formatText('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
             <button onmousedown="event.preventDefault(); formatText('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
@@ -236,6 +254,21 @@
         <details class="customize-menu">
             <summary>🎨 Customize & Data Management</summary>
             
+            <div class="settings-group">
+                <h4>☁️ Cloud Sync (Firebase)</h4>
+                <div class="auth-status" id="auth-status-container">
+                    <div>
+                        <span id="auth-status-text">Connecting to Firebase...</span><br>
+                        <span style="font-size: 11px; opacity: 0.7;" id="auth-uid"></span>
+                    </div>
+                    <button id="btn-google-login" class="btn-google" style="display: none;">
+                        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        Sign in to Sync
+                    </button>
+                    <button id="btn-google-logout" class="btn-alt" style="display: none;">Sign Out</button>
+                </div>
+            </div>
+
             <div class="settings-group">
                 <h4>Global UI Colors</h4>
                 <div class="settings-grid">
@@ -290,7 +323,7 @@
             </div>
 
             <div class="settings-group">
-                <h4>Data Backup</h4>
+                <h4>Manual Data Backup</h4>
                 <div class="data-buttons">
                     <button class="btn-alt" onclick="exportTasks()">⬇️ Export JSON</button>
                     <button class="btn-alt" onclick="document.getElementById('importFile').click()">⬆️ Import JSON</button>
@@ -299,7 +332,7 @@
             </div>
         </details>
 
-       
+        
        <!-- View Switcher Tabs -->
         <div class="view-tabs">
             <button class="view-tab active" id="tab-all" onclick="setView('all')">Kanban Board</button>
@@ -311,7 +344,9 @@
 
         <!-- Weekly Schedule Container (Hidden by default) -->
         <div id="schedule-container" class="schedule-container" style="display: none;">
-            <div id="schedule-grid" class="schedule-grid"></div>
+            <div id="schedule-grid" class="schedule-grid">
+                <!-- Grid generated by JS -->
+            </div>
         </div>
 
         <!-- Monthly Calendar Container (Hidden by default) -->
@@ -322,13 +357,6 @@
                 <button class="btn-alt" onclick="changeMonth(1)">Next ▶</button>
             </div>
             <div id="calendar-grid" class="calendar-grid"></div>
-        </div>
-
-        <!-- Weekly Schedule Container (Hidden by default) -->
-        <div id="schedule-container" class="schedule-container" style="display: none;">
-            <div id="schedule-grid" class="schedule-grid">
-                <!-- Grid generated by JS -->
-            </div>
         </div>
 
         <div class="control-panel">
@@ -408,57 +436,217 @@
 
     </div>
 
-    <script>
-        // --- UTILITY LOGIC ---
-        function formatTime(time24) {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration (from user)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOzHxHzVdHZrioqmVqPmD6wOvdUQL9zS8",
+            authDomain: "soloflow-41bfb.firebaseapp.com",
+            projectId: "soloflow-41bfb",
+            storageBucket: "soloflow-41bfb.firebasestorage.app",
+            messagingSenderId: "642151949374",
+            appId: "1:642151949374:web:ed2f6d8b6fcb2675029d6f",
+            measurementId: "G-4CPG3SZ1XS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Required paths configuration
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'soloflow-tracker';
+        let userId = null;
+        let unsubscribers = [];
+
+        // UI Toast replacement for alerts
+        window.showToast = function(msg, type='info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = msg;
+            if(type === 'error') toast.style.borderLeft = '4px solid var(--danger)';
+            if(type === 'success') toast.style.borderLeft = '4px solid var(--success)';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 3000);
+            setTimeout(() => toast.remove(), 3300);
+        };
+
+        // Custom global error wrapper for Firebase methods
+        window.alert = window.showToast;
+
+        // --- AUTH LOGIC ---
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Authentication Error:", error);
+                window.showToast("Failed to connect to cloud services.", "error");
+            }
+        }
+
+        const getDocPath = (collectionName, documentId) => {
+            if (!userId) return null;
+            return doc(db, 'artifacts', appId, 'users', userId, collectionName, documentId);
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            const statusText = document.getElementById('auth-status-text');
+            const uidText = document.getElementById('auth-uid');
+            const btnLogin = document.getElementById('btn-google-login');
+            const btnLogout = document.getElementById('btn-google-logout');
+
+            if (user) {
+                userId = user.uid;
+                uidText.innerText = `User ID: ${userId}`;
+                
+                if (user.isAnonymous) {
+                    statusText.innerText = "☁️ Using local cloud storage. Sign in to sync across devices.";
+                    statusText.style.color = "var(--text)";
+                    btnLogin.style.display = 'flex';
+                    btnLogout.style.display = 'none';
+                } else {
+                    statusText.innerText = `☁️ Synced to Google Account (${user.email})`;
+                    statusText.style.color = "var(--success)";
+                    btnLogin.style.display = 'none';
+                    btnLogout.style.display = 'inline-block';
+                }
+                
+                // Once authenticated, start listening to Firestore data
+                setupFirestoreListeners();
+            } else {
+                userId = null;
+                statusText.innerText = "Disconnected from Cloud";
+                uidText.innerText = "";
+                btnLogin.style.display = 'flex';
+                btnLogout.style.display = 'none';
+                
+                // Clear listeners
+                unsubscribers.forEach(unsub => unsub());
+                unsubscribers = [];
+            }
+        });
+
+        document.getElementById('btn-google-login').addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                window.showToast("Opening Google Sign-in...");
+                await signInWithPopup(auth, provider);
+                window.showToast("Successfully signed in!", "success");
+            } catch (error) {
+                window.showToast("Sign in cancelled or failed.", "error");
+            }
+        });
+
+        document.getElementById('btn-google-logout').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                // Re-init anonymous so the app doesn't break
+                initAuth(); 
+                window.showToast("Signed out. Using local cloud profile.");
+            } catch (error) {
+                console.error("Sign out error", error);
+            }
+        });
+
+        // Initialize App Auth
+        initAuth();
+
+        // --- GLOBAL VARIABLES & DATA MANAGEMENT ---
+        // Expose functions to window so inline HTML event handlers can call them
+        
+        window.formatTime = function(time24) {
             if (!time24) return '';
             const [hours, minutes] = time24.split(':');
             let h = parseInt(hours, 10);
             const ampm = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12;
             return `${h}:${minutes} ${ampm}`;
-        }
+        };
 
-        // --- SETTINGS LOGIC ---
         const defaultSettings = {
             title: "Rob's Globe and ADMU Task and Events Tracker", bgColor: '#f4f4f9', surfaceColor: '#ffffff',
             textColor: '#333333', cardTextColor: '#333333', primaryColor: '#4a90e2', todoBg: '#ffeaea',
             inprogBg: '#fffbe6', doneBg: '#f6ffed', bannerUrl: ''
         };
 
-        let settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
+        window.settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
+        window.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        window.events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
+        window.scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
 
-        function applySettings() {
-            document.getElementById('pageTitle').innerText = settings.title;
-            const root = document.documentElement;
-            root.style.setProperty('--bg', settings.bgColor);
-            root.style.setProperty('--surface', settings.surfaceColor);
-            root.style.setProperty('--text', settings.textColor);
-            root.style.setProperty('--card-text', settings.cardTextColor);
-            root.style.setProperty('--primary', settings.primaryColor);
-            root.style.setProperty('--todo-bg', settings.todoBg);
-            root.style.setProperty('--inprog-bg', settings.inprogBg);
-            root.style.setProperty('--done-bg', settings.doneBg);
+        // --- FIRESTORE LISTENERS ---
+        function setupFirestoreListeners() {
+            if (!userId) return;
             
-            const bannerDiv = document.getElementById('bannerImage');
-            if (settings.bannerUrl.trim()) {
-                bannerDiv.style.backgroundImage = `url('${settings.bannerUrl}')`;
-                bannerDiv.style.display = 'block';
-            } else { bannerDiv.style.display = 'none'; }
+            // Clear existing listeners if re-authenticating
+            unsubscribers.forEach(unsub => unsub());
+            unsubscribers = [];
 
-            document.getElementById('setBgColor').value = settings.bgColor;
-            document.getElementById('setSurfaceColor').value = settings.surfaceColor;
-            document.getElementById('setTextColor').value = settings.textColor;
-            document.getElementById('setCardTextColor').value = settings.cardTextColor;
-            document.getElementById('setPrimaryColor').value = settings.primaryColor;
-            document.getElementById('setTodoColor').value = settings.todoBg;
-            document.getElementById('setInprogColor').value = settings.inprogBg;
-            document.getElementById('setDoneColor').value = settings.doneBg;
-            document.getElementById('setBannerUrl').value = settings.bannerUrl;
+            // 1. Settings Listener
+            const settingsUnsub = onSnapshot(getDocPath('trackerData', 'settings'), (doc) => {
+                if (doc.exists()) {
+                    const cloudSettings = doc.data();
+                    if (JSON.stringify(cloudSettings) !== JSON.stringify(window.settings)) {
+                        window.settings = { ...defaultSettings, ...cloudSettings };
+                        localStorage.setItem('trackerSettings', JSON.stringify(window.settings));
+                        applySettings();
+                    }
+                }
+            }, (error) => console.error("Settings Sync Error:", error));
+
+            // 2. Tasks Listener
+            const tasksUnsub = onSnapshot(getDocPath('trackerData', 'tasks'), (doc) => {
+                if (doc.exists()) {
+                    const cloudTasks = doc.data().data || [];
+                    if (JSON.stringify(cloudTasks) !== JSON.stringify(window.tasks)) {
+                        window.tasks = cloudTasks;
+                        localStorage.setItem('tasks', JSON.stringify(window.tasks));
+                        window.renderTasks();
+                    }
+                }
+            }, (error) => console.error("Tasks Sync Error:", error));
+
+            // 3. Events Listener
+            const eventsUnsub = onSnapshot(getDocPath('trackerData', 'events'), (doc) => {
+                if (doc.exists()) {
+                    const cloudEvents = doc.data().data || [];
+                    if (JSON.stringify(cloudEvents) !== JSON.stringify(window.events)) {
+                        window.events = cloudEvents;
+                        localStorage.setItem('trackerEvents', JSON.stringify(window.events));
+                        window.renderEvents();
+                    }
+                }
+            }, (error) => console.error("Events Sync Error:", error));
+
+            // 4. Schedule Listener
+            const scheduleUnsub = onSnapshot(getDocPath('trackerData', 'schedule'), (doc) => {
+                if (doc.exists()) {
+                    const cloudSchedule = doc.data().data || {};
+                    if (JSON.stringify(cloudSchedule) !== JSON.stringify(window.scheduleData)) {
+                        window.scheduleData = cloudSchedule;
+                        localStorage.setItem('weeklySchedule', JSON.stringify(window.scheduleData));
+                        if(currentView === 'schedule') {
+                             document.getElementById('schedule-grid').innerHTML = ''; // Force rebuild
+                             window.renderSchedule();
+                        }
+                    }
+                }
+            }, (error) => console.error("Schedule Sync Error:", error));
+
+            unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub);
         }
 
-        function saveSettings() {
-            settings = {
+        // --- FIRESTORE SAVE WRAPPERS ---
+        
+        window.saveSettings = function() {
+            window.settings = {
                 title: document.getElementById('pageTitle').innerText.trim() || "Rob's Globe and ADMU Task and Events Tracker",
                 bgColor: document.getElementById('setBgColor').value,
                 surfaceColor: document.getElementById('setSurfaceColor').value,
@@ -470,28 +658,80 @@
                 doneBg: document.getElementById('setDoneColor').value,
                 bannerUrl: document.getElementById('setBannerUrl').value.trim()
             };
-            localStorage.setItem('trackerSettings', JSON.stringify(settings));
+            localStorage.setItem('trackerSettings', JSON.stringify(window.settings));
             applySettings();
+            
+            if (userId) {
+                setDoc(getDocPath('trackerData', 'settings'), window.settings).catch(e => console.error("Failed to sync settings", e));
+            }
+        };
+
+        window.saveTasks = function(skipRender = false) {
+            localStorage.setItem('tasks', JSON.stringify(window.tasks));
+            if(!skipRender) {
+                window.renderTasks();
+            }
+            if (userId) {
+                setDoc(getDocPath('trackerData', 'tasks'), { data: window.tasks }).catch(e => console.error("Failed to sync tasks", e));
+            }
+        };
+
+        window.saveEvents = function() {
+            localStorage.setItem('trackerEvents', JSON.stringify(window.events));
+            window.renderEvents();
+            if (userId) {
+                setDoc(getDocPath('trackerData', 'events'), { data: window.events }).catch(e => console.error("Failed to sync events", e));
+            }
+        };
+
+        window.saveSchedule = function() {
+            localStorage.setItem('weeklySchedule', JSON.stringify(window.scheduleData));
+            if (userId) {
+                setDoc(getDocPath('trackerData', 'schedule'), { data: window.scheduleData }).catch(e => console.error("Failed to sync schedule", e));
+            }
+        };
+
+
+        // --- SETTINGS LOGIC ---
+        function applySettings() {
+            document.getElementById('pageTitle').innerText = window.settings.title;
+            const root = document.documentElement;
+            root.style.setProperty('--bg', window.settings.bgColor);
+            root.style.setProperty('--surface', window.settings.surfaceColor);
+            root.style.setProperty('--text', window.settings.textColor);
+            root.style.setProperty('--card-text', window.settings.cardTextColor);
+            root.style.setProperty('--primary', window.settings.primaryColor);
+            root.style.setProperty('--todo-bg', window.settings.todoBg);
+            root.style.setProperty('--inprog-bg', window.settings.inprogBg);
+            root.style.setProperty('--done-bg', window.settings.doneBg);
+            
+            const bannerDiv = document.getElementById('bannerImage');
+            if (window.settings.bannerUrl.trim()) {
+                bannerDiv.style.backgroundImage = `url('${window.settings.bannerUrl}')`;
+                bannerDiv.style.display = 'block';
+            } else { bannerDiv.style.display = 'none'; }
+
+            document.getElementById('setBgColor').value = window.settings.bgColor;
+            document.getElementById('setSurfaceColor').value = window.settings.surfaceColor;
+            document.getElementById('setTextColor').value = window.settings.textColor;
+            document.getElementById('setCardTextColor').value = window.settings.cardTextColor;
+            document.getElementById('setPrimaryColor').value = window.settings.primaryColor;
+            document.getElementById('setTodoColor').value = window.settings.todoBg;
+            document.getElementById('setInprogColor').value = window.settings.inprogBg;
+            document.getElementById('setDoneColor').value = window.settings.doneBg;
+            document.getElementById('setBannerUrl').value = window.settings.bannerUrl;
         }
 
-        document.getElementById('pageTitle').addEventListener('blur', saveSettings);
+        document.getElementById('pageTitle').addEventListener('blur', window.saveSettings);
         ['Bg','Surface','Text','CardText','Primary','Todo','Inprog','Done'].forEach(id => {
-            document.getElementById('set' + id + 'Color').addEventListener('input', saveSettings);
+            document.getElementById('set' + id + 'Color').addEventListener('change', window.saveSettings);
         });
-        document.getElementById('setBannerUrl').addEventListener('input', saveSettings);
+        document.getElementById('setBannerUrl').addEventListener('change', window.saveSettings);
         applySettings();
 
-
         // --- TASK TRACKER LOGIC ---
-        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-        function saveTasks() {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            renderTasks();
-            calculateAnalytics();
-        }
-
-        function addTask() {
+        window.addTask = function() {
             const title = document.getElementById('taskTitle').value.trim();
             if (!title) return;
 
@@ -516,42 +756,39 @@
                 dueDate: document.getElementById('taskDueDate').value,
                 dueTime: document.getElementById('taskDueTime').value,
                 blockedBy: document.getElementById('taskBlockedBy').value,
-                status: 'todo'
+                status: 'todo',
+                syncedToCalendar: false
             };
 
-            tasks.push(newTask);
+            window.tasks.push(newTask);
             
             ['taskTitle','taskCategory','taskBudget','taskDescription','taskSubtasks','taskPhotoUrl','taskLinkUrl','taskAssignee','taskDateAssigned','taskDueDate','taskDueTime','taskBlockedBy'].forEach(id => {
                 document.getElementById(id).value = '';
             });
-            saveTasks();
-        }
+            window.saveTasks();
+        };
 
-        function moveTask(id, newStatus) {
-            const task = tasks.find(t => t.id === id);
-            if (task) { task.status = newStatus; saveTasks(); }
-        }
+        window.moveTask = function(id, newStatus) {
+            const task = window.tasks.find(t => t.id === id);
+            if (task) { task.status = newStatus; window.saveTasks(); }
+        };
 
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            saveTasks();
-        }
-        function syncTaskToCalendar(taskId) {
-            const task = tasks.find(t => t.id === taskId);
+        window.deleteTask = function(id) {
+            window.tasks = window.tasks.filter(t => t.id !== id);
+            window.saveTasks();
+        };
+
+        window.syncTaskToCalendarFile = function(taskId) {
+            const task = window.tasks.find(t => t.id === taskId);
             if (!task || !task.dueDate) {
-                alert("This task needs a Due Date to sync to your calendar.");
+                window.showToast("This task needs a Due Date to generate a calendar file.", "error");
                 return;
             }
 
-            // Create Date objects for the start and end times
             const startDate = new Date(`${task.dueDate}T${task.dueTime || '09:00'}`);
-            // Default the event to 1 hour long
             const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-
-            // Format to ICS timestamp (YYYYMMDDTHHMMSS)
             const formatDate = (date) => date.toISOString().replace(/-|:|\.\d+/g, '');
 
-            // Build the .ics file content
             const icsContent = [
                 "BEGIN:VCALENDAR",
                 "VERSION:2.0",
@@ -567,7 +804,6 @@
                 "END:VCALENDAR"
             ].join('\n');
 
-            // Trigger the file download
             const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
@@ -575,25 +811,25 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
+        };
 
-        function toggleSubtask(taskId, subIdx) {
-            const task = tasks.find(t => t.id === taskId);
+        window.syncTaskToCalendarApp = function(taskId) {
+            const task = window.tasks.find(t => t.id === taskId);
+            if (!task) return;
+            task.syncedToCalendar = !task.syncedToCalendar; 
+            window.saveTasks();
+        };
+
+        window.toggleSubtask = function(taskId, subIdx) {
+            const task = window.tasks.find(t => t.id === taskId);
             if(task && task.subtasks[subIdx]) {
                 task.subtasks[subIdx].completed = !task.subtasks[subIdx].completed;
-                saveTasks();
+                window.saveTasks();
             }
-        }
+        };
 
         // --- EVENTS LOGIC ---
-        let events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
-
-        function saveEvents() {
-            localStorage.setItem('trackerEvents', JSON.stringify(events));
-            renderEvents();
-        }
-
-        function addEvent() {
+        window.addEvent = function() {
             const title = document.getElementById('eventTitle').value.trim();
             const date = document.getElementById('eventDate').value;
             const time = document.getElementById('eventTime').value;
@@ -601,25 +837,25 @@
             
             if(!title || !date) return;
             
-            events.push({ id: Date.now().toString(), title, date, time, link });
+            window.events.push({ id: Date.now().toString(), title, date, time, link });
             
             document.getElementById('eventTitle').value = '';
             document.getElementById('eventDate').value = '';
             document.getElementById('eventTime').value = '';
             document.getElementById('eventLink').value = '';
-            saveEvents();
-        }
+            window.saveEvents();
+        };
 
-        function deleteEvent(id) {
-            events = events.filter(e => e.id !== id);
-            saveEvents();
-        }
+        window.deleteEvent = function(id) {
+            window.events = window.events.filter(e => e.id !== id);
+            window.saveEvents();
+        };
 
-        function renderEvents() {
+        window.renderEvents = function() {
             const container = document.getElementById('events-list');
             container.innerHTML = '';
             
-            const sortedEvents = [...events].sort((a,b) => new Date(a.date) - new Date(b.date));
+            const sortedEvents = [...window.events].sort((a,b) => new Date(a.date) - new Date(b.date));
             
             sortedEvents.forEach(ev => {
                 const eDate = new Date(ev.date);
@@ -649,24 +885,24 @@
                     </div>
                 `;
             });
-        }
+        };
 
         // --- INLINE EDIT & FORMATTING LOGIC ---
-        function formatText(command, value = null) {
+        window.formatText = function(command, value = null) {
             document.execCommand(command, false, value);
-        }
+        };
 
-        function applyHighlight() {
+        window.applyHighlight = function() {
             const color = document.getElementById('highlightColor').value;
-            formatText('backColor', color);
-        }
+            window.formatText('backColor', color);
+        };
 
-        function closeToolbar() {
+        window.closeToolbar = function() {
             document.getElementById('formatToolbar').style.display = 'none';
             if (document.activeElement && document.activeElement.classList.contains('editable')) {
                 document.activeElement.blur();
             }
-        }
+        };
 
         window.activeScheduleCell = null;
 
@@ -675,7 +911,6 @@
                 const toolbar = document.getElementById('formatToolbar');
                 const schedTools = document.getElementById('scheduleTools');
                 
-                // Show schedule specific tools only if clicking a schedule cell
                 if(e.target.classList.contains('schedule-cell')) {
                     window.activeScheduleCell = e.target;
                     schedTools.style.display = 'flex';
@@ -694,7 +929,6 @@
         document.addEventListener('focusout', function(e) {
             if(e.target.classList && e.target.classList.contains('editable')) {
                 setTimeout(() => {
-                    // Check if focus moved to a color picker or button inside the toolbar
                     if (!document.activeElement.classList.contains('editable') && !document.activeElement.closest('#formatToolbar')) {
                         document.getElementById('formatToolbar').style.display = 'none';
                     }
@@ -706,21 +940,21 @@
             if (e.target.classList && e.target.classList.contains('editable')) {
                 if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'h') {
                     e.preventDefault();
-                    applyHighlight();
+                    window.applyHighlight();
                 }
             }
         });
 
-        function handleDragStart(e, id) {
+        window.handleDragStart = function(e, id) {
             if (e.target.isContentEditable || e.target.type === 'checkbox' || e.target.tagName === 'BUTTON' || e.target.tagName === 'A') {
                 e.preventDefault();
                 return;
             }
             e.dataTransfer.setData('text/plain', id);
-        }
+        };
 
-        function updateTaskField(taskId, field, element, subtaskIdx = null) {
-            const task = tasks.find(t => t.id === taskId);
+        window.updateTaskField = function(taskId, field, element, subtaskIdx = null) {
+            const task = window.tasks.find(t => t.id === taskId);
             if (!task) return;
 
             const newValue = element.innerHTML.trim();
@@ -734,39 +968,39 @@
                 }
                 task[field] = newValue;
             }
-            saveTasks();
-        }
+            window.saveTasks();
+        };
 
-        function preventEnter(e) {
+        window.preventEnter = function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 e.target.blur(); 
             }
-        }
+        };
 
-        // --- DRAG AND DROP LOGIC ---
-        function allowDrop(e) { e.preventDefault(); }
-        function dragEnter(e) { e.currentTarget.classList.add('drag-over'); }
-        function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
-        function drop(e, newStatus) {
+        // DRAG AND DROP
+        window.allowDrop = function(e) { e.preventDefault(); };
+        window.dragEnter = function(e) { e.currentTarget.classList.add('drag-over'); };
+        window.dragLeave = function(e) { e.currentTarget.classList.remove('drag-over'); };
+        window.drop = function(e, newStatus) {
             e.preventDefault();
             e.currentTarget.classList.remove('drag-over');
             const id = e.dataTransfer.getData('text/plain');
-            if(id) moveTask(id, newStatus);
-        }
+            if(id) window.moveTask(id, newStatus);
+        };
 
-        // --- EXPORT / IMPORT LOGIC ---
-        function exportTasks() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tasks));
+        // EXPORT / IMPORT
+        window.exportTasks = function() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.tasks));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
             dlAnchor.setAttribute("download", "my_tracker_backup.json");
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
-        }
+        };
 
-        function importTasks(event) {
+        window.importTasks = function(event) {
             const file = event.target.files[0];
             if(!file) return;
             const reader = new FileReader();
@@ -774,20 +1008,20 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if(Array.isArray(imported)) {
-                        tasks = imported; 
-                        saveTasks();
-                        alert('Tasks imported successfully!');
-                    } else { alert('Invalid file format. Must be a JSON array.'); }
-                } catch(err) { alert('Failed to parse JSON file.'); }
+                        window.tasks = imported; 
+                        window.saveTasks();
+                        window.showToast('Tasks imported successfully!', 'success');
+                    } else { window.showToast('Invalid file format. Must be a JSON array.', 'error'); }
+                } catch(err) { window.showToast('Failed to parse JSON file.', 'error'); }
                 event.target.value = ''; 
             };
             reader.readAsText(file);
-        }
+        };
 
-        // --- RENDER LOGIC ---
+        // --- RENDER LOGIC & VIEWS ---
         let currentView = 'all';
 
-       function setView(view) {
+        window.setView = function(view) {
             currentView = view;
             document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById(`tab-${view}`).classList.add('active');
@@ -798,7 +1032,6 @@
             const kanbanForm = document.querySelector('.form-card');
             const kanbanBoard = document.querySelector('.board');
 
-            // Hide everything first
             scheduleContainer.style.display = 'none';
             calendarContainer.style.display = 'none';
             kanbanControls.style.display = 'none';
@@ -807,35 +1040,26 @@
 
             if (view === 'schedule') {
                 scheduleContainer.style.display = 'block';
-                renderSchedule();
+                window.renderSchedule();
             } else if (view === 'calendar') {
                 calendarContainer.style.display = 'block';
-                renderCalendar();
+                window.renderCalendar();
             } else {
                 kanbanControls.style.display = 'flex';
                 kanbanForm.style.display = 'flex';
                 kanbanBoard.style.display = 'grid';
-                renderTasks();
+                window.renderTasks();
             }
-        }
-
-        // --- INTERNAL CALENDAR SYNC & RENDER LOGIC ---
-        function syncTaskToCalendar(taskId) {
-            const task = tasks.find(t => t.id === taskId);
-            if (!task) return;
-            
-            task.syncedToCalendar = !task.syncedToCalendar; // Toggle True/False
-            saveTasks();
-        }
+        };
 
         let currentCalendarDate = new Date();
 
-        function changeMonth(offset) {
+        window.changeMonth = function(offset) {
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
-            renderCalendar();
-        }
+            window.renderCalendar();
+        };
 
-        function renderCalendar() {
+        window.renderCalendar = function() {
             const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
             
@@ -851,7 +1075,6 @@
             const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             dayNames.forEach(day => grid.innerHTML += `<div class="calendar-day-header">${day}</div>`);
 
-            // Blank days before month starts
             for (let i = 0; i < firstDay; i++) {
                 grid.innerHTML += `<div class="calendar-day" style="background: transparent; border: none;"></div>`;
             }
@@ -864,15 +1087,13 @@
                 let dayHtml = `<div class="calendar-day ${isToday ? 'today' : ''}">
                     <div class="calendar-date">${day}</div>`;
                 
-                // Add Upcoming Events to Calendar
-                events.forEach(ev => {
+                window.events.forEach(ev => {
                     if (ev.date === dateStr) {
                         dayHtml += `<div class="calendar-task" style="background: var(--warning); color: #000;" title="${ev.title}">${ev.time ? formatTime(ev.time) + ' ' : ''}⭐ ${ev.title}</div>`;
                     }
                 });
 
-                // Add Synced Tasks to Calendar
-                tasks.forEach(task => {
+                window.tasks.forEach(task => {
                     if (task.syncedToCalendar && task.dueDate === dateStr) {
                         const statusClass = task.status === 'done' ? 'done' : '';
                         dayHtml += `<div class="calendar-task ${statusClass}" title="${task.title}" onclick="setView('all')">${task.dueTime ? formatTime(task.dueTime) + ' ' : ''}📋 ${task.title}</div>`;
@@ -882,8 +1103,9 @@
                 dayHtml += `</div>`;
                 grid.innerHTML += dayHtml;
             }
-        }
-        function updateDropdowns() {
+        };
+
+        window.updateDropdowns = function() {
             const catSelect = document.getElementById('categoryFilter');
             const assignSelect = document.getElementById('assigneeFilter');
             const currentCat = catSelect.value;
@@ -892,7 +1114,7 @@
             const categories = new Set(['All']);
             const assignees = new Set(['All']);
             
-            tasks.forEach(t => {
+            window.tasks.forEach(t => {
                 if(t.category) categories.add(t.category);
                 if(t.assignee) assignees.add(t.assignee);
             });
@@ -903,12 +1125,11 @@
             if(categories.has(currentCat)) catSelect.value = currentCat;
             if(assignees.has(currentAssign)) assignSelect.value = currentAssign;
 
-            // Populate Blocked By Dropdown
             const blockedSelect = document.getElementById('taskBlockedBy');
             if (blockedSelect) {
                 const currentBlocked = blockedSelect.value;
                 let blockedOptions = '<option value="">No Dependencies</option>';
-                tasks.forEach(t => {
+                window.tasks.forEach(t => {
                     if (t.status !== 'done') {
                         blockedOptions += `<option value="${t.id}">Block with: ${t.title}</option>`;
                     }
@@ -916,9 +1137,9 @@
                 blockedSelect.innerHTML = blockedOptions;
                 blockedSelect.value = currentBlocked;
             }
-        }
+        };
 
-        function calculateAnalytics() {
+        window.calculateAnalytics = function() {
             let totalValue = 0;
             let finishedCount = 0;
             let overdueCount = 0;
@@ -927,10 +1148,8 @@
             const today = new Date();
             today.setHours(0,0,0,0);
 
-            tasks.forEach(task => {
-                if (task.timeSpent) {
-                    totalSecondsTracked += task.timeSpent;
-                }
+            window.tasks.forEach(task => {
+                if (task.timeSpent) totalSecondsTracked += task.timeSpent;
 
                 if (task.status === 'done') {
                     finishedCount++;
@@ -943,7 +1162,6 @@
                 }
             });
 
-            // Format Total Time
             const hrs = Math.floor(totalSecondsTracked / 3600);
             const mins = Math.floor((totalSecondsTracked % 3600) / 60);
 
@@ -952,10 +1170,10 @@
             document.getElementById('stat-overdue').innerText = overdueCount;
             document.getElementById('stat-velocity').innerText = `${(finishedCount / 7).toFixed(1)} / day`;
             document.getElementById('stat-time').innerText = `${hrs}h ${mins}m`;
-        }
+        };
 
-        function renderTasks() {
-            updateDropdowns();
+        window.renderTasks = function() {
+            window.updateDropdowns();
 
             document.getElementById('todo-list').innerHTML = '';
             document.getElementById('inprogress-list').innerHTML = '';
@@ -967,7 +1185,7 @@
 
             let totals = { todo: 0, inprogress: 0, done: 0 };
 
-            const filteredTasks = tasks.filter(task => {
+            const filteredTasks = window.tasks.filter(task => {
                 const matchSearch = task.title.toLowerCase().includes(searchTerm) || (task.description && task.description.toLowerCase().includes(searchTerm));
                 const matchCat = filterCat === 'All' || task.category === filterCat;
                 const matchAssign = filterAssign === 'All' || task.assignee === filterAssign;
@@ -990,12 +1208,10 @@
                 const card = document.createElement('div');
                 card.className = `task-card card-${task.status}`;
                 
-                // Check if the task is blocked
                 let isBlocked = false;
                 let blockedBadgeHtml = '';
                 if (task.blockedBy) {
-                    const blockingTask = tasks.find(t => t.id === task.blockedBy);
-                    // If the blocking task exists and is NOT done, this task is locked
+                    const blockingTask = window.tasks.find(t => t.id === task.blockedBy);
                     if (blockingTask && blockingTask.status !== 'done') {
                         isBlocked = true;
                         blockedBadgeHtml = `<div style="background: rgba(231, 76, 60, 0.1); color: var(--danger); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px dashed var(--danger);">🔒 Blocked by: ${blockingTask.title}</div>`;
@@ -1004,7 +1220,7 @@
 
                 card.draggable = !isBlocked;
                 if (isBlocked) card.style.opacity = '0.65';
-                card.ondragstart = (e) => handleDragStart(e, task.id);
+                card.ondragstart = (e) => window.handleDragStart(e, task.id);
                 
                 let actionBtns = '';
                 if (isBlocked) {
@@ -1077,7 +1293,6 @@
                     metaHtml += `</div>`;
                 }
 
-                // --- POMODORO TIMER UI LOGIC ---
                 const totalSeconds = task.timeSpent || 0;
                 const hrs = Math.floor(totalSeconds / 3600);
                 const mins = Math.floor((totalSeconds % 3600) / 60);
@@ -1089,7 +1304,6 @@
                 const timerBtnText = isTimerActive ? '⏹ Stop' : '▶ Pomodoro';
 
                 let timerHtml = '';
-                // Hide timer if the task is locked by a dependency
                 if (!isBlocked) {
                     timerHtml = `
                         <div class="timer-container">
@@ -1099,8 +1313,7 @@
                     `;
                 }
 
-               // Button logic for the sync state
-                const syncText = task.syncedToCalendar ? "🗓️ Synced" : "📅 Sync";
+                const syncText = task.syncedToCalendar ? "🗓️ Synced" : "📅 Sync App";
                 const syncColor = task.syncedToCalendar ? "var(--success)" : "var(--primary)";
 
                 card.innerHTML = `
@@ -1119,12 +1332,15 @@
                         <span class="badge ${task.priority.toLowerCase()}">${task.priority}</span>
                         <span class="badge">${task.category}</span>
                     </div>
-                    <div class="actions">
+                    <div class="actions" style="flex-wrap: wrap; gap: 5px;">
                         <div style="display: flex; gap: 5px;">
                             ${actionBtns}
-                            ${task.dueDate ? `<button class="btn-small" style="color: ${syncColor}; border-color: ${syncColor}; font-weight: bold;" onclick="syncTaskToCalendar('${task.id}')">${syncText}</button>` : ''}
                         </div>
-                        <button class="btn-small btn-danger" onclick="deleteTask('${task.id}')">Delete</button>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                           ${task.dueDate ? `<button class="btn-small" style="color: ${syncColor}; border-color: ${syncColor}; font-weight: bold;" title="Sync to internal Calendar tab" onclick="syncTaskToCalendarApp('${task.id}')">${syncText}</button>` : ''}
+                           ${task.dueDate ? `<button class="btn-small" title="Export .ics file for Google Calendar/Apple" onclick="syncTaskToCalendarFile('${task.id}')">💾 .ics</button>` : ''}
+                           <button class="btn-small btn-danger" onclick="deleteTask('${task.id}')">Delete</button>
+                        </div>
                     </div>
                 `;
 
@@ -1156,34 +1372,32 @@
             document.getElementById('total-inprogress').innerText = totals.inprogress > 0 ? `(₱${totals.inprogress.toLocaleString()})` : '';
             document.getElementById('total-done').innerText = totals.done > 0 ? `(₱${totals.done.toLocaleString()})` : '';
             
-            calculateAnalytics();
-        }
-// --- POMODORO & TIME TRACKING LOGIC ---
+            window.calculateAnalytics();
+        };
+
         window.activeTaskId = null;
         window.timerInterval = null;
 
-        function toggleTimer(taskId) {
-            // Stop current timer if one is running
+        window.toggleTimer = function(taskId) {
             if (window.activeTaskId) {
                 clearInterval(window.timerInterval);
                 const oldTaskId = window.activeTaskId;
                 window.activeTaskId = null;
                 
-                // Update old button UI
                 const oldBtn = document.getElementById(`btn-timer-${oldTaskId}`);
                 if (oldBtn) {
                     oldBtn.className = 'btn-timer';
                     oldBtn.innerText = '▶ Pomodoro';
                 }
-                saveTasks(); // Save the final time to memory
                 
-                // If they clicked the same task, just stop it and exit
+                // Do a background save to not disrupt UI by calling saveTasks(true)
+                window.saveTasks(true); 
+                
                 if (oldTaskId === taskId) return;
             }
 
-            // Start new timer
             window.activeTaskId = taskId;
-            const task = tasks.find(t => t.id === taskId);
+            const task = window.tasks.find(t => t.id === taskId);
             if (!task.timeSpent) task.timeSpent = 0;
 
             const newBtn = document.getElementById(`btn-timer-${taskId}`);
@@ -1195,7 +1409,6 @@
             window.timerInterval = setInterval(() => {
                 task.timeSpent += 1;
                 
-                // Update the display without re-rendering the whole board
                 const display = document.getElementById(`display-timer-${taskId}`);
                 if (display) {
                     const hrs = Math.floor(task.timeSpent / 3600);
@@ -1204,48 +1417,38 @@
                     display.innerText = `⏱ ${hrs > 0 ? hrs + 'h ' : ''}${mins}m${secs}s`;
                 }
                 
-                // Stealth save to localStorage every 5 seconds 
-                if (task.timeSpent % 5 === 0) {
-                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                if (task.timeSpent % 10 === 0) {
+                     window.saveTasks(true); // periodic background save
                 }
             }, 1000);
-        }
+        };
+
         // --- WEEKLY SCHEDULE LOGIC ---
-        let scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
-
-        function saveSchedule() {
-            localStorage.setItem('weeklySchedule', JSON.stringify(scheduleData));
-        }
-
-       function updateScheduleCell(day, time, element) {
+        window.updateScheduleCell = function(day, time, element) {
             const key = `${day}-${time}`;
-            let data = scheduleData[key];
+            let data = window.scheduleData[key];
             
-            // On-the-fly migration: Convert old strings to objects
             if (typeof data !== 'object' || data === null) {
                 data = { text: '', bg: '', span: 1, hidden: false };
             }
 
-            // Save the rich text (innerHTML)
             data.text = element.innerHTML.trim();
 
-            // Clean up completely empty objects to save localStorage space
             if (!data.text && !data.bg && data.span === 1 && !data.hidden) {
-                delete scheduleData[key];
+                delete window.scheduleData[key];
             } else {
-                scheduleData[key] = data;
+                window.scheduleData[key] = data;
             }
-            saveSchedule();
-        }
+            window.saveSchedule();
+        };
 
-        function renderSchedule() {
+        window.renderSchedule = function() {
             const grid = document.getElementById('schedule-grid');
-            if (grid.children.length > 0) return; // Only build the grid once
+            if (grid.children.length > 0) return; 
 
             const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
             const times = [];
             
-            // Generate 30-min intervals
             for (let h = 7; h <= 20; h++) {
                 const hour12 = h > 12 ? h - 12 : h;
                 const ampm = h >= 12 ? 'PM' : 'AM';
@@ -1253,25 +1456,23 @@
                 if (h !== 20) times.push(`${hour12}:30 ${ampm}`);
             }
 
-            // Headers need explicit grid positions
             let html = `<div class="schedule-header" style="grid-row: 1; grid-column: 1;">Time</div>`;
             days.forEach((day, dIdx) => {
                 html += `<div class="schedule-header" style="grid-row: 1; grid-column: ${dIdx + 2};">${day}</div>`;
             });
 
             times.forEach((time, tIdx) => {
-                const row = tIdx + 2; // +2 because row 1 is header
+                const row = tIdx + 2; 
                 html += `<div class="schedule-time" style="grid-row: ${row}; grid-column: 1;">${time}</div>`;
                 
                 days.forEach((day, dIdx) => {
                     const col = dIdx + 2;
                     const key = `${day}-${time}`;
-                    let data = scheduleData[key];
+                    let data = window.scheduleData[key];
                     
-                    // Legacy migration logic for older string saves
                     if (typeof data === 'string') {
                         data = { text: data, bg: '', span: 1, hidden: false };
-                        scheduleData[key] = data; // Update in memory
+                        window.scheduleData[key] = data; 
                     }
                     
                     const content = data ? data.text : '';
@@ -1288,98 +1489,92 @@
             });
 
             grid.innerHTML = html;
-        }
-        // --- SCHEDULE MERGING & COLOR LOGIC ---
-        function applyCellColor(color) {
+        };
+
+        window.applyCellColor = function(color) {
             if (!window.activeScheduleCell) return;
             const cell = window.activeScheduleCell;
-            cell.style.backgroundColor = color; // Change visual color immediately
+            cell.style.backgroundColor = color; 
 
             const day = cell.dataset.day;
             const time = cell.dataset.time;
             const key = `${day}-${time}`;
 
-            if(typeof scheduleData[key] !== 'object') {
-                scheduleData[key] = { text: cell.innerHTML, bg: '', span: 1, hidden: false };
+            if(typeof window.scheduleData[key] !== 'object') {
+                window.scheduleData[key] = { text: cell.innerHTML, bg: '', span: 1, hidden: false };
             }
-            scheduleData[key].bg = color;
-            saveSchedule();
-        }
+            window.scheduleData[key].bg = color;
+            window.saveSchedule();
+        };
 
-        function mergeScheduleCells() {
+        window.mergeScheduleCells = function() {
             if (!window.activeScheduleCell) return;
             const cell = window.activeScheduleCell;
             const day = cell.dataset.day;
             const tIdx = parseInt(cell.dataset.tidx);
             
-            // Get current span length (default 1 block)
             const currentSpan = parseInt(cell.style.gridRowEnd ? cell.style.gridRowEnd.replace('span ', '') : 1) || 1;
             const nextTidx = tIdx + currentSpan;
             const nextCell = document.getElementById(`cell-${day}-${nextTidx}`);
 
             if (!nextCell) {
-                alert("Cannot merge past the end of the schedule.");
+                window.showToast("Cannot merge past the end of the schedule.", "error");
                 return; 
             }
 
-            // Expand the top cell and hide the bottom cell
             const newSpan = currentSpan + 1;
             cell.style.gridRow = `${cell.dataset.row} / span ${newSpan}`;
             nextCell.style.display = 'none';
 
-            // Merge any text that was in the bottom cell into the top one
             if (nextCell.innerHTML.trim() && nextCell.innerHTML !== '<br>') {
                 cell.innerHTML += '<br>' + nextCell.innerHTML;
                 nextCell.innerHTML = '';
             }
 
-            // Save changes for Top Cell
             const key1 = `${day}-${cell.dataset.time}`;
-            if(typeof scheduleData[key1] !== 'object') scheduleData[key1] = {text: cell.innerHTML, bg: cell.style.backgroundColor, span: 1, hidden: false};
-            scheduleData[key1].span = newSpan;
-            scheduleData[key1].text = cell.innerHTML; 
+            if(typeof window.scheduleData[key1] !== 'object') window.scheduleData[key1] = {text: cell.innerHTML, bg: cell.style.backgroundColor, span: 1, hidden: false};
+            window.scheduleData[key1].span = newSpan;
+            window.scheduleData[key1].text = cell.innerHTML; 
 
-            // Save changes for Hidden Cell
             const key2 = `${day}-${nextCell.dataset.time}`;
-            if(typeof scheduleData[key2] !== 'object') scheduleData[key2] = {text: '', bg: '', span: 1, hidden: false};
-            scheduleData[key2].hidden = true;
-            scheduleData[key2].text = '';
+            if(typeof window.scheduleData[key2] !== 'object') window.scheduleData[key2] = {text: '', bg: '', span: 1, hidden: false};
+            window.scheduleData[key2].hidden = true;
+            window.scheduleData[key2].text = '';
 
-            saveSchedule();
-            cell.focus(); // Keep focus so you can click merge repeatedly!
-        }
+            window.saveSchedule();
+            cell.focus(); 
+        };
 
-        function unmergeScheduleCells() {
+        window.unmergeScheduleCells = function() {
             if (!window.activeScheduleCell) return;
             const cell = window.activeScheduleCell;
             const day = cell.dataset.day;
             const tIdx = parseInt(cell.dataset.tidx);
             
             const currentSpan = parseInt(cell.style.gridRowEnd ? cell.style.gridRowEnd.replace('span ', '') : 1) || 1;
-            if (currentSpan <= 1) return; // Nothing to unmerge
+            if (currentSpan <= 1) return; 
 
-            // Reset top cell back to single block
             cell.style.gridRow = `${cell.dataset.row} / span 1`;
             const key1 = `${day}-${cell.dataset.time}`;
-            if(scheduleData[key1]) scheduleData[key1].span = 1;
+            if(window.scheduleData[key1]) window.scheduleData[key1].span = 1;
 
-            // Unhide all cells that were swallowed by the merge
             for(let i = 1; i < currentSpan; i++) {
                 const hiddenTidx = tIdx + i;
                 const hiddenCell = document.getElementById(`cell-${day}-${hiddenTidx}`);
                 if (hiddenCell) {
-                    hiddenCell.style.display = ''; // Removes display:none
+                    hiddenCell.style.display = ''; 
                     const hiddenKey = `${day}-${hiddenCell.dataset.time}`;
-                    if(scheduleData[hiddenKey]) scheduleData[hiddenKey].hidden = false;
+                    if(window.scheduleData[hiddenKey]) window.scheduleData[hiddenKey].hidden = false;
                 }
             }
 
-            saveSchedule();
+            window.saveSchedule();
             cell.focus();
-        }
-        // Initialize Everything
-        renderTasks();
-        renderEvents();
+        };
+
+        // Initialize UI before DB loads
+        window.renderTasks();
+        window.renderEvents();
     </script>
-    </body>
-    </html>
+</body>
+</html>
