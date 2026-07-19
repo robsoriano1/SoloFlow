@@ -222,7 +222,7 @@
         
         <div id="auth-banner">
             <span id="auth-status">Verifying sync availability...</span>
-            <button id="auth-btn" style="padding: 6px 12px; margin: 0; display: none;">Connected</button>
+            <button id="auth-btn" style="padding: 6px 12px; margin: 0; background: var(--success); cursor: default;" disabled>Securing Sync...</button>
         </div>
         
         <div id="bannerImage"></div>
@@ -420,13 +420,28 @@
 
         // Global Immersive App Identifiers
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
+        let app = null;
+        let auth = null;
+        let db = null;
         let currentUser = null;
+        let firebaseEnabled = false;
+
+        // SAFELY verify if valid config exists so the app doesn't crash on boot
+        try {
+            const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+            if (configStr) {
+                const firebaseConfig = JSON.parse(configStr);
+                if (firebaseConfig.apiKey) {
+                    app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+                    firebaseEnabled = true;
+                }
+            }
+        } catch (e) {
+            console.warn("Could not parse Firebase config. Falling back to local offline mode.");
+        }
 
         const defaultSettings = {
             title: "Rob's Globe and ADMU Task and Events Tracker", bgColor: '#f4f4f9', surfaceColor: '#ffffff',
@@ -439,7 +454,7 @@
         let events = [];
         let scheduleData = {};
         
-        // --- CUSTOM UI NOTIFICATION ---
+        // Custom UI Notification
         window.showNotification = function(msg) {
             const toast = document.getElementById('notification-toast');
             toast.innerText = msg;
@@ -451,8 +466,38 @@
             }, 3000);
         };
 
-        // --- AUTHENTICATION INIT (RULE 3) ---
+        // Local Storage Helpers
+        const getLocal = (key, def) => { try { return JSON.parse(localStorage.getItem(key)) || def; } catch(e) { return def; } };
+        const setLocal = (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) { } };
+
+        // Local Fallback Loader
+        function loadFromLocal() {
+            settings = getLocal('trackerSettings', defaultSettings);
+            tasks = getLocal('trackerTasks', []);
+            events = getLocal('trackerEvents', []);
+            scheduleData = getLocal('trackerSchedule', {});
+            
+            applySettings();
+            renderTasks();
+            renderEvents();
+            if (currentView === 'schedule') renderSchedule();
+            if (currentView === 'calendar') renderCalendar();
+        }
+
+        // --- AUTHENTICATION INIT ---
         async function initializePlatformAuth() {
+            const authBtn = document.getElementById('auth-btn');
+            const statusEl = document.getElementById('auth-status');
+
+            if (!firebaseEnabled) {
+                statusEl.innerHTML = `⚠️ Running in Offline Local Mode`;
+                authBtn.innerText = "No Cloud Available";
+                authBtn.style.background = "var(--border)";
+                authBtn.style.color = "var(--text)";
+                loadFromLocal();
+                return;
+            }
+
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -460,23 +505,31 @@
                     await signInAnonymously(auth);
                 }
                 currentUser = auth.currentUser;
-                document.getElementById('auth-status').innerHTML = `🟢 Live Sync Active`;
+                
+                statusEl.innerHTML = `🟢 Live Sync Active`;
+                authBtn.innerText = "Securely Synced";
+                authBtn.style.background = "var(--success)";
+
                 startRealtimeSync();
             } catch (err) {
                 console.error("Authentication Error", err);
-                document.getElementById('auth-status').innerHTML = `🔴 Sync Failed`;
-                window.showNotification("Unable to connect to sync server.");
+                statusEl.innerHTML = `🔴 Sync Failed`;
+                authBtn.innerText = "Offline";
+                authBtn.style.background = "var(--danger)";
+                window.showNotification("Unable to connect to sync server. Using Local Storage.");
+                
+                firebaseEnabled = false; // Disable cloud saves
+                loadFromLocal();
             }
         }
 
-        // Helper path generator (RULE 1)
+        // Helper path generator
         const getColPath = (colName) => `artifacts/${appId}/users/${currentUser.uid}/${colName}`;
 
         // --- REALTIME FIRESTORE SYNC LOGIC ---
         function startRealtimeSync() {
-            if (!currentUser) return;
+            if (!currentUser || !firebaseEnabled) return;
 
-            // 1. Sync Settings
             onSnapshot(doc(db, getColPath('settings'), 'global'), (docSnap) => {
                 if (docSnap.exists()) {
                     settings = { ...defaultSettings, ...docSnap.data() };
@@ -484,19 +537,16 @@
                 applySettings();
             }, (err) => console.error(err));
 
-            // 2. Sync Tasks
             onSnapshot(collection(db, getColPath('tasks')), (snapshot) => {
                 tasks = snapshot.docs.map(d => d.data());
                 renderTasks();
             }, (err) => console.error(err));
 
-            // 3. Sync Events
             onSnapshot(collection(db, getColPath('events')), (snapshot) => {
                 events = snapshot.docs.map(d => d.data());
                 renderEvents();
             }, (err) => console.error(err));
 
-            // 4. Sync Schedule
             onSnapshot(doc(db, getColPath('schedule'), 'weekly'), (docSnap) => {
                 if (docSnap.exists()) {
                     scheduleData = docSnap.data();
@@ -507,35 +557,63 @@
             }, (err) => console.error(err));
         }
 
-        // --- DB WRITE OPERATIONS ---
+        // --- STREAMING_CHUNK:Safe Database Writes ---
         async function saveSettingsToDB() {
-            if (!currentUser) return;
-            await setDoc(doc(db, getColPath('settings'), 'global'), settings);
+            if (firebaseEnabled && currentUser) {
+                try { await setDoc(doc(db, getColPath('settings'), 'global'), settings); } catch(e){ console.error(e); }
+            } else {
+                setLocal('trackerSettings', settings);
+            }
         }
 
         async function saveTaskToDB(taskObj) {
-            if (!currentUser) return;
-            await setDoc(doc(db, getColPath('tasks'), taskObj.id), taskObj);
+            if (firebaseEnabled && currentUser) {
+                try { await setDoc(doc(db, getColPath('tasks'), taskObj.id), taskObj); } catch(e){ console.error(e); }
+            } else {
+                const idx = tasks.findIndex(t => t.id === taskObj.id);
+                if(idx > -1) tasks[idx] = taskObj; else tasks.push(taskObj);
+                setLocal('trackerTasks', tasks);
+                renderTasks(); // Trigger UI rebuild for local
+            }
         }
 
         async function deleteTaskFromDB(id) {
-            if (!currentUser) return;
-            await deleteDoc(doc(db, getColPath('tasks'), id));
+            if (firebaseEnabled && currentUser) {
+                try { await deleteDoc(doc(db, getColPath('tasks'), id)); } catch(e){ console.error(e); }
+            } else {
+                tasks = tasks.filter(t => t.id !== id);
+                setLocal('trackerTasks', tasks);
+                renderTasks();
+            }
         }
 
         async function saveEventToDB(eventObj) {
-            if (!currentUser) return;
-            await setDoc(doc(db, getColPath('events'), eventObj.id), eventObj);
+            if (firebaseEnabled && currentUser) {
+                try { await setDoc(doc(db, getColPath('events'), eventObj.id), eventObj); } catch(e){ console.error(e); }
+            } else {
+                const idx = events.findIndex(e => e.id === eventObj.id);
+                if(idx > -1) events[idx] = eventObj; else events.push(eventObj);
+                setLocal('trackerEvents', events);
+                renderEvents();
+            }
         }
 
         async function deleteEventFromDB(id) {
-            if (!currentUser) return;
-            await deleteDoc(doc(db, getColPath('events'), id));
+            if (firebaseEnabled && currentUser) {
+                try { await deleteDoc(doc(db, getColPath('events'), id)); } catch(e){ console.error(e); }
+            } else {
+                events = events.filter(e => e.id !== id);
+                setLocal('trackerEvents', events);
+                renderEvents();
+            }
         }
 
         async function saveScheduleToDB() {
-            if (!currentUser) return;
-            await setDoc(doc(db, getColPath('schedule'), 'weekly'), scheduleData);
+            if (firebaseEnabled && currentUser) {
+                try { await setDoc(doc(db, getColPath('schedule'), 'weekly'), scheduleData); } catch(e){ console.error(e); }
+            } else {
+                setLocal('trackerSchedule', scheduleData);
+            }
         }
 
 
