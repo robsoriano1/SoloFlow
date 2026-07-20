@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoloFlow - Task Tracker</title>
+    <title>Rob's Globe and ADMU Task and Events Tracker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         :root {
@@ -480,6 +480,15 @@
         // --- AUTH LOGIC ---
         async function initAuth() {
             try {
+                // CRITICAL FIX: Wait for Firebase to check browser memory for an existing session
+                await auth.authStateReady(); 
+                
+                // If a user is already logged in (via Google OR Anonymous), stop here! 
+                // Do not overwrite their session.
+                if (auth.currentUser) {
+                    return; 
+                }
+
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -546,6 +555,20 @@
 
         document.getElementById('btn-google-logout').addEventListener('click', async () => {
             try {
+                // Clear local memory so the logged-out state is clean
+                window.tasks = [];
+                window.events = [];
+                window.scheduleData = {};
+                localStorage.removeItem('tasks');
+                localStorage.removeItem('trackerEvents');
+                localStorage.removeItem('weeklySchedule');
+                window.renderTasks();
+                window.renderEvents();
+                if (currentView === 'schedule') {
+                     document.getElementById('schedule-grid').innerHTML = '';
+                     window.renderSchedule();
+                }
+
                 await signOut(auth);
                 // Re-init anonymous so the app doesn't break
                 initAuth(); 
@@ -598,6 +621,9 @@
                         localStorage.setItem('trackerSettings', JSON.stringify(window.settings));
                         applySettings();
                     }
+                } else {
+                    // Initialize cloud with local settings
+                    window.saveSettings();
                 }
             }, (error) => console.error("Settings Sync Error:", error));
 
@@ -610,6 +636,9 @@
                         localStorage.setItem('tasks', JSON.stringify(window.tasks));
                         window.renderTasks();
                     }
+                } else if (window.tasks && window.tasks.length > 0) {
+                    // Initialize cloud with local tasks
+                    window.saveTasks(true);
                 }
             }, (error) => console.error("Tasks Sync Error:", error));
 
@@ -622,6 +651,9 @@
                         localStorage.setItem('trackerEvents', JSON.stringify(window.events));
                         window.renderEvents();
                     }
+                } else if (window.events && window.events.length > 0) {
+                    // Initialize cloud with local events
+                    window.saveEvents();
                 }
             }, (error) => console.error("Events Sync Error:", error));
 
@@ -637,6 +669,9 @@
                              window.renderSchedule();
                         }
                     }
+                } else if (Object.keys(window.scheduleData).length > 0) {
+                    // Initialize cloud with local schedule
+                    window.saveSchedule();
                 }
             }, (error) => console.error("Schedule Sync Error:", error));
 
