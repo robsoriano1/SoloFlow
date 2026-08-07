@@ -455,8 +455,11 @@
                 <input type="text" id="taskSubtasks" class="flex-grow" placeholder="Subtasks (comma separated)">
             </div>
             
+            <!-- NEW: Upload OR Link Photo Row -->
             <div class="form-row">
-                <input type="url" id="taskPhotoUrl" class="flex-grow" placeholder="Photo URL (e.g., https://imgur.com/...png)">
+                <input type="url" id="taskPhotoUrl" class="flex-grow" placeholder="Photo URL (https://...) OR upload a file ->">
+                <input type="file" id="taskPhotoFile" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+                <button type="button" class="btn-alt" onclick="document.getElementById('taskPhotoFile').click()">📁 Upload Photo</button>
                 <input type="url" id="taskLinkUrl" class="flex-grow" placeholder="Reference Link (e.g., https://shopify.com/...)">
                 <input type="url" id="taskWorkspaceUrl" class="flex-grow" placeholder="Workspace / Doc Link (e.g., Google Docs, Notion, Drive)">
             </div>
@@ -783,6 +786,63 @@
         applySettings();
 
         // --- TASK TRACKER LOGIC ---
+        
+        // NEW: Handle Photo File Upload in Form
+        window.handlePhotoUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('taskPhotoUrl').value = e.target.result;
+                window.showToast("Photo file attached!", "success");
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // NEW: Handle Photo Upload/Link editing on Existing Card
+        window.editTaskPhoto = function(taskId) {
+            const task = window.tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            const choice = confirm("Press OK to UPLOAD an image file from your device, or press CANCEL to ENTER an image URL.");
+            if (choice) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (readerEvent) => {
+                            task.photoUrl = readerEvent.target.result;
+                            window.saveTasks();
+                            window.showToast("Photo uploaded to card!", "success");
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                input.click();
+            } else {
+                const newUrl = prompt("Enter Image URL (or leave blank to remove photo):", task.photoUrl || "");
+                if (newUrl !== null) {
+                    task.photoUrl = newUrl.trim();
+                    window.saveTasks();
+                }
+            }
+        };
+
+        // NEW: Dynamic Subtask Addition
+        window.addSubtask = function(taskId) {
+            const task = window.tasks.find(t => t.id === taskId);
+            if (!task) return;
+            const text = prompt("Enter new subtask:");
+            if (text && text.trim()) {
+                if (!task.subtasks) task.subtasks = [];
+                task.subtasks.push({ text: text.trim(), completed: false });
+                window.saveTasks();
+            }
+        };
+
         window.addTask = function() {
             const title = document.getElementById('taskTitle').value.trim();
             if (!title) return;
@@ -822,7 +882,6 @@
             window.saveTasks();
         };
 
-        // NEW: Toggle Expandable Task Card Area
         window.toggleCardExpand = function(taskId) {
             const expandArea = document.getElementById(`expand-${taskId}`);
             const btn = document.getElementById(`btn-expand-${taskId}`);
@@ -1359,9 +1418,9 @@
                 const descText = task.description || '';
                 const descHtml = `<div class="task-desc editable" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${descText}</div>`;
                 
-                let subtasksHtml = '';
+                // NEW: Dynamic subtask renderer with "+ Add Subtask" inside expandable area
+                let subtasksHtml = '<div class="subtasks-list">';
                 if(task.subtasks && task.subtasks.length > 0) {
-                    subtasksHtml = '<div class="subtasks-list">';
                     task.subtasks.forEach((st, idx) => {
                         const checked = st.completed ? 'checked' : '';
                         const strikeClass = st.completed ? 'completed' : '';
@@ -1374,8 +1433,9 @@
                             </div>
                         `;
                     });
-                    subtasksHtml += '</div>';
                 }
+                subtasksHtml += `<button class="btn-small" style="margin-top: 4px; align-self: flex-start; color: var(--primary); border-color: rgba(74, 144, 226, 0.4); font-weight: bold;" onclick="addSubtask('${task.id}')">+ Add Subtask</button>`;
+                subtasksHtml += '</div>';
 
                 let dueBadgeHtml = '';
                 if (task.dueDate && task.status !== 'done') {
@@ -1468,6 +1528,7 @@
                         ${metaHtml}
                         ${timerHtml}
                         <div class="actions" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px;">
+                           <button class="btn-small" title="Upload or link a photo" onclick="editTaskPhoto('${task.id}')">📷 Photo</button>
                            <button class="btn-small" title="Edit Reference or Workspace/Doc Links" onclick="editTaskLinks('${task.id}')">✏️ Links</button>
                            ${task.dueDate ? `<button class="btn-small" style="color: ${syncColor}; border-color: ${syncColor}; font-weight: bold;" title="Sync to internal Calendar tab" onclick="syncTaskToCalendarApp('${task.id}')">${syncText}</button>` : ''}
                            ${task.dueDate ? `<button class="btn-small" title="Export .ics file for Google Calendar/Apple" onclick="syncTaskToCalendarFile('${task.id}')">💾 .ics</button>` : ''}
