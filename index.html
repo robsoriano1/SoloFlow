@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoloFlow - Task and Events Tracker</title>
+    <title>Rob's Globe and ADMU Task and Events Tracker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         :root {
@@ -133,11 +133,15 @@
 
         /* Attachments & Events */
         .task-photo { width: 100%; height: auto; max-height: 160px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 10px; display: block; }
+        
+        .task-links-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
         .task-link { 
             display: inline-block; font-size: 12px; font-weight: bold; color: var(--primary); text-decoration: none; 
-            margin-bottom: 10px; background: rgba(255,255,255,0.6); padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.7); padding: 5px 10px; border-radius: 4px; border: 1px solid var(--border);
         }
         .task-link:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .task-link.doc-link { color: #8e44ad; }
+        .task-link.doc-link:hover { background: #8e44ad; color: white; border-color: #8e44ad; }
 
         /* Inline Editing Styles */
         .editable { outline: none; border: 1px dashed transparent; border-radius: 4px; padding: 2px 4px; margin-left: -4px; transition: background-color 0.2s, border-color 0.2s; }
@@ -147,10 +151,19 @@
 
         .task-title { font-weight: bold; margin-bottom: 5px; color: var(--card-text); }
         .task-desc { font-size: 13px; color: var(--card-text); opacity: 0.9; margin-bottom: 10px; line-height: 1.4; min-height: 20px; }
-        .task-metric { font-size: 14px; font-weight: bold; color: var(--success); margin-bottom: 10px; }
         
-        .task-meta { font-size: 12px; background: rgba(255, 255, 255, 0.3); padding: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid rgba(0,0,0,0.05); }
-        .task-meta p { margin: 3px 0; color: var(--card-text); }
+        /* Budget / Profit Styles */
+        .task-metric { font-size: 14px; font-weight: bold; margin-bottom: 10px; display: inline-block; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.5); border: 1px solid rgba(0,0,0,0.08); }
+        .metric-profit { color: var(--success); }
+        .metric-budget { color: #d97706; }
+        
+        /* Editable Task Meta (Dates) */
+        .task-meta { font-size: 12px; background: rgba(255, 255, 255, 0.4); padding: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid rgba(0,0,0,0.08); }
+        .task-meta p { margin: 5px 0; color: var(--card-text); display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+        .meta-input-date, .meta-input-time {
+            padding: 2px 5px; border: 1px solid var(--border); border-radius: 4px;
+            background: rgba(255,255,255,0.8); color: var(--card-text); font-size: 11px; font-family: inherit;
+        }
         
         .subtasks-list { margin-bottom: 10px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
         .subtask-item { font-size: 12px; display: flex; align-items: flex-start; gap: 8px; color: var(--card-text); }
@@ -165,8 +178,8 @@
         .badge.low { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
         
         .actions { display: flex; justify-content: space-between; }
-        .btn-small { padding: 5px 10px; font-size: 12px; background: rgba(255, 255, 255, 0.4); border: 1px solid var(--border); color: var(--card-text); border-radius: 4px; cursor: pointer; }
-        .btn-small:hover { background: rgba(255, 255, 255, 0.8); }
+        .btn-small { padding: 5px 10px; font-size: 12px; background: rgba(255, 255, 255, 0.5); border: 1px solid var(--border); color: var(--card-text); border-radius: 4px; cursor: pointer; }
+        .btn-small:hover { background: rgba(255, 255, 255, 0.9); }
         .btn-danger { background: none; color: var(--danger); border: 1px solid var(--danger); }
         .btn-danger:hover { background: var(--danger); color: white; }
 
@@ -239,7 +252,7 @@
             
             <button onmousedown="event.preventDefault(); formatText('removeFormat')" title="Clear Format">✕</button>
 
-            <!-- NEW SCHEDULE TOOLS (Hidden by default, shown only in schedule) -->
+            <!-- SCHEDULE TOOLS (Hidden by default, shown only in schedule) -->
             <div id="scheduleTools" style="display: none; align-items: center; gap: 4px; border-left: 1px solid var(--border); padding-left: 4px; margin-left: 2px;">
                 <input type="color" id="cellBgColor" value="#ffffff" style="width: 20px; height: 20px; padding: 0; border: none; cursor: pointer; background: transparent;" title="Fill Cell Color" oninput="applyCellColor(this.value)">
                 <button onmousedown="event.preventDefault(); mergeScheduleCells()" title="Merge Down">⬇️</button>
@@ -300,8 +313,12 @@
                 <h4>📊 Productivity Analytics</h4>
                 <div class="settings-grid" style="text-align: center; gap: 10px;">
                     <div class="setting-item" style="background: rgba(46, 204, 113, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(46, 204, 113, 0.3);">
-                        <label>Total Value Earned</label>
+                        <label>Total Profit Earned</label>
                         <div id="stat-value" style="font-size: 16px; font-weight: bold; color: var(--success); margin-top: 5px;">₱0.00</div>
+                    </div>
+                    <div class="setting-item" style="background: rgba(217, 119, 6, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(217, 119, 6, 0.3);">
+                        <label>Total Budget Allocated</label>
+                        <div id="stat-budget" style="font-size: 16px; font-weight: bold; color: #d97706; margin-top: 5px;">₱0.00</div>
                     </div>
                     <div class="setting-item" style="background: rgba(74, 144, 226, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(74, 144, 226, 0.3);">
                         <label>Tasks Finished</label>
@@ -332,8 +349,7 @@
             </div>
         </details>
 
-        
-       <!-- View Switcher Tabs -->
+        <!-- View Switcher Tabs -->
         <div class="view-tabs">
             <button class="view-tab active" id="tab-all" onclick="setView('all')">Kanban Board</button>
             <button class="view-tab" id="tab-today" onclick="setView('today')">Today's Focus</button>
@@ -379,7 +395,11 @@
                     <option value="Medium" selected>Medium Priority</option>
                     <option value="High">High Priority</option>
                 </select>
-                <input type="number" id="taskBudget" placeholder="Budget / Profit (₱)" step="0.01">
+                <select id="taskFinanceType" style="min-width: 110px;">
+                    <option value="Profit">Profit</option>
+                    <option value="Budget">Budget</option>
+                </select>
+                <input type="number" id="taskBudget" placeholder="Amount (₱)" step="0.01">
             </div>
             
             <textarea id="taskDescription" placeholder="Add a description or notes..."></textarea>
@@ -391,6 +411,7 @@
             <div class="form-row">
                 <input type="url" id="taskPhotoUrl" class="flex-grow" placeholder="Photo URL (e.g., https://imgur.com/...png)">
                 <input type="url" id="taskLinkUrl" class="flex-grow" placeholder="Reference Link (e.g., https://shopify.com/...)">
+                <input type="url" id="taskWorkspaceUrl" class="flex-grow" placeholder="Workspace / Doc Link (e.g., Google Docs, Notion, Drive)">
             </div>
             
             <div class="form-row">
@@ -441,7 +462,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration (from user)
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAOzHxHzVdHZrioqmVqPmD6wOvdUQL9zS8",
             authDomain: "soloflow-41bfb.firebaseapp.com",
@@ -456,7 +477,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Required paths configuration
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'soloflow-tracker';
         let userId = null;
         let unsubscribers = [];
@@ -474,21 +494,11 @@
             setTimeout(() => toast.remove(), 3300);
         };
 
-        // Custom global error wrapper for Firebase methods
         window.alert = window.showToast;
 
         // --- AUTH LOGIC ---
         async function initAuth() {
             try {
-                // CRITICAL FIX: Wait for Firebase to check browser memory for an existing session
-                await auth.authStateReady(); 
-                
-                // If a user is already logged in (via Google OR Anonymous), stop here! 
-                // Do not overwrite their session.
-                if (auth.currentUser) {
-                    return; 
-                }
-
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -526,8 +536,6 @@
                     btnLogin.style.display = 'none';
                     btnLogout.style.display = 'inline-block';
                 }
-                
-                // Once authenticated, start listening to Firestore data
                 setupFirestoreListeners();
             } else {
                 userId = null;
@@ -536,7 +544,6 @@
                 btnLogin.style.display = 'flex';
                 btnLogout.style.display = 'none';
                 
-                // Clear listeners
                 unsubscribers.forEach(unsub => unsub());
                 unsubscribers = [];
             }
@@ -555,22 +562,7 @@
 
         document.getElementById('btn-google-logout').addEventListener('click', async () => {
             try {
-                // Clear local memory so the logged-out state is clean
-                window.tasks = [];
-                window.events = [];
-                window.scheduleData = {};
-                localStorage.removeItem('tasks');
-                localStorage.removeItem('trackerEvents');
-                localStorage.removeItem('weeklySchedule');
-                window.renderTasks();
-                window.renderEvents();
-                if (currentView === 'schedule') {
-                     document.getElementById('schedule-grid').innerHTML = '';
-                     window.renderSchedule();
-                }
-
                 await signOut(auth);
-                // Re-init anonymous so the app doesn't break
                 initAuth(); 
                 window.showToast("Signed out. Using local cloud profile.");
             } catch (error) {
@@ -578,12 +570,9 @@
             }
         });
 
-        // Initialize App Auth
         initAuth();
 
         // --- GLOBAL VARIABLES & DATA MANAGEMENT ---
-        // Expose functions to window so inline HTML event handlers can call them
-        
         window.formatTime = function(time24) {
             if (!time24) return '';
             const [hours, minutes] = time24.split(':');
@@ -607,12 +596,9 @@
         // --- FIRESTORE LISTENERS ---
         function setupFirestoreListeners() {
             if (!userId) return;
-            
-            // Clear existing listeners if re-authenticating
             unsubscribers.forEach(unsub => unsub());
             unsubscribers = [];
 
-            // 1. Settings Listener
             const settingsUnsub = onSnapshot(getDocPath('trackerData', 'settings'), (doc) => {
                 if (doc.exists()) {
                     const cloudSettings = doc.data();
@@ -621,13 +607,9 @@
                         localStorage.setItem('trackerSettings', JSON.stringify(window.settings));
                         applySettings();
                     }
-                } else {
-                    // Initialize cloud with local settings
-                    window.saveSettings();
                 }
             }, (error) => console.error("Settings Sync Error:", error));
 
-            // 2. Tasks Listener
             const tasksUnsub = onSnapshot(getDocPath('trackerData', 'tasks'), (doc) => {
                 if (doc.exists()) {
                     const cloudTasks = doc.data().data || [];
@@ -636,13 +618,9 @@
                         localStorage.setItem('tasks', JSON.stringify(window.tasks));
                         window.renderTasks();
                     }
-                } else if (window.tasks && window.tasks.length > 0) {
-                    // Initialize cloud with local tasks
-                    window.saveTasks(true);
                 }
             }, (error) => console.error("Tasks Sync Error:", error));
 
-            // 3. Events Listener
             const eventsUnsub = onSnapshot(getDocPath('trackerData', 'events'), (doc) => {
                 if (doc.exists()) {
                     const cloudEvents = doc.data().data || [];
@@ -651,13 +629,9 @@
                         localStorage.setItem('trackerEvents', JSON.stringify(window.events));
                         window.renderEvents();
                     }
-                } else if (window.events && window.events.length > 0) {
-                    // Initialize cloud with local events
-                    window.saveEvents();
                 }
             }, (error) => console.error("Events Sync Error:", error));
 
-            // 4. Schedule Listener
             const scheduleUnsub = onSnapshot(getDocPath('trackerData', 'schedule'), (doc) => {
                 if (doc.exists()) {
                     const cloudSchedule = doc.data().data || {};
@@ -665,13 +639,10 @@
                         window.scheduleData = cloudSchedule;
                         localStorage.setItem('weeklySchedule', JSON.stringify(window.scheduleData));
                         if(currentView === 'schedule') {
-                             document.getElementById('schedule-grid').innerHTML = ''; // Force rebuild
+                             document.getElementById('schedule-grid').innerHTML = '';
                              window.renderSchedule();
                         }
                     }
-                } else if (Object.keys(window.scheduleData).length > 0) {
-                    // Initialize cloud with local schedule
-                    window.saveSchedule();
                 }
             }, (error) => console.error("Schedule Sync Error:", error));
 
@@ -679,7 +650,6 @@
         }
 
         // --- FIRESTORE SAVE WRAPPERS ---
-        
         window.saveSettings = function() {
             window.settings = {
                 title: document.getElementById('pageTitle').innerText.trim() || "Rob's Globe and ADMU Task and Events Tracker",
@@ -726,7 +696,6 @@
             }
         };
 
-
         // --- SETTINGS LOGIC ---
         function applySettings() {
             document.getElementById('pageTitle').innerText = window.settings.title;
@@ -765,7 +734,6 @@
         applySettings();
 
         // --- TASK TRACKER LOGIC ---
-
         window.addTask = function() {
             const title = document.getElementById('taskTitle').value.trim();
             if (!title) return;
@@ -781,11 +749,13 @@
                 title: title,
                 category: document.getElementById('taskCategory').value.trim() || 'General',
                 priority: document.getElementById('taskPriority').value,
+                financeType: document.getElementById('taskFinanceType').value || 'Profit',
                 budget: document.getElementById('taskBudget').value,
                 description: document.getElementById('taskDescription').value.trim(),
                 subtasks: subtasksArr,
                 photoUrl: document.getElementById('taskPhotoUrl').value.trim(),
                 linkUrl: document.getElementById('taskLinkUrl').value.trim(),
+                workspaceUrl: document.getElementById('taskWorkspaceUrl').value.trim(),
                 assignee: document.getElementById('taskAssignee').value.trim(),
                 dateAssigned: document.getElementById('taskDateAssigned').value,
                 dueDate: document.getElementById('taskDueDate').value,
@@ -797,9 +767,32 @@
 
             window.tasks.push(newTask);
             
-            ['taskTitle','taskCategory','taskBudget','taskDescription','taskSubtasks','taskPhotoUrl','taskLinkUrl','taskAssignee','taskDateAssigned','taskDueDate','taskDueTime','taskBlockedBy'].forEach(id => {
+            ['taskTitle','taskCategory','taskBudget','taskDescription','taskSubtasks','taskPhotoUrl','taskLinkUrl','taskWorkspaceUrl','taskAssignee','taskDateAssigned','taskDueDate','taskDueTime','taskBlockedBy'].forEach(id => {
                 document.getElementById(id).value = '';
             });
+            window.saveTasks();
+        };
+
+        // NEW: Inline Editable Date & Time Helper
+        window.updateTaskDate = function(taskId, field, value) {
+            const task = window.tasks.find(t => t.id === taskId);
+            if (task) {
+                task[field] = value;
+                window.saveTasks();
+            }
+        };
+
+        // NEW: Inline Link Editor
+        window.editTaskLinks = function(taskId) {
+            const task = window.tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            const newRefLink = prompt("Reference Link URL (e.g. Shopify, website):", task.linkUrl || "");
+            if (newRefLink !== null) task.linkUrl = newRefLink.trim();
+            
+            const newWorkspaceLink = prompt("Workspace / Doc Link URL (e.g. Google Docs, Notion, Drive):", task.workspaceUrl || "");
+            if (newWorkspaceLink !== null) task.workspaceUrl = newWorkspaceLink.trim();
+            
             window.saveTasks();
         };
 
@@ -871,7 +864,6 @@
             const link = document.getElementById('eventLink').value.trim();
             
             if(!title || !date) return;
-            
             window.events.push({ id: Date.now().toString(), title, date, time, link });
             
             document.getElementById('eventTitle').value = '';
@@ -891,7 +883,6 @@
             container.innerHTML = '';
             
             const sortedEvents = [...window.events].sort((a,b) => new Date(a.date) - new Date(b.date));
-            
             sortedEvents.forEach(ev => {
                 const eDate = new Date(ev.date);
                 const today = new Date();
@@ -981,7 +972,7 @@
         });
 
         window.handleDragStart = function(e, id) {
-            if (e.target.isContentEditable || e.target.type === 'checkbox' || e.target.tagName === 'BUTTON' || e.target.tagName === 'A') {
+            if (e.target.isContentEditable || e.target.type === 'checkbox' || e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT') {
                 e.preventDefault();
                 return;
             }
@@ -1175,7 +1166,8 @@
         };
 
         window.calculateAnalytics = function() {
-            let totalValue = 0;
+            let totalProfit = 0;
+            let totalBudget = 0;
             let finishedCount = 0;
             let overdueCount = 0;
             let totalSecondsTracked = 0;
@@ -1188,7 +1180,14 @@
 
                 if (task.status === 'done') {
                     finishedCount++;
-                    if (task.budget) totalValue += parseFloat(task.budget);
+                    if (task.budget) {
+                        const val = parseFloat(task.budget);
+                        if (task.financeType === 'Budget') {
+                            totalBudget += val;
+                        } else {
+                            totalProfit += val;
+                        }
+                    }
                 } 
                 else if (task.dueDate && task.status !== 'done') {
                     const due = new Date(task.dueDate);
@@ -1200,7 +1199,8 @@
             const hrs = Math.floor(totalSecondsTracked / 3600);
             const mins = Math.floor((totalSecondsTracked % 3600) / 60);
 
-            document.getElementById('stat-value').innerText = `₱${totalValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('stat-value').innerText = `₱${totalProfit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('stat-budget').innerText = `₱${totalBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             document.getElementById('stat-finished').innerText = finishedCount;
             document.getElementById('stat-overdue').innerText = overdueCount;
             document.getElementById('stat-velocity').innerText = `${(finishedCount / 7).toFixed(1)} / day`;
@@ -1274,8 +1274,24 @@
                 }
 
                 const photoHtml = task.photoUrl ? `<img src="${task.photoUrl}" class="task-photo" alt="Attached photo" onerror="this.style.display='none'">` : '';
-                const linkHtml = task.linkUrl ? `<a href="${task.linkUrl}" target="_blank" class="task-link">🔗 View Reference Link</a>` : '';
-                const budgetHtml = task.budget ? `<div class="task-metric">₱${parseFloat(task.budget).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>` : '';
+                
+                // NEW: Reference and Workspace / Doc Links
+                let linksContainerHtml = '';
+                if (task.linkUrl || task.workspaceUrl) {
+                    linksContainerHtml = `<div class="task-links-container">`;
+                    if (task.linkUrl) {
+                        linksContainerHtml += `<a href="${task.linkUrl}" target="_blank" class="task-link">🔗 Reference Link</a>`;
+                    }
+                    if (task.workspaceUrl) {
+                        linksContainerHtml += `<a href="${task.workspaceUrl}" target="_blank" class="task-link doc-link">📄 Workspace / Doc</a>`;
+                    }
+                    linksContainerHtml += `</div>`;
+                }
+
+                // NEW: Explicit Budget vs Profit label & styling
+                const financeTypeLabel = task.financeType || 'Profit';
+                const financeClass = financeTypeLabel === 'Budget' ? 'metric-budget' : 'metric-profit';
+                const budgetHtml = task.budget ? `<div class="task-metric ${financeClass}">${financeTypeLabel}: ₱${parseFloat(task.budget).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>` : '';
                 
                 const descText = task.description || '';
                 const descHtml = `<div class="task-desc editable" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${descText}</div>`;
@@ -1307,26 +1323,32 @@
                     const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
                     
                     if (diffDays < 0) {
-                        dueBadgeHtml = `<p style="color: var(--danger); font-weight: bold;">⚠️ Overdue by ${Math.abs(diffDays)} days</p>`;
+                        dueBadgeHtml = `<p style="color: var(--danger); font-weight: bold; width: 100%;">⚠️ Overdue by ${Math.abs(diffDays)} days</p>`;
                     } else if (diffDays === 0) {
-                        dueBadgeHtml = `<p style="color: var(--warning); font-weight: bold;">⏰ Due Today</p>`;
+                        dueBadgeHtml = `<p style="color: var(--warning); font-weight: bold; width: 100%;">⏰ Due Today</p>`;
                     } else {
-                        dueBadgeHtml = `<p style="color: var(--card-text); opacity: 0.8;">⏳ ${diffDays} days left</p>`;
+                        dueBadgeHtml = `<p style="color: var(--card-text); opacity: 0.8; width: 100%;">⏳ ${diffDays} days left</p>`;
                     }
                 }
 
-                let metaHtml = '';
-                if (task.assignee || task.dateAssigned || task.dueDate || dueBadgeHtml) {
-                    metaHtml += `<div class="task-meta">`;
-                    if (task.assignee) metaHtml += `<p><strong>Assigned to:</strong> ${task.assignee}</p>`;
-                    if (task.dateAssigned) metaHtml += `<p><strong>Assigned:</strong> ${task.dateAssigned}</p>`;
-                    if (task.dueDate) {
-                        const displayTime = task.dueTime ? ` at ${formatTime(task.dueTime)}` : '';
-                        metaHtml += `<p><strong>Due:</strong> ${task.dueDate}${displayTime}</p>`;
-                        if(dueBadgeHtml) metaHtml += dueBadgeHtml;
-                    }
-                    metaHtml += `</div>`;
-                }
+                // NEW: Editable date & time inputs inside task-meta
+                let metaHtml = `<div class="task-meta">`;
+                if (task.assignee) metaHtml += `<p><strong>Assigned to:</strong> ${task.assignee}</p>`;
+                
+                metaHtml += `
+                    <p>
+                        <strong>Assigned:</strong> 
+                        <input type="date" class="meta-input-date" value="${task.dateAssigned || ''}" onchange="updateTaskDate('${task.id}', 'dateAssigned', this.value)" title="Change assigned date">
+                    </p>
+                    <p>
+                        <strong>Due:</strong> 
+                        <input type="date" class="meta-input-date" value="${task.dueDate || ''}" onchange="updateTaskDate('${task.id}', 'dueDate', this.value)" title="Change due date">
+                        <input type="time" class="meta-input-time" value="${task.dueTime || ''}" onchange="updateTaskDate('${task.id}', 'dueTime', this.value)" title="Change due time">
+                    </p>
+                `;
+                
+                if (dueBadgeHtml) metaHtml += dueBadgeHtml;
+                metaHtml += `</div>`;
 
                 const totalSeconds = task.timeSpent || 0;
                 const hrs = Math.floor(totalSeconds / 3600);
@@ -1356,7 +1378,7 @@
                     <div class="task-title editable" contenteditable="true" spellcheck="false" 
                         onkeydown="preventEnter(event)" 
                         onblur="updateTaskField('${task.id}', 'title', this)">${task.title}</div>
-                    ${linkHtml}
+                    ${linksContainerHtml}
                     ${blockedBadgeHtml}
                     ${budgetHtml}
                     ${descHtml}
@@ -1372,6 +1394,7 @@
                             ${actionBtns}
                         </div>
                         <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                           <button class="btn-small" title="Edit Reference or Workspace/Doc Links" onclick="editTaskLinks('${task.id}')">✏️ Links</button>
                            ${task.dueDate ? `<button class="btn-small" style="color: ${syncColor}; border-color: ${syncColor}; font-weight: bold;" title="Sync to internal Calendar tab" onclick="syncTaskToCalendarApp('${task.id}')">${syncText}</button>` : ''}
                            ${task.dueDate ? `<button class="btn-small" title="Export .ics file for Google Calendar/Apple" onclick="syncTaskToCalendarFile('${task.id}')">💾 .ics</button>` : ''}
                            <button class="btn-small btn-danger" onclick="deleteTask('${task.id}')">Delete</button>
@@ -1425,9 +1448,7 @@
                     oldBtn.innerText = '▶ Pomodoro';
                 }
                 
-                // Do a background save to not disrupt UI by calling saveTasks(true)
                 window.saveTasks(true); 
-                
                 if (oldTaskId === taskId) return;
             }
 
@@ -1453,7 +1474,7 @@
                 }
                 
                 if (task.timeSpent % 10 === 0) {
-                     window.saveTasks(true); // periodic background save
+                     window.saveTasks(true);
                 }
             }, 1000);
         };
@@ -1607,7 +1628,7 @@
             cell.focus();
         };
 
-        // Initialize UI before DB loads
+        // Initialize UI
         window.renderTasks();
         window.renderEvents();
     </script>
