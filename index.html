@@ -1223,54 +1223,67 @@
            FIX 2: Productivity Hub Analytics Card (.deep-dive-cta)
            ========================================================= */
         .deep-dive-cta {
-            background: linear-gradient(135deg, rgba(var(--primary-rgb, 59, 130, 246), 0.12) 0%, rgba(142, 68, 173, 0.12) 100%), var(--surface);
-            border: 1px dashed var(--primary);
-            border-radius: var(--radius-lg);
-            padding: 22px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            width: 100%;
-            box-sizing: border-box;
-            box-shadow: var(--shadow-sm);
-            color: var(--card-text);
+            background-color: var(--surface) !important;
+            background-image: linear-gradient(135deg, rgba(var(--primary-rgb, 59, 130, 246), 0.12) 0%, rgba(142, 68, 173, 0.12) 100%) !important;
+            border: 1px dashed var(--primary) !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 22px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            flex-wrap: wrap !important;
+            gap: 16px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            box-shadow: var(--shadow-sm) !important;
+            color: var(--card-text) !important;
         }
 
         /* =========================================================
-           FIX 1: Floating Rich Text Formatting Toolbar
+           FIX 1: Floating Rich Text Formatting Toolbar (Bulletproof)
            ========================================================= */
-        .format-toolbar {
+        #formatToolbar.format-toolbar {
             display: none;
             position: absolute;
-            z-index: 1000;
-            background: var(--surface);
-            border: 1px solid var(--surface-border-strong);
-            border-radius: var(--radius-md);
-            padding: 6px 8px;
-            box-shadow: var(--shadow-lg);
-            align-items: center;
-            gap: 4px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            transition: opacity 0.15s ease;
+            top: 0;
+            left: 0;
+            z-index: 99999;
+            background: var(--surface) !important;
+            border: 1px solid var(--surface-border-strong) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 6px 10px !important;
+            box-shadow: var(--shadow-lg) !important;
+            align-items: center !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            width: max-content !important;
+            gap: 6px !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
-        .format-toolbar button {
-            padding: 4px 10px;
-            min-height: 30px;
-            font-size: 13px;
-            background: transparent;
-            color: var(--card-text);
-            border: 1px solid transparent;
-            border-radius: var(--radius-sm);
-            box-shadow: none;
+        #formatToolbar.format-toolbar button {
+            padding: 6px 10px !important;
+            min-height: 30px !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            background: rgba(15, 23, 42, 0.05) !important;
+            color: var(--card-text) !important;
+            border: 1px solid var(--surface-border) !important;
+            border-radius: var(--radius-sm) !important;
+            box-shadow: none !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
         }
 
-        .format-toolbar button:hover {
-            background: rgba(15, 23, 42, 0.06);
-            border-color: var(--surface-border);
+        #formatToolbar.format-toolbar button:hover {
+            background: rgba(var(--primary-rgb, 59, 130, 246), 0.15) !important;
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+            transform: none !important;
         }
 
         /* Section Dividers & Toast */
@@ -2568,16 +2581,28 @@
         };
 
         window.closeToolbar = function() {
-            document.getElementById('formatToolbar').style.display = 'none';
-            if (document.activeElement && document.activeElement.classList.contains('editable')) {
+            const tb = document.getElementById('formatToolbar');
+            if (tb) tb.style.display = 'none';
+            if (document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('editable')) {
                 document.activeElement.blur();
             }
         };
 
         window.activeScheduleCell = null;
 
+        // Global mousedown listener to close the formatting toolbar whenever clicking outside
+        document.addEventListener('mousedown', function(e) {
+            const tb = document.getElementById('formatToolbar');
+            if (!tb || tb.style.display === 'none') return;
+            if (!e.target.closest('.editable') && !e.target.closest('#formatToolbar')) {
+                tb.style.display = 'none';
+            }
+        });
+
         document.addEventListener('focusin', function(e) {
             if(e.target.classList && e.target.classList.contains('editable')) {
+                // Prevent toolbar from showing on initial page load / automatic focus restoration
+                if (!document.hasFocus()) return;
                 const toolbar = document.getElementById('formatToolbar');
                 const schedTools = document.getElementById('scheduleTools');
                 
@@ -2591,8 +2616,8 @@
 
                 toolbar.style.display = 'flex';
                 const rect = e.target.getBoundingClientRect();
-                toolbar.style.top = (window.scrollY + rect.top - 45) + 'px';
-                toolbar.style.left = (window.scrollX + rect.left) + 'px';
+                toolbar.style.top = Math.max(10, window.scrollY + rect.top - 48) + 'px';
+                toolbar.style.left = Math.max(10, window.scrollX + rect.left) + 'px';
             }
         });
 
@@ -2793,7 +2818,6 @@
                         </div>
                     </div>
 
-                    <!-- Updated Analytics Card with improved contrast & styling -->
                     <div class="deep-dive-portal deep-dive-cta">
                         <div>
                             <strong style="font-size: 16px; font-weight: 700; color: var(--card-text); display: block;">
@@ -2804,7 +2828,7 @@
                             </div>
                         </div>
                         <button class="btn-alt" onclick="window.navigateToCustomizeAnalytics()" 
-                            style="background: var(--primary); color: var(--primary-contrast-text, #ffffff); border: none; font-weight: 600; padding: 10px 18px; box-shadow: var(--shadow-sm);">
+                            style="background: var(--primary); color: var(--primary-contrast-text, #ffffff); border: none; font-weight: 600; padding: 10px 20px; border-radius: 9999px; box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition);">
                             📊 Open Analytics Settings →
                         </button>
                     </div>
@@ -2825,6 +2849,8 @@
 
         window.setView = function(view) {
             currentView = view;
+            const tb = document.getElementById('formatToolbar');
+            if (tb) tb.style.display = 'none';
             document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
             
             const activeTab = document.getElementById(`tab-${view}`);
@@ -3428,6 +3454,10 @@
         };
 
         // Initialize UI
+        document.addEventListener('DOMContentLoaded', () => {
+            const tb = document.getElementById('formatToolbar');
+            if (tb) tb.style.display = 'none';
+        });
         window.renderTasks();
         window.renderEvents();
     </script>
