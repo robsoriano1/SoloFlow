@@ -119,11 +119,11 @@
         .soloflow-header-badge {
             font-size: 12px;
             font-weight: 600;
-            background: rgba(59, 130, 246, 0.08);
+            background: rgba(var(--primary-rgb, 59, 130, 246), 0.08);
             color: var(--primary);
             padding: 8px 14px;
             border-radius: 9999px;
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(var(--primary-rgb, 59, 130, 246), 0.2);
             white-space: nowrap;
             letter-spacing: 0.01em;
         }
@@ -269,7 +269,7 @@
         }
         .color-swatch-wrapper:hover {
             border-color: var(--primary);
-            box-shadow: 0 2px 8px -1px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 2px 8px -1px rgba(var(--primary-rgb, 59, 130, 246), 0.15);
         }
         .setting-item input[type="color"] { 
             width: 100%; 
@@ -307,7 +307,7 @@
         .setting-item select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 59, 130, 246), 0.15);
         }
         
         .auth-status { 
@@ -324,8 +324,8 @@
             border: 1px solid var(--surface-border);
         }
         .btn-google { 
-            background: #3b82f6; 
-            color: #ffffff; 
+            background: var(--primary); 
+            color: var(--primary-contrast-text, #ffffff); 
             border: none; 
             padding: 10px 18px; 
             border-radius: 9999px; 
@@ -340,7 +340,7 @@
             box-shadow: var(--shadow-sm);
         }
         .btn-google:hover { 
-            background: #2563eb; 
+            opacity: 0.9;
             box-shadow: var(--shadow-md);
             transform: translateY(-1px);
         }
@@ -433,7 +433,7 @@
         }
         .dot-success { background: var(--success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
         .dot-warning { background: var(--warning); box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
-        .dot-primary { background: var(--primary); box-shadow: 0 0 8px rgba(59, 130, 246, 0.6); }
+        .dot-primary { background: var(--primary); box-shadow: 0 0 8px rgba(var(--primary-rgb, 59, 130, 246), 0.6); }
         .dot-danger { background: var(--danger); box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
         .dot-purple { background: var(--purple); box-shadow: 0 0 8px rgba(139, 92, 246, 0.6); }
 
@@ -447,7 +447,7 @@
         
         .card-profit   { background: rgba(16, 185, 129, 0.04); border-color: rgba(16, 185, 129, 0.18); }
         .card-budget   { background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.18); }
-        .card-finished { background: rgba(59, 130, 246, 0.04); border-color: rgba(59, 130, 246, 0.18); }
+        .card-finished { background: rgba(var(--primary-rgb, 59, 130, 246), 0.04); border-color: rgba(var(--primary-rgb, 59, 130, 246), 0.18); }
         .card-overdue  { background: rgba(239, 68, 68, 0.04); border-color: rgba(239, 68, 68, 0.18); }
         .card-velocity { background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.18); }
         .card-time     { background: rgba(139, 92, 246, 0.04); border-color: rgba(139, 92, 246, 0.18); }
@@ -485,7 +485,7 @@
         input:not([type="color"]):not([type="file"]):not([type="checkbox"]):focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 59, 130, 246), 0.15);
         }
         ::placeholder { 
             color: var(--card-text); 
@@ -505,7 +505,7 @@
         }
         button { 
             background: var(--primary); 
-            color: #ffffff; 
+            color: var(--primary-contrast-text, #ffffff); 
             border: none; 
             cursor: pointer; 
             font-weight: 600; 
@@ -603,8 +603,8 @@
         .view-tab.active { 
             color: var(--primary); 
             opacity: 1; 
-            background: rgba(59, 130, 246, 0.08); 
-            border-color: rgba(59, 130, 246, 0.2);
+            background: rgba(var(--primary-rgb, 59, 130, 246), 0.08); 
+            border-color: rgba(var(--primary-rgb, 59, 130, 246), 0.2);
         }
 
         /* Board Styles */
@@ -639,7 +639,7 @@
         }
         .column.drag-over { 
             border-color: var(--primary); 
-            background: rgba(59, 130, 246, 0.03); 
+            background: rgba(var(--primary-rgb, 59, 130, 246), 0.03); 
             border-style: dashed; 
         }
         .col-total { 
@@ -670,9 +670,19 @@
             box-shadow: var(--shadow-lg); 
         }
         
-        .card-todo { background-color: var(--todo-bg); }
-        .card-inprogress { background-color: var(--inprog-bg); }
-        .card-done { background-color: var(--done-bg); }
+        /* Dynamic Contrast-Compliant Task Status Cards */
+        .card-todo { 
+            background-color: var(--todo-bg); 
+            color: var(--todo-contrast-text, var(--card-text)); 
+        }
+        .card-inprogress { 
+            background-color: var(--inprog-bg); 
+            color: var(--inprog-contrast-text, var(--card-text)); 
+        }
+        .card-done { 
+            background-color: var(--done-bg); 
+            color: var(--done-contrast-text, var(--card-text)); 
+        }
 
         /* Attachments & Links */
         .task-photo { 
@@ -707,7 +717,7 @@
         }
         .task-link:hover { 
             background: var(--primary); 
-            color: #ffffff; 
+            color: var(--primary-contrast-text, #ffffff); 
             border-color: var(--primary); 
         }
 
@@ -725,19 +735,17 @@
             background-color: rgba(255, 255, 255, 0.95); 
             border-color: var(--primary); 
             cursor: text; 
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 59, 130, 246), 0.15);
         }
 
         .task-title { 
             font-weight: 700; 
             margin-bottom: 8px; 
-            color: var(--card-text); 
             font-size: 15px; 
             line-height: 1.35;
         }
         .task-desc { 
             font-size: 13px; 
-            color: var(--card-text); 
             opacity: 0.85; 
             margin-bottom: 12px; 
             line-height: 1.5; 
@@ -783,7 +791,6 @@
         }
         .task-meta p { 
             margin: 6px 0; 
-            color: var(--card-text); 
             display: flex; 
             align-items: center; 
             flex-wrap: wrap; 
@@ -813,7 +820,6 @@
             display: flex; 
             align-items: flex-start; 
             gap: 10px; 
-            color: var(--card-text); 
         }
         .subtask-item input[type="checkbox"] { 
             cursor: pointer; 
@@ -875,7 +881,7 @@
         .btn-expand { 
             color: var(--primary); 
             font-weight: 600; 
-            border-color: rgba(59, 130, 246, 0.3); 
+            border-color: rgba(var(--primary-rgb, 59, 130, 246), 0.3); 
             background: rgba(255, 255, 255, 0.9); 
         }
         .btn-danger { 
@@ -907,7 +913,7 @@
         }
         .btn-timer { 
             background: var(--primary); 
-            color: #ffffff; 
+            color: var(--primary-contrast-text, #ffffff); 
             border: none; 
             padding: 6px 12px; 
             border-radius: 4px; 
@@ -919,6 +925,7 @@
         }
         .btn-timer.active { 
             background: var(--danger); 
+            color: #ffffff;
             animation: pulse 1.5s infinite; 
         }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
@@ -1046,7 +1053,7 @@
             word-wrap: break-word;
         }
         .calendar-day.today { 
-            background: rgba(59, 130, 246, 0.05); 
+            background: rgba(var(--primary-rgb, 59, 130, 246), 0.05); 
             border-color: var(--primary); 
         }
         .calendar-date { 
@@ -1059,7 +1066,7 @@
         }
         .calendar-task { 
             background: var(--primary); 
-            color: #ffffff; 
+            color: var(--primary-contrast-text, #ffffff); 
             font-size: 11px; 
             padding: 4px 8px; 
             border-radius: 4px; 
@@ -1071,6 +1078,7 @@
         }
         .calendar-task.done { 
             background: var(--success); 
+            color: #ffffff;
             opacity: 0.75; 
             text-decoration: line-through; 
         }
@@ -1121,7 +1129,7 @@
         }
         .inbox-card:hover { 
             border-color: var(--primary); 
-            background: rgba(59, 130, 246, 0.03); 
+            background: rgba(var(--primary-rgb, 59, 130, 246), 0.03); 
         }
         .inbox-subject { font-weight: 700; font-size: 15px; }
         .inbox-date { font-size: 12px; opacity: 0.7; }
@@ -1207,11 +1215,11 @@
             font-weight: 700;
             padding: 4px 10px;
             border-radius: 9999px;
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(var(--primary-rgb, 59, 130, 246), 0.1);
             color: var(--primary);
         }
         .deep-dive-cta {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(142, 68, 173, 0.05) 100%);
+            background: linear-gradient(135deg, rgba(var(--primary-rgb, 59, 130, 246), 0.05) 0%, rgba(142, 68, 173, 0.05) 100%);
             border: 1px dashed var(--primary);
             border-radius: var(--radius-lg);
             padding: 20px;
@@ -1687,6 +1695,62 @@
         window.expandedCards = window.expandedCards || new Set();
         window.gmailAccessToken = sessionStorage.getItem('gmailAccessToken') || null;
 
+        // --- DYNAMIC THEME & ACCESSIBILITY ENGINE ---
+        const ThemeAccessibilityEngine = {
+            hexToRgb(hex) {
+                let cleanHex = (hex || '#000000').replace('#', '');
+                if (cleanHex.length === 3) {
+                    cleanHex = cleanHex.split('').map(c => c + c).join('');
+                }
+                const int = parseInt(cleanHex, 16) || 0;
+                return {
+                    r: (int >> 16) & 255,
+                    g: (int >> 8) & 255,
+                    b: int & 255
+                };
+            },
+
+            getRelativeLuminance({ r, g, b }) {
+                const toLinear = (c) => {
+                    const v = c / 255;
+                    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+                };
+                return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+            },
+
+            getContrastRatio(l1, l2) {
+                const lighter = Math.max(l1, l2);
+                const darker = Math.min(l1, l2);
+                return (lighter + 0.05) / (darker + 0.05);
+            },
+
+            getSafeTextColor(bgHex) {
+                const bgRgb = this.hexToRgb(bgHex);
+                const bgLuminance = this.getRelativeLuminance(bgRgb);
+                const whiteLuminance = 1.0;
+                const darkLuminance = 0.01; // #0f172a
+
+                const whiteContrast = this.getContrastRatio(bgLuminance, whiteLuminance);
+                const darkContrast = this.getContrastRatio(bgLuminance, darkLuminance);
+
+                return whiteContrast >= darkContrast ? '#ffffff' : '#0f172a';
+            },
+
+            applyThemeVariables(root, tokenPrefix, hexColor) {
+                if (!hexColor) return;
+                const { r, g, b } = this.hexToRgb(hexColor);
+                const rgbStr = `${r}, ${g}, ${b}`;
+                const safeText = this.getSafeTextColor(hexColor);
+
+                root.style.setProperty(`--${tokenPrefix}-hex`, hexColor);
+                root.style.setProperty(`--${tokenPrefix}-rgb`, rgbStr);
+                root.style.setProperty(`--${tokenPrefix}-surface`, `rgba(${rgbStr}, 0.08)`);
+                root.style.setProperty(`--${tokenPrefix}-border`, `rgba(${rgbStr}, 0.22)`);
+                root.style.setProperty(`--${tokenPrefix}-hover`, `rgba(${rgbStr}, 0.14)`);
+                root.style.setProperty(`--${tokenPrefix}-contrast-text`, safeText);
+            }
+        };
+
         window.showToast = function(msg, type='info') {
             const toast = document.createElement('div');
             toast.className = 'toast';
@@ -1825,7 +1889,6 @@
                 }
             }, (error) => console.error("Settings Sync Error:", error));
 
-            // Guard snapshot listener from clobbering active local writes
             const tasksUnsub = onSnapshot(getDocPath('trackerData', 'tasks'), (doc) => {
                 if (doc.metadata && doc.metadata.hasPendingWrites) return;
 
@@ -1923,7 +1986,7 @@
             }
         };
 
-        // --- DYNAMIC THEME ENGINE & SETTINGS APPLY ---
+        // --- DYNAMIC THEME ENGINE & ACCESSIBILITY-COMPLIANT SETTINGS APPLY ---
         function applySettings() {
             document.getElementById('pageTitle').innerText = window.settings.title;
             const root = document.documentElement;
@@ -1936,6 +1999,12 @@
             root.style.setProperty('--todo-bg', window.settings.todoBg);
             root.style.setProperty('--inprog-bg', window.settings.inprogBg);
             root.style.setProperty('--done-bg', window.settings.doneBg);
+
+            // Execute Theme Accessibility Engine Tokens Calculation
+            ThemeAccessibilityEngine.applyThemeVariables(root, 'primary', window.settings.primaryColor);
+            ThemeAccessibilityEngine.applyThemeVariables(root, 'todo', window.settings.todoBg);
+            ThemeAccessibilityEngine.applyThemeVariables(root, 'inprog', window.settings.inprogBg);
+            ThemeAccessibilityEngine.applyThemeVariables(root, 'done', window.settings.doneBg);
             
             const bannerDiv = document.getElementById('bannerImage');
             if (window.settings.bannerUrl && window.settings.bannerUrl.trim()) {
@@ -2149,7 +2218,6 @@
             window.open(mailtoUrl, '_blank');
         };
 
-        // Automatic Canvas Resizing & Compression to safeguard against Base64 crash & Firestore 1MB limits
         window.handlePhotoUpload = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -2253,7 +2321,6 @@
                 subtasksArr = subtasksRaw.split(',').map(s => ({text: s.trim(), completed: false})).filter(s => s.text);
             }
 
-            // Sanitize financial values (removes commas, peso signs, symbols)
             const rawBudget = document.getElementById('taskBudget').value;
             const cleanBudget = rawBudget ? parseFloat(rawBudget.toString().replace(/[^0-9.-]+/g, "")) : "";
 
@@ -2284,7 +2351,6 @@
                 document.getElementById(id).value = '';
             });
 
-            // Clear search/filters and auto-reset view to 'all' so new tasks are visible
             document.getElementById('searchInput').value = '';
             document.getElementById('categoryFilter').value = 'All';
             document.getElementById('assigneeFilter').value = 'All';
@@ -2986,7 +3052,7 @@
                         `;
                     });
                 }
-                subtasksHtml += `<button class="btn-small" style="margin-top: 4px; align-self: flex-start; color: var(--primary); border-color: rgba(74, 144, 226, 0.4); font-weight: bold;" onclick="addSubtask('${task.id}')">+ Add Subtask</button>`;
+                subtasksHtml += `<button class="btn-small" style="margin-top: 4px; align-self: flex-start; color: var(--primary); border-color: rgba(var(--primary-rgb, 59, 130, 246), 0.4); font-weight: bold;" onclick="addSubtask('${task.id}')">+ Add Subtask</button>`;
                 subtasksHtml += '</div>';
 
                 let dueBadgeHtml = '';
@@ -3002,7 +3068,7 @@
                     } else if (diffDays === 0) {
                         dueBadgeHtml = `<p style="color: var(--warning); font-weight: bold; width: 100%;">⏰ Due Today</p>`;
                     } else {
-                        dueBadgeHtml = `<p style="color: var(--card-text); opacity: 0.8; width: 100%;">⏳ ${diffDays} days left</p>`;
+                        dueBadgeHtml = `<p style="opacity: 0.8; width: 100%;">⏳ ${diffDays} days left</p>`;
                     }
                 }
 
