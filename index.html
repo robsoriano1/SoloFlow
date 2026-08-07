@@ -1044,139 +1044,114 @@
         applySettings();
 
         // --- PHASE 2: GMAIL REST API INBOX LOGIC ---
-        window.connectGmailInbox = async function() {
-            const provider = new GoogleAuthProvider();
-            provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
-            try {
-                window.showToast("Opening Google Auth for Gmail access...");
-                const result = await signInWithPopup(auth, provider);
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                if (credential && credential.accessToken) {
-                    window.gmailAccessToken = credential.accessToken;
-                    sessionStorage.setItem('gmailAccessToken', window.gmailAccessToken);
-                    window.showToast("Gmail Inbox authorized successfully!", "success");
-                    window.fetchGmailMessages();
-                } else {
-                    window.showToast("Could not retrieve Gmail token from Google.", "error");
-                }
-            } catch (error) {
-                console.error("Gmail Auth Error:", error);
-                window.showToast("Gmail authorization cancelled or failed.", "error");
-            }
-        };
+       window.connectGmailInbox = async function() {
+    const provider = new GoogleAuthProvider();
+    // 1. Explicitly request the read-only Gmail scope
+    provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+    // 2. Force Google to re-prompt so it generates a fresh OAuth access token
+    provider.setCustomParameters({ prompt: 'consent' });
 
-        window.fetchGmailMessages = async function() {
-            const container = document.getElementById('inbox-list');
-            if (!window.gmailAccessToken) {
-                container.innerHTML = `<div style="text-align: center; opacity: 0.7; padding: 30px;">
-                    Please click <strong>🔑 Connect Gmail Inbox</strong> above to authorize read-only access to your emails.
-                </div>`;
-                return;
-            }
+    try {
+        window.showToast("Opening Google Auth for Gmail access...");
+        const result = await signInWithPopup(auth, provider);
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        
+        if (credential && credential.accessToken) {
+            window.gmailAccessToken = credential.accessToken;
+            sessionStorage.setItem('gmailAccessToken', window.gmailAccessToken);
+            window.showToast("Gmail Inbox authorized successfully!", "success");
+            window.fetchGmailMessages();
+        } else {
+            window.showToast("Could not retrieve Gmail access token.", "error");
+        }
+    } catch (error) {
+        console.error("Gmail Auth Error:", error);
+        window.showToast("Gmail authorization cancelled or failed.", "error");
+    }
+};
 
-            container.innerHTML = `<div style="text-align: center; padding: 30px;">⏳ Fetching your latest 10 messages from Gmail...</div>`;
+window.fetchGmailMessages = async function() {
+    const container = document.getElementById('inbox-list');
+    
+    // Check if token exists in session memory
+    if (!window.gmailAccessToken) {
+        window.gmailAccessToken = sessionStorage.getItem('gmailAccessToken');
+    }
 
-            try {
-                const listRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10', {
-                    headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
-                });
+    if (!window.gmailAccessToken) {
+        container.innerHTML = `<div style="text-align: center; opacity: 0.7; padding: 30px;">
+            Please click <strong>🔑 Connect Gmail Inbox</strong> above to authorize read-only access to your emails.
+        </div>`;
+        return;
+    }
 
-                if (listRes.status === 401 || listRes.status === 403) {
-                    window.gmailAccessToken = null;
-                    sessionStorage.removeItem('gmailAccessToken');
-                    container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
-                        Your Gmail session expired. Please click <strong>🔑 Connect Gmail Inbox</strong> to re-authenticate.
-                    </div>`;
-                    return;
-                }
+    container.innerHTML = `<div style="text-align: center; padding: 30px;">⏳ Fetching your latest 10 messages from Gmail...</div>`;
 
-                const listData = await listRes.json();
-                const messages = listData.messages || [];
+    try {
+        const listRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10', {
+            headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
+        });
 
-                if (messages.length === 0) {
-                    container.innerHTML = `<div style="text-align: center; padding: 30px;">No messages found in your inbox.</div>`;
-                    return;
-                }
+        if (listRes.status === 401 || listRes.status === 403) {
+            window.gmailAccessToken = null;
+            sessionStorage.removeItem('gmailAccessToken');
+            container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
+                Your Gmail session expired or access was denied. Please click <strong>🔑 Connect Gmail Inbox</strong> to re-authenticate.
+            </div>`;
+            return;
+        }
 
-                container.innerHTML = '';
+        const listData = await listRes.json();
+        const messages = listData.messages || [];
 
-                for (const msg of messages) {
-                    const detailRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=full`, {
-                        headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
-                    });
-                    const msgData = await detailRes.json();
-                    
-                    const headers = msgData.payload ? (msgData.payload.headers || []) : [];
-                    const getHeader = (name) => {
-                        const found = headers.find(h => h.name.toLowerCase() === name.toLowerCase());
-                        return found ? found.value : '';
-                    };
+        if (messages.length === 0) {
+            container.innerHTML = `<div style="text-align: center; padding: 30px;">No messages found in your inbox.</div>`;
+            return;
+        }
 
-                    const subject = getHeader('Subject') || '(No Subject)';
-                    const sender = getHeader('From') || 'Unknown Sender';
-                    const dateStr = getHeader('Date') || '';
-                    const snippet = msgData.snippet || '';
-                    const permalink = `https://mail.google.com/mail/u/0/#inbox/${msgData.id}`;
+        container.innerHTML = '';
 
-                    const card = document.createElement('div');
-                    card.className = 'inbox-card';
-                    card.innerHTML = `
-                        <div class="inbox-card-header">
-                            <div class="inbox-subject">${subject}</div>
-                            <div class="inbox-date">${dateStr}</div>
-                        </div>
-                        <div class="inbox-sender">${sender}</div>
-                        <div class="inbox-snippet">${snippet}</div>
-                        <div class="inbox-actions">
-                            <button class="btn-inbox-convert" onclick="convertEmailToTask('${encodeURIComponent(subject)}', '${encodeURIComponent(snippet)}', '${encodeURIComponent(sender)}', '${encodeURIComponent(permalink)}')">✨ Convert to SoloFlow Task</button>
-                            <a href="${permalink}" target="_blank" class="task-link" style="margin: 0;">🔗 Open in Gmail</a>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                }
-            } catch (err) {
-                console.error("Fetch Gmail Error:", err);
-                container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
-                    Failed to fetch Gmail messages. Please check your connection or re-authenticate.
-                </div>`;
-            }
-        };
-
-        window.convertEmailToTask = function(encSubject, encSnippet, encSender, encPermalink) {
-            const subject = decodeURIComponent(encSubject);
-            const snippet = decodeURIComponent(encSnippet);
-            const sender = decodeURIComponent(encSender);
-            const permalink = decodeURIComponent(encPermalink);
-
-            const senderEmailMatch = sender.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-            const assigneeStr = senderEmailMatch ? senderEmailMatch[0] : sender;
-
-            const newTask = {
-                id: Date.now().toString(),
-                title: subject,
-                category: 'Email Task',
-                priority: 'Medium',
-                financeType: 'Profit',
-                budget: '',
-                description: snippet,
-                subtasks: [],
-                photoUrl: '',
-                linkUrl: '',
-                workspaceUrl: permalink,
-                assignee: assigneeStr,
-                dateAssigned: new Date().toISOString().split('T')[0],
-                dueDate: '',
-                dueTime: '',
-                blockedBy: '',
-                status: 'todo',
-                syncedToCalendar: false
+        for (const msg of messages) {
+            const detailRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=full`, {
+                headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
+            });
+            const msgData = await detailRes.json();
+            
+            const headers = msgData.payload ? (msgData.payload.headers || []) : [];
+            const getHeader = (name) => {
+                const found = headers.find(h => h.name.toLowerCase() === name.toLowerCase());
+                return found ? found.value : '';
             };
 
-            window.tasks.push(newTask);
-            window.saveTasks();
-            window.showToast("Email converted into SoloFlow task!", "success");
-        };
+            const subject = getHeader('Subject') || '(No Subject)';
+            const sender = getHeader('From') || 'Unknown Sender';
+            const dateStr = getHeader('Date') || '';
+            const snippet = msgData.snippet || '';
+            const permalink = `https://mail.google.com/mail/u/0/#inbox/${msgData.id}`;
 
+            const card = document.createElement('div');
+            card.className = 'inbox-card';
+            card.innerHTML = `
+                <div class="inbox-card-header">
+                    <div class="inbox-subject">${subject}</div>
+                    <div class="inbox-date">${dateStr}</div>
+                </div>
+                <div class="inbox-sender">${sender}</div>
+                <div class="inbox-snippet">${snippet}</div>
+                <div class="inbox-actions">
+                    <button class="btn-inbox-convert" onclick="convertEmailToTask('${encodeURIComponent(subject)}', '${encodeURIComponent(snippet)}', '${encodeURIComponent(sender)}', '${encodeURIComponent(permalink)}')">✨ Convert to SoloFlow Task</button>
+                    <a href="${permalink}" target="_blank" class="task-link" style="margin: 0;">🔗 Open in Gmail</a>
+                </div>
+            `;
+            container.appendChild(card);
+        }
+    } catch (err) {
+        console.error("Fetch Gmail Error:", err);
+        container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
+            Failed to fetch Gmail messages. Please check your connection or re-authenticate.
+        </div>`;
+    }
+};
         // --- TASK TRACKER LOGIC ---
         window.parseEmailToTask = function() {
             const emailText = prompt("Paste copied text from your email (Subject, Sender, Body, or URL):");
