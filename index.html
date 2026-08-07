@@ -11,30 +11,36 @@
         
         :root {
             /* Dynamic variables controlled by JS */
-            --bg: #f4f4f9; 
+            --bg: #f8fafc; 
             --surface: #ffffff;
-            --text: #1e293b;       /* Outside Text (Title, section headers, tabs) */
-            --card-text: #1e293b;  /* Inside Box/Card Text */
+            --text: #0f172a;       /* Outside Text (Title, section headers, tabs) */
+            --card-text: #0f172a;  /* Inside Box/Card Text */
             --primary: #3b82f6; 
             --todo-bg: #fff1f2;
             --inprog-bg: #fefce8;
             --done-bg: #f0fdf4;
 
-            /* Modernized static structural variables */
-            --border: rgba(15, 23, 42, 0.08);
-            --border-strong: rgba(15, 23, 42, 0.14);
+            /* Alpha-layer mappings for soft surface elevation */
+            --primary-rgb: 59, 130, 246;
+            --surface-overlay: rgba(255, 255, 255, 0.75);
+            --surface-border: rgba(15, 23, 42, 0.08);
+            --surface-border-strong: rgba(15, 23, 42, 0.14);
+            
+            /* Status Accents */
             --danger: #ef4444;
             --warning: #f59e0b;
             --success: #10b981;
-            --text-muted: rgba(100, 116, 139, 0.85);
+            --purple: #8b5cf6;
+            --text-muted: rgba(15, 23, 42, 0.65);
             
             /* Design system tokens */
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 30px -4px rgba(0, 0, 0, 0.08);
             --transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
@@ -45,7 +51,7 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg);
-            background-image: radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px);
+            background-image: radial-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px);
             background-size: 24px 24px;
             color: var(--text);
             margin: 0;
@@ -63,8 +69,8 @@
         /* SOLOFLOW AESTHETIC HEADER */
         .soloflow-header {
             background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-xl);
             padding: 16px 24px;
             margin-bottom: 24px;
             display: flex;
@@ -129,11 +135,11 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-xl);
             margin: 0 auto 24px auto;
             display: none;
             box-shadow: var(--shadow-md);
-            border: 1px solid var(--border);
+            border: 1px solid var(--surface-border);
             transition: height 0.3s ease, width 0.3s ease;
         }
         #pageTitle {
@@ -146,12 +152,12 @@
             border: 1px dashed transparent; 
             transition: var(--transition);
             color: var(--text); 
-            font-size: 22px; 
+            font-size: 24px; 
             font-weight: 700;
             letter-spacing: -0.02em;
         }
         #pageTitle:hover, #pageTitle:focus { 
-            border-color: var(--border-strong); 
+            border-color: var(--surface-border-strong); 
             background: rgba(100, 116, 139, 0.08); 
         }
 
@@ -160,54 +166,89 @@
             color: var(--card-text) !important;
         }
 
-        /* Customization Menu */
+        /* ==========================================================================
+           REFACTORED CUSTOMIZE & DATA MANAGEMENT DASHBOARD PANEL
+           ========================================================================== */
         details.customize-menu {
-            background: var(--surface); 
-            padding: 16px 24px 24px; 
-            border-radius: var(--radius-md);
-            margin-bottom: 24px; 
-            box-shadow: var(--shadow-sm); 
-            border: 1px solid var(--border);
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 20px 28px 28px; 
+            border-radius: var(--radius-xl);
+            margin-bottom: 28px; 
+            box-shadow: var(--shadow-md); 
+            border: 1px solid var(--surface-border);
             transition: var(--transition);
         }
         details.customize-menu[open] {
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--surface-border-strong);
         }
         details.customize-menu summary { 
             cursor: pointer; 
-            font-weight: 600; 
+            font-weight: 700; 
             color: var(--card-text); 
             user-select: none; 
             outline: none;
-            font-size: 14px;
-            padding: 4px 0;
+            font-size: 15px;
+            padding: 6px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            list-style: none;
         }
-        details.customize-menu summary:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 4px;
-            border-radius: var(--radius-sm);
+        details.customize-menu summary::-webkit-details-marker {
+            display: none;
         }
-        .settings-group { margin-top: 20px; }
+        details.customize-menu summary::after {
+            content: "▼";
+            font-size: 10px;
+            opacity: 0.5;
+            transition: transform var(--transition);
+        }
+        details.customize-menu[open] summary::after {
+            transform: rotate(-180deg);
+        }
+        
+        .settings-group { 
+            margin-top: 24px; 
+            padding-top: 20px;
+            border-top: 1px solid var(--surface-border);
+        }
+        .settings-group:first-of-type {
+            border-top: none;
+            padding-top: 12px;
+        }
         .settings-group h4 { 
-            margin: 0 0 12px 0; 
-            font-size: 12px; 
+            margin: 0 0 16px 0; 
+            font-size: 11px; 
             font-weight: 700;
             text-transform: uppercase; 
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--card-text); 
-            opacity: 0.65; 
-            border-bottom: 1px solid var(--border); 
-            padding-bottom: 8px; 
+            opacity: 0.6; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        
+        /* Modern 4-Column Structured Grid for Color Pickers & Dropdowns */
         .settings-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            grid-template-columns: repeat(4, minmax(0, 1fr)); 
             gap: 16px; 
         }
+        @media (max-width: 900px) {
+            .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 500px) {
+            .settings-grid { grid-template-columns: 1fr; }
+        }
+
         .setting-item { 
             display: flex; 
             flex-direction: column; 
-            gap: 6px; 
+            gap: 8px; 
         }
         .setting-item label { 
             font-size: 12px; 
@@ -215,121 +256,225 @@
             color: var(--card-text); 
             opacity: 0.85;
         }
+        
+        /* Polished Color Swatch Input Wrapper */
+        .color-swatch-wrapper {
+            position: relative;
+            width: 100%;
+            height: 42px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--surface-border-strong);
+            background: var(--surface);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 3px;
+            transition: var(--transition);
+        }
+        .color-swatch-wrapper:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px -1px rgba(59, 130, 246, 0.15);
+        }
         .setting-item input[type="color"] { 
             width: 100%; 
-            height: 40px; 
-            padding: 3px; 
+            height: 100%; 
+            padding: 0; 
+            border: none; 
             cursor: pointer; 
-            border: 1px solid var(--border); 
-            border-radius: var(--radius-sm); 
-            background: var(--surface); 
+            border-radius: 6px; 
+            background: transparent; 
         }
-        .setting-item input[type="text"], .setting-item input[type="number"], .setting-item select { 
-            padding: 10px 12px; 
-            border: 1px solid var(--border); 
+        .setting-item input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .setting-item input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
+        }
+
+        .setting-item input[type="text"], 
+        .setting-item input[type="number"], 
+        .setting-item select { 
+            padding: 10px 16px; 
+            border: 1px solid var(--surface-border-strong); 
             border-radius: var(--radius-sm); 
             background: var(--surface); 
             color: var(--card-text); 
             font-family: inherit; 
             font-size: 13px;
+            font-weight: 500;
+            min-height: 42px;
             transition: var(--transition);
         }
-        .setting-item input[type="text"]:focus, .setting-item input[type="number"]:focus, .setting-item select:focus {
+        .setting-item input[type="text"]:focus, 
+        .setting-item input[type="number"]:focus, 
+        .setting-item select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
         
-        .data-buttons { 
-            display: flex; 
-            gap: 10px; 
-            margin-top: 8px; 
-            flex-wrap: wrap; 
-        }
-        .btn-alt { 
-            background: var(--surface); 
-            border: 1px solid var(--border-strong); 
-            color: var(--card-text); 
-            padding: 10px 16px; 
-            border-radius: var(--radius-sm); 
-            cursor: pointer; 
-            font-size: 13px; 
-            font-weight: 600;
-            min-height: 44px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: var(--transition);
-        }
-        .btn-alt:hover { 
-            background: rgba(15, 23, 42, 0.04); 
-            border-color: var(--card-text);
-        }
-        .btn-alt:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-        .btn-email { 
-            background: rgba(142, 68, 173, 0.08); 
-            color: #8e44ad; 
-            border: 1px solid rgba(142, 68, 173, 0.3); 
-            font-weight: 600; 
-            min-height: 44px;
-            padding: 10px 16px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .btn-email:hover { 
-            background: #8e44ad; 
-            color: #ffffff; 
-        }
-
-        /* Auth Styles */
+        /* Modern Cloud Sync Status Box */
         .auth-status { 
             font-size: 13px; 
-            padding: 12px 16px; 
-            border-radius: var(--radius-sm); 
-            background: rgba(15, 23, 42, 0.04); 
-            margin-bottom: 12px; 
+            padding: 16px 20px; 
+            border-radius: var(--radius-md); 
+            background: rgba(15, 23, 42, 0.03); 
+            margin-bottom: 8px; 
             display: flex; 
             align-items: center; 
             justify-content: space-between;
-            border: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid var(--surface-border);
         }
         .btn-google { 
             background: #3b82f6; 
             color: #ffffff; 
             border: none; 
-            padding: 10px 16px; 
-            border-radius: var(--radius-sm); 
+            padding: 10px 18px; 
+            border-radius: 9999px; 
             cursor: pointer; 
             font-weight: 600; 
             font-size: 13px; 
             display: flex; 
             align-items: center; 
             gap: 8px;
-            min-height: 44px;
+            min-height: 40px;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
         }
         .btn-google:hover { 
             background: #2563eb; 
             box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
         }
 
-        /* Form Styles */
+        /* Pill / Rounded Secondary & Primary Button Controls */
+        .data-buttons { 
+            display: flex; 
+            gap: 12px; 
+            margin-top: 4px; 
+            flex-wrap: wrap; 
+        }
+        .btn-alt { 
+            background: var(--surface); 
+            border: 1px solid var(--surface-border-strong); 
+            color: var(--card-text); 
+            padding: 10px 18px; 
+            border-radius: 9999px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: 600;
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-alt:hover { 
+            background: rgba(15, 23, 42, 0.04); 
+            border-color: var(--card-text);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-alt:active {
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           MODERN SAAS PRODUCTIVITY ANALYTICS CARDS (UPGRADED METRIC GRID)
+           ========================================================================== */
+        .analytics-grid-elevated {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            text-align: left;
+        }
+        @media (max-width: 800px) {
+            .analytics-grid-elevated { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 500px) {
+            .analytics-grid-elevated { grid-template-columns: 1fr; }
+        }
+
+        .metric-card-elevated {
+            position: relative;
+            padding: 18px 20px;
+            border-radius: var(--radius-lg);
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        .metric-card-elevated:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--surface-border-strong);
+            transform: translateY(-2px);
+        }
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .metric-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--card-text);
+            opacity: 0.65;
+        }
+        /* Micro-visual status indicator dots */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            flex-shrink: 0;
+        }
+        .dot-success { background: var(--success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+        .dot-warning { background: var(--warning); box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+        .dot-primary { background: var(--primary); box-shadow: 0 0 8px rgba(59, 130, 246, 0.6); }
+        .dot-danger { background: var(--danger); box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+        .dot-purple { background: var(--purple); box-shadow: 0 0 8px rgba(139, 92, 246, 0.6); }
+
+        .metric-value-display {
+            font-family: 'Poppins', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+        
+        /* Semantic metric card fills using low alpha overlays */
+        .card-profit   { background: rgba(16, 185, 129, 0.04); border-color: rgba(16, 185, 129, 0.18); }
+        .card-budget   { background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.18); }
+        .card-finished { background: rgba(59, 130, 246, 0.04); border-color: rgba(59, 130, 246, 0.18); }
+        .card-overdue  { background: rgba(239, 68, 68, 0.04); border-color: rgba(239, 68, 68, 0.18); }
+        .card-velocity { background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.18); }
+        .card-time     { background: rgba(139, 92, 246, 0.04); border-color: rgba(139, 92, 246, 0.18); }
+
+        /* ==========================================================================
+           REMAINING STRUCTURAL STYLES
+           ========================================================================== */
         .form-card {
             background: var(--surface); 
             padding: 24px; 
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-xl);
             box-shadow: var(--shadow-sm); 
             margin-bottom: 24px;
             display: flex; 
             flex-direction: column; 
             gap: 16px; 
-            border: 1px solid var(--border);
+            border: 1px solid var(--surface-border);
         }
         .form-row { 
             display: flex; 
@@ -340,7 +485,7 @@
         
         input:not([type="color"]):not([type="file"]):not([type="checkbox"]), select, textarea { 
             padding: 10px 14px; 
-            border: 1px solid var(--border-strong); 
+            border: 1px solid var(--surface-border-strong); 
             border-radius: var(--radius-sm); 
             font-size: 14px; 
             font-family: inherit; 
@@ -377,10 +522,10 @@
             cursor: pointer; 
             font-weight: 600; 
             transition: var(--transition); 
-            padding: 10px 18px; 
-            border-radius: var(--radius-sm); 
+            padding: 10px 20px; 
+            border-radius: 9999px; 
             font-size: 14px;
-            min-height: 44px;
+            min-height: 42px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -389,13 +534,10 @@
         button:hover { 
             opacity: 0.92; 
             box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
         }
         button:active {
-            transform: translateY(1px);
-        }
-        button:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
+            transform: translateY(0);
         }
         .input-label { 
             font-size: 13px; 
@@ -405,7 +547,7 @@
             margin-right: -4px; 
         }
 
-        /* Control Panel (Search/Filter) */
+        /* Control Panel */
         .control-panel {
             display: flex; 
             gap: 12px; 
@@ -413,8 +555,8 @@
             flex-wrap: wrap;
             background: var(--surface); 
             padding: 16px 20px; 
-            border-radius: var(--radius-lg); 
-            border: 1px solid var(--border); 
+            border-radius: var(--radius-xl); 
+            border: 1px solid var(--surface-border); 
             box-shadow: var(--shadow-sm);
             align-items: center;
         }
@@ -446,7 +588,7 @@
             display: flex; 
             gap: 8px; 
             margin-bottom: 24px; 
-            border-bottom: 1px solid var(--border); 
+            border-bottom: 1px solid var(--surface-border); 
             padding-bottom: 12px; 
             overflow-x: auto; 
             white-space: nowrap;
@@ -459,15 +601,16 @@
             color: var(--text); 
             opacity: 0.7; 
             cursor: pointer; 
-            padding: 10px 16px; 
-            border-radius: var(--radius-sm); 
+            padding: 10px 18px; 
+            border-radius: 9999px; 
             transition: var(--transition);
-            min-height: 44px;
+            min-height: 42px;
             box-shadow: none;
         }
         .view-tab:hover { 
             background: rgba(15, 23, 42, 0.04); 
             opacity: 1; 
+            transform: none;
         }
         .view-tab.active { 
             color: var(--primary); 
@@ -485,10 +628,10 @@
         }
         .column { 
             background: var(--surface); 
-            border-radius: var(--radius-lg); 
+            border-radius: var(--radius-xl); 
             padding: 18px; 
             box-shadow: var(--shadow-sm); 
-            border: 1px solid var(--border); 
+            border: 1px solid var(--surface-border); 
             transition: var(--transition);
             display: flex; 
             flex-direction: column; 
@@ -499,7 +642,7 @@
             font-size: 16px;
             font-weight: 700;
             margin: 0 0 16px 0; 
-            border-bottom: 1px solid var(--border); 
+            border-bottom: 1px solid var(--surface-border); 
             padding-bottom: 12px; 
             color: var(--card-text); 
             display: flex; 
@@ -519,19 +662,19 @@
         }
 
         .task-card { 
-            padding: 16px; 
+            padding: 18px; 
             border-radius: var(--radius-md); 
-            margin-bottom: 12px; 
+            margin-bottom: 14px; 
             position: relative;
             transition: var(--transition); 
-            border: 1px solid var(--border);
+            border: 1px solid var(--surface-border);
             cursor: grab; 
             color: var(--card-text);
             box-shadow: var(--shadow-sm);
         }
         .task-card:hover {
             box-shadow: var(--shadow-md);
-            border-color: var(--border-strong);
+            border-color: var(--surface-border-strong);
         }
         .task-card:active { 
             cursor: grabbing; 
@@ -543,18 +686,17 @@
         .card-inprogress { background-color: var(--inprog-bg); }
         .card-done { background-color: var(--done-bg); }
 
-        /* Attachments & Events */
+        /* Attachments & Links */
         .task-photo { 
             width: 100%; 
             height: auto; 
             max-height: 180px; 
             object-fit: cover; 
             border-radius: var(--radius-sm); 
-            border: 1px solid var(--border); 
+            border: 1px solid var(--surface-border); 
             margin-bottom: 12px; 
             display: block; 
         }
-        
         .task-links-container { 
             display: flex; 
             flex-wrap: wrap; 
@@ -572,7 +714,7 @@
             background: rgba(255, 255, 255, 0.85); 
             padding: 6px 12px; 
             border-radius: var(--radius-sm); 
-            border: 1px solid var(--border);
+            border: 1px solid var(--surface-border);
             transition: var(--transition);
         }
         .task-link:hover { 
@@ -580,14 +722,8 @@
             color: #ffffff; 
             border-color: var(--primary); 
         }
-        .task-link.doc-link { color: #8e44ad; }
-        .task-link.doc-link:hover { 
-            background: #8e44ad; 
-            color: #ffffff; 
-            border-color: #8e44ad; 
-        }
 
-        /* Inline Editing Styles */
+        /* Inline Editing */
         .editable { 
             outline: none; 
             border: 1px dashed transparent; 
@@ -596,14 +732,13 @@
             margin-left: -6px; 
             transition: var(--transition); 
         }
-        .editable:hover { border-color: var(--border-strong); }
+        .editable:hover { border-color: var(--surface-border-strong); }
         .editable:focus { 
             background-color: rgba(255, 255, 255, 0.95); 
             border-color: var(--primary); 
             cursor: text; 
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
         }
-        .editable:focus, input[type="checkbox"]:focus, button:focus { cursor: text; }
 
         .task-title { 
             font-weight: 700; 
@@ -621,11 +756,10 @@
             min-height: 24px; 
         }
         
-        /* Expandable Card Body Area */
         .task-expand-area { 
             display: none; 
             margin-top: 12px; 
-            border-top: 1px dashed var(--border-strong); 
+            border-top: 1px dashed var(--surface-border-strong); 
             padding-top: 12px; 
         }
         .task-expand-area.expanded { 
@@ -637,7 +771,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Budget / Profit Styles */
         .task-metric { 
             font-size: 12px; 
             font-weight: 700; 
@@ -647,20 +780,18 @@
             padding: 4px 10px; 
             border-radius: var(--radius-sm); 
             background: rgba(255, 255, 255, 0.75); 
-            border: 1px solid var(--border); 
-            letter-spacing: 0.01em;
+            border: 1px solid var(--surface-border); 
         }
         .metric-profit { color: var(--success); }
         .metric-budget { color: #d97706; }
         
-        /* Editable Task Meta (Dates) */
         .task-meta { 
             font-size: 12px; 
             background: rgba(255, 255, 255, 0.55); 
             padding: 10px 12px; 
             border-radius: var(--radius-sm); 
             margin-bottom: 12px; 
-            border: 1px solid var(--border); 
+            border: 1px solid var(--surface-border); 
         }
         .task-meta p { 
             margin: 6px 0; 
@@ -672,7 +803,7 @@
         }
         .meta-input-date, .meta-input-time {
             padding: 4px 8px; 
-            border: 1px solid var(--border-strong); 
+            border: 1px solid var(--surface-border-strong); 
             border-radius: 4px;
             background: rgba(255, 255, 255, 0.9); 
             color: var(--card-text); 
@@ -683,7 +814,7 @@
         
         .subtasks-list { 
             margin-bottom: 12px; 
-            border-top: 1px dashed var(--border); 
+            border-top: 1px dashed var(--surface-border); 
             padding-top: 10px; 
             display: flex; 
             flex-direction: column; 
@@ -721,9 +852,8 @@
             background: rgba(255, 255, 255, 0.75); 
             padding: 4px 10px; 
             border-radius: 9999px; 
-            border: 1px solid var(--border); 
+            border: 1px solid var(--surface-border); 
             color: var(--card-text); 
-            letter-spacing: 0.02em;
         }
         .badge.high { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
         .badge.medium { background: #fef3c7; color: #92400e; border-color: #fde68a; }
@@ -740,7 +870,7 @@
             padding: 6px 12px; 
             font-size: 12px; 
             background: rgba(255, 255, 255, 0.75); 
-            border: 1px solid var(--border-strong); 
+            border: 1px solid var(--surface-border-strong); 
             color: var(--card-text); 
             border-radius: var(--radius-sm); 
             cursor: pointer; 
@@ -752,6 +882,7 @@
         .btn-small:hover { 
             background: rgba(255, 255, 255, 1); 
             border-color: var(--card-text);
+            transform: none;
         }
         .btn-expand { 
             color: var(--primary); 
@@ -769,37 +900,7 @@
             color: #ffffff; 
         }
 
-        /* Rich Text Floating Toolbar */
-        .format-toolbar {
-            position: absolute; 
-            display: none; 
-            background: var(--surface);
-            border: 1px solid var(--border-strong); 
-            border-radius: var(--radius-sm); 
-            padding: 6px;
-            box-shadow: var(--shadow-lg); 
-            z-index: 1000; 
-            gap: 6px;
-            align-items: center;
-        }
-        .format-toolbar button {
-            background: transparent; 
-            color: var(--text); 
-            border: 1px solid transparent;
-            padding: 6px 10px; 
-            font-size: 14px; 
-            cursor: pointer; 
-            border-radius: 4px; 
-            font-weight: 500;
-            min-height: 32px;
-            box-shadow: none;
-        }
-        .format-toolbar button:hover { 
-            background: rgba(15, 23, 42, 0.05); 
-            border-color: var(--border); 
-        }
-        
-        /* Timer & Pomodoro Styles */
+        /* Timer Styles */
         .timer-container { 
             display: flex; 
             align-items: center; 
@@ -808,7 +909,7 @@
             background: rgba(15, 23, 42, 0.04); 
             padding: 8px 12px; 
             border-radius: var(--radius-sm); 
-            border: 1px solid var(--border); 
+            border: 1px solid var(--surface-border); 
         }
         .timer-display { 
             font-family: monospace; 
@@ -838,8 +939,8 @@
         .schedule-container { 
             background: var(--surface); 
             padding: 20px; 
-            border-radius: var(--radius-lg); 
-            border: 1px solid var(--border); 
+            border-radius: var(--radius-xl); 
+            border: 1px solid var(--surface-border); 
             box-shadow: var(--shadow-sm); 
             overflow: auto; 
             max-height: 700px; 
@@ -851,8 +952,8 @@
             display: grid; 
             grid-template-columns: 85px repeat(7, minmax(130px, 1fr)); 
             gap: 1px; 
-            background: var(--border); 
-            border: 1px solid var(--border); 
+            background: var(--surface-border); 
+            border: 1px solid var(--surface-border); 
             border-radius: var(--radius-sm); 
             overflow: hidden; 
             min-width: 800px;
@@ -885,7 +986,6 @@
             z-index: 5; 
             box-shadow: 1px 0 2px rgba(0,0,0,0.05);
         }
-        .schedule-header:first-child { z-index: 15; left: 0; top: 0; }
         .schedule-cell { 
             background: var(--surface); 
             color: var(--card-text); 
@@ -906,8 +1006,8 @@
         .calendar-container { 
             background: var(--surface); 
             padding: 20px; 
-            border-radius: var(--radius-lg); 
-            border: 1px solid var(--border); 
+            border-radius: var(--radius-xl); 
+            border: 1px solid var(--surface-border); 
             box-shadow: var(--shadow-sm); 
             display: none; 
             margin-bottom: 24px; 
@@ -946,7 +1046,7 @@
         }
         .calendar-day { 
             background: rgba(15, 23, 42, 0.02); 
-            border: 1px solid var(--border); 
+            border: 1px solid var(--surface-border); 
             border-radius: var(--radius-sm); 
             min-height: 100px; 
             padding: 8px; 
@@ -980,8 +1080,6 @@
             overflow: hidden; 
             text-overflow: ellipsis; 
             font-weight: 600; 
-            max-width: 100%; 
-            box-sizing: border-box;
         }
         .calendar-task.done { 
             background: var(--success); 
@@ -989,12 +1087,12 @@
             text-decoration: line-through; 
         }
 
-        /* GMAIL API INBOX TAB STYLES */
+        /* GMAIL INBOX STYLES */
         .inbox-container {
             background: var(--surface);
             padding: 24px;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--surface-border);
             box-shadow: var(--shadow-sm);
             display: none;
             margin-bottom: 24px;
@@ -1004,7 +1102,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--surface-border);
             padding-bottom: 16px;
             flex-wrap: wrap;
             gap: 12px;
@@ -1024,7 +1122,7 @@
             gap: 12px; 
         }
         .inbox-card {
-            border: 1px solid var(--border);
+            border: 1px solid var(--surface-border);
             border-radius: var(--radius-md);
             padding: 18px;
             background: rgba(15, 23, 42, 0.015);
@@ -1032,71 +1130,18 @@
             flex-direction: column;
             gap: 10px;
             transition: var(--transition);
-            box-shadow: var(--shadow-sm);
         }
         .inbox-card:hover { 
             border-color: var(--primary); 
             background: rgba(59, 130, 246, 0.03); 
-            box-shadow: var(--shadow-md);
         }
-        .inbox-card-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-start; 
-            gap: 12px; 
-            flex-wrap: wrap; 
-        }
-        .inbox-subject { 
-            font-weight: 700; 
-            font-size: 15px; 
-            color: var(--card-text); 
-        }
-        .inbox-date { 
-            font-size: 12px; 
-            opacity: 0.7; 
-            color: var(--card-text); 
-        }
-        .inbox-sender { 
-            font-size: 13px; 
-            color: var(--primary); 
-            font-weight: 600; 
-        }
-        .inbox-snippet { 
-            font-size: 13px; 
-            color: var(--card-text); 
-            opacity: 0.85; 
-            line-height: 1.5; 
-        }
-        .inbox-actions { 
-            display: flex; 
-            gap: 10px; 
-            margin-top: 8px; 
-            flex-wrap: wrap; 
-            align-items: center;
-        }
-        .btn-inbox-convert { 
-            background: var(--success); 
-            color: #ffffff; 
-            border: none; 
-            padding: 8px 14px; 
-            border-radius: var(--radius-sm); 
-            font-size: 12px; 
-            font-weight: 600; 
-            cursor: pointer;
-            min-height: 36px;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-        .btn-inbox-convert:hover { 
-            opacity: 0.9; 
-            box-shadow: var(--shadow-md);
-        }
+        .inbox-subject { font-weight: 700; font-size: 15px; }
+        .inbox-date { font-size: 12px; opacity: 0.7; }
+        .inbox-sender { font-size: 13px; color: var(--primary); font-weight: 600; }
+        .inbox-snippet { font-size: 13px; opacity: 0.85; line-height: 1.5; }
 
-        /* DEDICATED PRODUCTIVITY DASHBOARD STYLES */
-        .productivity-container {
-            display: none;
-            margin-bottom: 24px;
-        }
+        /* PRODUCTIVITY DASHBOARD STYLES */
+        .productivity-container { display: none; margin-bottom: 24px; }
         .productivity-dashboard {
             display: flex;
             flex-direction: column;
@@ -1110,7 +1155,7 @@
         }
         .prod-card {
             background: var(--surface);
-            border: 1px solid var(--border);
+            border: 1px solid var(--surface-border);
             border-radius: var(--radius-lg);
             padding: 20px;
             box-shadow: var(--shadow-sm);
@@ -1118,14 +1163,13 @@
         }
         .prod-card:hover {
             box-shadow: var(--shadow-md);
-            border-color: var(--border-strong);
+            border-color: var(--surface-border-strong);
         }
         .prod-card-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--card-text);
+            letter-spacing: 0.06em;
             opacity: 0.65;
             margin-bottom: 8px;
         }
@@ -1133,7 +1177,6 @@
             font-size: 24px;
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
-            color: var(--card-text);
         }
         .prod-progress-bar-bg {
             width: 100%;
@@ -1159,7 +1202,7 @@
         }
         .active-task-hero {
             background: var(--surface);
-            border: 1px solid var(--border);
+            border: 1px solid var(--surface-border);
             border-radius: var(--radius-lg);
             padding: 24px;
             box-shadow: var(--shadow-sm);
@@ -1190,12 +1233,12 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-        
-        /* Section Dividers */
+
+        /* Section Dividers & Toast */
         .section-divider { 
             margin: 48px 0 24px 0; 
             border: 0; 
-            border-top: 1px solid var(--border); 
+            border-top: 1px solid var(--surface-border); 
         }
         .event-card { 
             display: flex; 
@@ -1204,7 +1247,7 @@
             background: var(--surface); 
             padding: 18px 20px; 
             border-radius: var(--radius-md); 
-            border: 1px solid var(--border); 
+            border: 1px solid var(--surface-border); 
             margin-bottom: 12px; 
             color: var(--card-text);
             box-shadow: var(--shadow-sm);
@@ -1212,10 +1255,8 @@
         }
         .event-card:hover {
             box-shadow: var(--shadow-md);
-            border-color: var(--border-strong);
+            border-color: var(--surface-border-strong);
         }
-        
-        /* Toast Notifications */
         .toast { 
             position: fixed; 
             bottom: 24px; 
@@ -1225,7 +1266,7 @@
             padding: 14px 24px; 
             border-radius: var(--radius-md); 
             box-shadow: var(--shadow-lg); 
-            border: 1px solid var(--border-strong); 
+            border: 1px solid var(--surface-border-strong); 
             z-index: 9999; 
             transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
             transform: translateY(100px); 
@@ -1239,20 +1280,10 @@
         }
 
         @media(max-width: 640px) { 
-            body {
-                padding: 16px;
-            }
-            .soloflow-header {
-                padding: 14px 16px;
-            }
-            .event-card { 
-                flex-direction: column; 
-                align-items: flex-start; 
-                gap: 12px; 
-            } 
-            .form-card {
-                padding: 16px;
-            }
+            body { padding: 16px; }
+            .soloflow-header { padding: 14px 16px; }
+            .event-card { flex-direction: column; align-items: flex-start; gap: 12px; } 
+            .form-card { padding: 16px; }
         }
     </style>
 </head>
@@ -1293,7 +1324,7 @@
             <button onmousedown="event.preventDefault(); formatText('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
             <button onmousedown="event.preventDefault(); formatText('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
             
-            <div style="display: flex; align-items: center; gap: 4px; border-left: 1px solid var(--border); padding-left: 4px; margin-left: 2px;">
+            <div style="display: flex; align-items: center; gap: 4px; border-left: 1px solid var(--surface-border); padding-left: 4px; margin-left: 2px;">
                 <input type="color" id="highlightColor" value="#ffff00" style="width: 20px; height: 20px; padding: 0; border: none; cursor: pointer; background: transparent;" title="Pick Text Highlight Color">
                 <button onmousedown="event.preventDefault(); applyHighlight()" title="Highlight Text (Ctrl+Shift+H)">🖌️</button>
             </div>
@@ -1301,60 +1332,109 @@
             <button onmousedown="event.preventDefault(); formatText('removeFormat')" title="Clear Format">✕</button>
 
             <!-- SCHEDULE TOOLS -->
-            <div id="scheduleTools" style="display: none; align-items: center; gap: 4px; border-left: 1px solid var(--border); padding-left: 4px; margin-left: 2px;">
+            <div id="scheduleTools" style="display: none; align-items: center; gap: 4px; border-left: 1px solid var(--surface-border); padding-left: 4px; margin-left: 2px;">
                 <input type="color" id="cellBgColor" value="#ffffff" style="width: 20px; height: 20px; padding: 0; border: none; cursor: pointer; background: transparent;" title="Fill Cell Color" oninput="applyCellColor(this.value)">
                 <button onmousedown="event.preventDefault(); mergeScheduleCells()" title="Merge Down">⬇️</button>
                 <button onmousedown="event.preventDefault(); unmergeScheduleCells()" title="Unmerge">⏏️</button>
             </div>
             
-            <div style="border-left: 1px solid var(--border); margin-left: 2px; padding-left: 4px;">
+            <div style="border-left: 1px solid var(--surface-border); margin-left: 2px; padding-left: 4px;">
                 <button onmousedown="event.preventDefault(); closeToolbar()" style="font-size: 12px; font-weight: bold; color: var(--primary);">Done</button>
             </div>
         </div>
 
+        <!-- ======================================================================
+             REFACTORED CUSTOMIZE & DATA MANAGEMENT DASHBOARD PANEL
+             ====================================================================== -->
         <details class="customize-menu">
-            <summary>🎨 Customize & Data Management</summary>
+            <summary>
+                <span>🎨 Customize, Theme Architecture &amp; Data Management</span>
+            </summary>
             
+            <!-- 1. CLOUD SYNC SECTION -->
             <div class="settings-group">
                 <h4>☁️ Cloud Sync (Firebase)</h4>
                 <div class="auth-status" id="auth-status-container">
                     <div>
-                        <span id="auth-status-text">Connecting to Firebase...</span><br>
-                        <span style="font-size: 11px; opacity: 0.7;" id="auth-uid"></span>
+                        <span id="auth-status-text" style="font-weight: 600;">Connecting to Firebase...</span><br>
+                        <span style="font-size: 11px; opacity: 0.65; font-family: monospace;" id="auth-uid"></span>
                     </div>
                     <button id="btn-google-login" class="btn-google" style="display: none;">
                         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                         Sign in to Sync
                     </button>
+                    <!-- Redesigned pill Sign Out button -->
                     <button id="btn-google-logout" class="btn-alt" style="display: none;">Sign Out</button>
                 </div>
             </div>
 
+            <!-- 2. GLOBAL UI COLORS -->
             <div class="settings-group">
                 <h4>Global UI Colors</h4>
                 <div class="settings-grid">
-                    <div class="setting-item"><label>App Background</label><input type="color" id="setBgColor"></div>
-                    <div class="setting-item"><label>Surface (Panels & Inputs)</label><input type="color" id="setSurfaceColor"></div>
-                    <div class="setting-item"><label>Outside Text Color</label><input type="color" id="setTextColor"></div>
-                    <div class="setting-item"><label>Card Text Color</label><input type="color" id="setCardTextColor"></div>
-                    <div class="setting-item"><label>Accent & Buttons</label><input type="color" id="setPrimaryColor"></div>
+                    <div class="setting-item">
+                        <label>App Background</label>
+                        <div class="color-swatch-wrapper">
+                            <input type="color" id="setBgColor">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>Surface Panels</label>
+                        <div class="color-swatch-wrapper">
+                            <input type="color" id="setSurfaceColor">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>Outside Text</label>
+                        <div class="color-swatch-wrapper">
+                            <input type="color" id="setTextColor">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>Card Text</label>
+                        <div class="color-swatch-wrapper">
+                            <input type="color" id="setCardTextColor">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>Accent &amp; Buttons</label>
+                        <div class="color-swatch-wrapper">
+                            <input type="color" id="setPrimaryColor">
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- 3. TASK CARD STATUS COLORS -->
             <div class="settings-group">
-                <h4>Task Card Colors</h4>
+                <h4>Task Card Status Colors</h4>
                 <div class="settings-grid">
-                    <div class="setting-item"><label>To Do</label><input type="color" id="setTodoColor"></div>
-                    <div class="setting-item"><label>In Progress</label><input type="color" id="setInprogColor"></div>
-                    <div class="setting-item"><label>Done</label><input type="color" id="setDoneColor"></div>
+                    <div class="setting-item">
+                        <label>To Do Surface</label>
+                        <div class="color-swatch-wrapper">
+                            <input type="color" id="setTodoColor">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>In Progress Surface</label>
+                        <div class="color-swatch-wrapper">
+                            <input type="color" id="setInprogColor">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>Done Surface</label>
+                        <div class="color-swatch-wrapper">
+                            <input type="color" id="setDoneColor">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- EXPANDED BANNER IMAGE & RESOLUTION SETTINGS -->
+            <!-- 4. BANNER IMAGE & RESOLUTION SETTINGS -->
             <div class="settings-group">
                 <h4>Banner Image &amp; Resolution Settings</h4>
                 <div class="settings-grid">
-                    <div class="setting-item" style="grid-column: 1 / -1;">
+                    <div class="setting-item" style="grid-column: span 2;">
                         <label>Banner Image URL</label>
                         <input type="text" id="setBannerUrl" placeholder="Paste an image URL here...">
                     </div>
@@ -1394,36 +1474,56 @@
                 </div>
             </div>
 
+            <!-- 5. PRODUCTIVITY ANALYTICS (ELEVATED SAAS METRICS GRID) -->
             <div class="settings-group">
                 <h4>📊 Productivity Analytics</h4>
-                <div class="settings-grid" style="text-align: center; gap: 12px;">
-                    <div class="setting-item" style="background: rgba(16, 185, 129, 0.08); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.25);">
-                        <label>Total Profit Earned</label>
-                        <div id="stat-value" style="font-size: 18px; font-weight: 700; color: var(--success); margin-top: 6px;">₱0.00</div>
+                <div class="analytics-grid-elevated">
+                    <div class="metric-card-elevated card-profit">
+                        <div class="metric-header">
+                            <span class="metric-label">Total Profit Earned</span>
+                            <span class="status-dot dot-success"></span>
+                        </div>
+                        <div id="stat-value" class="metric-value-display" style="color: var(--success);">₱0.00</div>
                     </div>
-                    <div class="setting-item" style="background: rgba(245, 158, 11, 0.08); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(245, 158, 11, 0.25);">
-                        <label>Total Budget Allocated</label>
-                        <div id="stat-budget" style="font-size: 18px; font-weight: 700; color: #d97706; margin-top: 6px;">₱0.00</div>
+                    <div class="metric-card-elevated card-budget">
+                        <div class="metric-header">
+                            <span class="metric-label">Total Budget Allocated</span>
+                            <span class="status-dot dot-warning"></span>
+                        </div>
+                        <div id="stat-budget" class="metric-value-display" style="color: #d97706;">₱0.00</div>
                     </div>
-                    <div class="setting-item" style="background: rgba(59, 130, 246, 0.08); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(59, 130, 246, 0.25);">
-                        <label>Tasks Finished</label>
-                        <div id="stat-finished" style="font-size: 18px; font-weight: 700; color: var(--primary); margin-top: 6px;">0</div>
+                    <div class="metric-card-elevated card-finished">
+                        <div class="metric-header">
+                            <span class="metric-label">Tasks Finished</span>
+                            <span class="status-dot dot-primary"></span>
+                        </div>
+                        <div id="stat-finished" class="metric-value-display" style="color: var(--primary);">0</div>
                     </div>
-                    <div class="setting-item" style="background: rgba(239, 68, 68, 0.08); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(239, 68, 68, 0.25);">
-                        <label>Tasks Overdue</label>
-                        <div id="stat-overdue" style="font-size: 18px; font-weight: 700; color: var(--danger); margin-top: 6px;">0</div>
+                    <div class="metric-card-elevated card-overdue">
+                        <div class="metric-header">
+                            <span class="metric-label">Tasks Overdue</span>
+                            <span class="status-dot dot-danger"></span>
+                        </div>
+                        <div id="stat-overdue" class="metric-value-display" style="color: var(--danger);">0</div>
                     </div>
-                    <div class="setting-item" style="background: rgba(245, 158, 11, 0.08); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(245, 158, 11, 0.25);">
-                        <label>7-Day Velocity</label>
-                        <div id="stat-velocity" style="font-size: 18px; font-weight: 700; color: var(--warning); margin-top: 6px;">0 / day</div>
+                    <div class="metric-card-elevated card-velocity">
+                        <div class="metric-header">
+                            <span class="metric-label">7-Day Velocity</span>
+                            <span class="status-dot dot-warning"></span>
+                        </div>
+                        <div id="stat-velocity" class="metric-value-display" style="color: var(--warning);">0 / day</div>
                     </div>
-                    <div class="setting-item" style="background: rgba(142, 68, 173, 0.08); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(142, 68, 173, 0.25);">
-                        <label>Total Time Tracked</label>
-                        <div id="stat-time" style="font-size: 18px; font-weight: 700; color: #8e44ad; margin-top: 6px;">0h 0m</div>
+                    <div class="metric-card-elevated card-time">
+                        <div class="metric-header">
+                            <span class="metric-label">Total Time Tracked</span>
+                            <span class="status-dot dot-purple"></span>
+                        </div>
+                        <div id="stat-time" class="metric-value-display" style="color: var(--purple);">0h 0m</div>
                     </div>
                 </div>
             </div>
 
+            <!-- 6. MANUAL DATA BACKUP -->
             <div class="settings-group">
                 <h4>Manual Data Backup</h4>
                 <div class="data-buttons">
@@ -1442,18 +1542,15 @@
             <button class="view-tab" id="tab-schedule" onclick="setView('schedule')">📅 Weekly Schedule</button>
             <button class="view-tab" id="tab-calendar" onclick="setView('calendar')">📆 Calendar</button>
             <button class="view-tab" id="tab-inbox" onclick="setView('inbox')">📧 Email Inbox</button>
-            <!-- DEDICATED PRODUCTIVITY TAB -->
             <button class="view-tab" id="tab-productivity" onclick="setView('productivity')">🚀 Productivity Hub</button>
         </div>
 
-        <!-- Weekly Schedule Container (Hidden by default) -->
+        <!-- Weekly Schedule Container -->
         <div id="schedule-container" class="schedule-container" style="display: none;">
-            <div id="schedule-grid" class="schedule-grid">
-                <!-- Grid generated by JS -->
-            </div>
+            <div id="schedule-grid" class="schedule-grid"></div>
         </div>
 
-        <!-- Monthly Calendar Container (Hidden by default) -->
+        <!-- Monthly Calendar Container -->
         <div id="calendar-container" class="calendar-container" style="display: none;">
             <div class="calendar-header">
                 <button class="btn-alt" onclick="changeMonth(-1)">◀ Prev</button>
@@ -1479,14 +1576,13 @@
             </div>
         </div>
 
-        <!-- DEDICATED PRODUCTIVITY DASHBOARD CONTAINER -->
+        <!-- PRODUCTIVITY DASHBOARD CONTAINER -->
         <div id="productivity-container" class="productivity-container"></div>
 
-        <!-- SEARCH BAR WITH SOLOFLOW LOGO EMBEDDED INSIDE -->
+        <!-- SEARCH BAR -->
         <div class="control-panel">
             <div class="search-input-wrapper">
                 <div class="search-logo-icon">
-                    <!-- SoloFlow Shooting Star Arc & Star SVG Logo -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22">
                         <path d="M15 65 C 15 35, 45 30, 80 35" stroke="#ff2e2e" stroke-width="8" fill="none" stroke-linecap="round"/>
                         <path d="M22 75 C 22 45, 48 40, 75 43" stroke="#ff2e2e" stroke-width="5" fill="none" stroke-linecap="round"/>
@@ -1504,7 +1600,7 @@
             </select>
         </div>
 
-        <!-- Add Task Form with Email Paste Parser -->
+        <!-- Add Task Form -->
         <div class="form-card">
             <div class="form-row">
                 <input type="text" id="taskTitle" class="flex-grow" placeholder="What needs to be done?" required>
@@ -1606,7 +1702,6 @@
         window.expandedCards = window.expandedCards || new Set();
         window.gmailAccessToken = sessionStorage.getItem('gmailAccessToken') || null;
 
-        // UI Toast replacement for alerts
         window.showToast = function(msg, type='info') {
             const toast = document.createElement('div');
             toast.className = 'toast';
@@ -1709,10 +1804,10 @@
 
         const defaultSettings = {
             title: "Rob's Globe and ADMU Task and Events Tracker",
-            bgColor: '#f4f4f9',
+            bgColor: '#f8fafc',
             surfaceColor: '#ffffff',
-            textColor: '#1e293b',
-            cardTextColor: '#1e293b',
+            textColor: '#0f172a',
+            cardTextColor: '#0f172a',
             primaryColor: '#3b82f6',
             todoBg: '#fff1f2',
             inprogBg: '#fefce8',
@@ -1729,7 +1824,6 @@
         window.events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
         window.scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
 
-        // --- FIRESTORE LISTENERS ---
         function setupFirestoreListeners() {
             if (!userId) return;
             unsubscribers.forEach(unsub => unsub());
@@ -1788,7 +1882,6 @@
             unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub);
         }
 
-        // --- FIRESTORE SAVE WRAPPERS ---
         window.saveSettings = function() {
             window.settings = {
                 title: document.getElementById('pageTitle').innerText.trim() || "Rob's Globe and ADMU Task and Events Tracker",
@@ -1842,10 +1935,11 @@
             }
         };
 
-        // --- SETTINGS LOGIC ---
+        // --- DYNAMIC THEME ENGINE & SETTINGS APPLY ---
         function applySettings() {
             document.getElementById('pageTitle').innerText = window.settings.title;
             const root = document.documentElement;
+            
             root.style.setProperty('--bg', window.settings.bgColor);
             root.style.setProperty('--surface', window.settings.surfaceColor);
             root.style.setProperty('--text', window.settings.textColor);
@@ -2445,7 +2539,7 @@
             reader.readAsText(file);
         };
 
-        // --- DEDICATED PRODUCTIVITY DASHBOARD MODULE ---
+        // --- PRODUCTIVITY DASHBOARD MODULE ---
         window.renderProductivityDashboard = function() {
             const container = document.getElementById('productivity-container');
             if (!container) return;
@@ -2476,7 +2570,6 @@
 
             container.innerHTML = `
                 <div class="productivity-dashboard">
-                    <!-- 1. DAILY OVERVIEW / FOCUS SNAPSHOT -->
                     <div class="prod-card">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
@@ -2492,11 +2585,10 @@
                         </div>
                     </div>
 
-                    <!-- 2. QUICK ANALYTICS SUMMARY CARDS -->
                     <div class="prod-grid-summary">
                         <div class="prod-card">
                             <div class="prod-card-title">Total Focus Time</div>
-                            <div class="prod-card-value" style="color: #8e44ad;">${focusHours}h ${focusMins}m</div>
+                            <div class="prod-card-value" style="color: #8b5cf6;">${focusHours}h ${focusMins}m</div>
                         </div>
                         <div class="prod-card">
                             <div class="prod-card-title">Completion Rate</div>
@@ -2512,7 +2604,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. ACTIVE WORKSPACE & FOCUS MODULE -->
                     <div class="workspace-layout">
                         <div class="active-task-hero">
                             <div>
@@ -2540,12 +2631,11 @@
                             ` : ''}
                         </div>
 
-                        <!-- QUICK ACTIVE TASK QUEUE -->
                         <div class="prod-card" style="display: flex; flex-direction: column; gap: 12px;">
                             <div class="prod-card-title">Active Queue (${inProgressTasks.length + highPriorityTasks.length})</div>
                             <div style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
                                 ${[...inProgressTasks, ...highPriorityTasks].slice(0, 5).map(t => `
-                                    <div style="padding: 8px 12px; background: rgba(15, 23, 42, 0.03); border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="padding: 8px 12px; background: rgba(15, 23, 42, 0.03); border-radius: var(--radius-sm); border: 1px solid var(--surface-border); display: flex; justify-content: space-between; align-items: center;">
                                         <span style="font-size: 13px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 170px;">${t.title}</span>
                                         <button class="btn-small" onclick="window.moveTask('${t.id}', 'done'); window.renderProductivityDashboard();" style="padding: 2px 8px; min-height: 26px;">✓</button>
                                     </div>
@@ -2554,7 +2644,6 @@
                         </div>
                     </div>
 
-                    <!-- 4. DEEP-DIVE PORTAL CTA -->
                     <div class="deep-dive-portal deep-dive-cta">
                         <div>
                             <strong style="font-size: 15px; color: var(--card-text);">Detailed Financial & Time Analytics</strong>
@@ -2933,7 +3022,6 @@
                         <span class="badge">${task.category}</span>
                     </div>
 
-                    <!-- Compact Actions Bar -->
                     <div class="actions" style="margin-top: 8px;">
                         <div style="display: flex; gap: 5px;">
                             ${actionBtns}
@@ -2941,7 +3029,6 @@
                         <button class="btn-small btn-expand" id="btn-expand-${task.id}" onclick="toggleCardExpand('${task.id}')">${expandBtnText}</button>
                     </div>
 
-                    <!-- Expandable Body Area -->
                     <div class="${expandClass}" id="expand-${task.id}">
                         ${photoHtml}
                         ${linksContainerHtml}
