@@ -39,7 +39,7 @@
         }
         .container { max-width: 1050px; margin: auto; }
         
-        /* BRAND NEW SOLOFLOW AESTHETIC HEADER */
+        /* SOLOFLOW AESTHETIC HEADER */
         .soloflow-header {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -139,7 +139,9 @@
         .data-buttons { display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
         .btn-alt { background: var(--surface); border: 1px solid var(--border); color: var(--card-text); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
         .btn-alt:hover { background: rgba(0,0,0,0.05); }
-        
+        .btn-email { background: rgba(142, 68, 173, 0.1); color: #8e44ad; border: 1px solid rgba(142, 68, 173, 0.3); font-weight: bold; }
+        .btn-email:hover { background: #8e44ad; color: white; }
+
         /* Auth Styles */
         .auth-status { font-size: 12px; padding: 10px; border-radius: 4px; background: rgba(0,0,0,0.05); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
         .btn-google { background: #4285f4; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; }
@@ -596,10 +598,11 @@
             </select>
         </div>
 
-        <!-- Add Task Form -->
+        <!-- Add Task Form with Email Paste Parser -->
         <div class="form-card">
             <div class="form-row">
                 <input type="text" id="taskTitle" class="flex-grow" placeholder="What needs to be done?" required>
+                <button type="button" class="btn-email" onclick="parseEmailToTask()" title="Paste text copied from Gmail, Outlook, or Apple Mail">📧 Paste Email to Task</button>
                 <input type="text" id="taskCategory" placeholder="Category">
                 <select id="taskPriority">
                     <option value="Low">Low Priority</option>
@@ -628,7 +631,7 @@
             </div>
             
             <div class="form-row">
-                <input type="text" id="taskAssignee" placeholder="Assignee">
+                <input type="text" id="taskAssignee" placeholder="Assignee (Name or email@domain.com)">
                 <span class="input-label">Assigned:</span><input type="date" id="taskDateAssigned">
                 <span class="input-label">Due:</span><input type="date" id="taskDueDate"><input type="time" id="taskDueTime">
                 <select id="taskBlockedBy" style="flex-grow: 1; min-width: 150px;">
@@ -980,6 +983,81 @@
         applySettings();
 
         // --- TASK TRACKER LOGIC ---
+        
+        // EMAIL INTEGRATION: Parse Email Text into Form
+        window.parseEmailToTask = function() {
+            const emailText = prompt("Paste copied text from your email (Subject, Sender, Body, or URL):");
+            if (!emailText || !emailText.trim()) return;
+
+            const lines = emailText.split('\n').map(l => l.trim()).filter(l => l);
+            if (lines.length > 0) {
+                // First non-empty line becomes Subject/Title
+                document.getElementById('taskTitle').value = lines[0];
+                
+                // Remaining lines become Description
+                if (lines.length > 1) {
+                    document.getElementById('taskDescription').value = lines.slice(1).join('\n');
+                }
+                
+                // Look for any URLs in the text to put into Reference or Workspace link
+                const urlMatch = emailText.match(/https?:\/\/[^\s]+/i);
+                if (urlMatch && urlMatch[0]) {
+                    if (urlMatch[0].includes('mail.google.com') || urlMatch[0].includes('outlook') || urlMatch[0].includes('docs.google.com')) {
+                        document.getElementById('taskWorkspaceUrl').value = urlMatch[0];
+                    } else {
+                        document.getElementById('taskLinkUrl').value = urlMatch[0];
+                    }
+                }
+
+                // Look for any email address (@) to pre-fill assignee
+                const emailMatch = emailText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+                if (emailMatch && emailMatch[0]) {
+                    document.getElementById('taskAssignee').value = emailMatch[0];
+                }
+
+                window.showToast("Email parsed into task fields!", "success");
+            }
+        };
+
+        // EMAIL INTEGRATION: Draft Outbound Status Mailto Link
+        window.emailTaskUpdate = function(taskId) {
+            const task = window.tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            let targetEmail = "";
+            if (task.assignee && task.assignee.includes('@')) {
+                targetEmail = task.assignee;
+            } else {
+                const input = prompt("Enter target email address for status update:", "recipient@domain.com");
+                if (input === null) return;
+                targetEmail = input.trim();
+            }
+
+            const subject = encodeURIComponent(`[SoloFlow Update] ${task.title}`);
+            
+            let bodyText = `Hi,\n\nHere is the latest progress update for "${task.title}" from SoloFlow:\n\n`;
+            bodyText += `• Status: ${task.status.toUpperCase()}\n`;
+            bodyText += `• Priority: ${task.priority}\n`;
+            if (task.dueDate) bodyText += `• Due Date: ${task.dueDate}${task.dueTime ? ' at ' + formatTime(task.dueTime) : ''}\n`;
+            if (task.budget) bodyText += `• ${task.financeType || 'Profit'}: ₱${parseFloat(task.budget).toLocaleString()}\n`;
+            
+            if (task.subtasks && task.subtasks.length > 0) {
+                bodyText += `\nSubtask Progress:\n`;
+                task.subtasks.forEach(st => {
+                    bodyText += `${st.completed ? '[x]' : '[ ]'} ${st.text}\n`;
+                });
+            }
+
+            if (task.description) {
+                bodyText += `\nNotes / Snippet:\n${task.description}\n`;
+            }
+
+            bodyText += `\nBest regards,\nSoloFlow Productivity Suite`;
+
+            const mailtoUrl = `mailto:${targetEmail}?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+            window.open(mailtoUrl, '_blank');
+        };
+
         window.handlePhotoUpload = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1719,6 +1797,7 @@
                         <div class="actions" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px;">
                            <button class="btn-small" title="Upload or link a photo" onclick="editTaskPhoto('${task.id}')">📷 Photo</button>
                            <button class="btn-small" title="Edit Reference or Workspace/Doc Links" onclick="editTaskLinks('${task.id}')">✏️ Links</button>
+                           <button class="btn-small" style="color: #8e44ad; border-color: rgba(142,68,173,0.3); font-weight: bold;" title="Send progress report mailto to Assignee or target email" onclick="emailTaskUpdate('${task.id}')">✉️ Email Update</button>
                            ${task.dueDate ? `<button class="btn-small" style="color: ${syncColor}; border-color: ${syncColor}; font-weight: bold;" title="Sync to internal Calendar tab" onclick="syncTaskToCalendarApp('${task.id}')">${syncText}</button>` : ''}
                            ${task.dueDate ? `<button class="btn-small" title="Export .ics file for Google Calendar/Apple" onclick="syncTaskToCalendarFile('${task.id}')">💾 .ics</button>` : ''}
                            <button class="btn-small btn-danger" onclick="deleteTask('${task.id}')">Delete</button>
