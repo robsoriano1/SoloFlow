@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoloFlow - Task and Events Tracker</title>
-    <!-- Soloflow Favicon for Browser Tab & URL Address Bar -->
+    <title>SoloFlow — Rob's Globe and ADMU Task and Events Tracker</title>
+    <!-- SoloFlow Favicon for Browser Tab & URL Address Bar -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M15 65 C 15 35, 45 30, 80 35' stroke='%23ff2e2e' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M22 75 C 22 45, 48 40, 75 43' stroke='%23ff2e2e' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M75 20 Q 80 35 95 40 Q 80 45 75 60 Q 70 45 55 40 Q 70 35 75 20 Z' fill='%23ff2e2e'/%3E%3Cpath d='M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z' fill='%23ffb82e'/%3E%3C/svg%3E">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
         :root {
             /* Dynamic variables controlled by JS */
             --bg: #f4f4f9; 
@@ -37,17 +37,83 @@
             padding: 20px;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
-        .container { max-width: 1000px; margin: auto; }
+        .container { max-width: 1050px; margin: auto; }
         
+        /* BRAND NEW SOLOFLOW AESTHETIC HEADER */
+        .soloflow-header {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .soloflow-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .soloflow-logo-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(255, 46, 46, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 46, 46, 0.2);
+            flex-shrink: 0;
+        }
+        .soloflow-title-group h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--card-text);
+            line-height: 1.1;
+        }
+        .soloflow-title-group span {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            opacity: 0.9;
+        }
+        .soloflow-header-badge {
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(74, 144, 226, 0.1);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(74, 144, 226, 0.25);
+            white-space: nowrap;
+        }
+
         /* Banner & Header Styles */
         #bannerImage {
-            width: 100%; height: 150px; background-size: cover; background-position: center;
-            border-radius: 8px; margin-bottom: 20px; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 12px;
+            margin: 0 auto 20px auto;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            transition: height 0.3s ease, width 0.3s ease;
         }
         #pageTitle {
-            display: inline-block; padding: 5px 10px; margin-left: -10px;
+            display: inline-block; padding: 5px 10px; margin: -5px 0 15px -10px;
             border-radius: 6px; outline: none; border: 1px dashed transparent; transition: border 0.2s;
-            color: var(--text);
+            color: var(--text); font-size: 20px; font-weight: 600;
         }
         #pageTitle:hover, #pageTitle:focus { border-color: var(--border); background: rgba(128, 128, 128, 0.1); }
 
@@ -68,7 +134,7 @@
         .setting-item { display: flex; flex-direction: column; gap: 5px; }
         .setting-item label { font-size: 12px; font-weight: bold; color: var(--card-text); opacity: 0.8;}
         .setting-item input[type="color"] { width: 100%; height: 35px; padding: 2px; cursor: pointer; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); }
-        .setting-item input[type="text"] { padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); color: var(--card-text); }
+        .setting-item input[type="text"], .setting-item input[type="number"], .setting-item select { padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); color: var(--card-text); font-family: inherit; font-size: 13px; }
         
         .data-buttons { display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
         .btn-alt { background: var(--surface); border: 1px solid var(--border); color: var(--card-text); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
@@ -98,7 +164,7 @@
         button:hover { opacity: 0.9; }
         .input-label { font-size: 13px; color: var(--card-text); opacity: 0.8; margin-right: -5px; }
 
-        /* Control Panel (Search/Filter) with Soloflow Logo inside Search Bar */
+        /* Control Panel (Search/Filter) with SoloFlow Logo inside Search Bar */
         .control-panel {
             display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
             background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -307,8 +373,33 @@
 <body>
     <div class="container">
         
+        <!-- SOLOFLOW TOP BRAND HEADER -->
+        <header class="soloflow-header">
+            <div class="soloflow-brand">
+                <div class="soloflow-logo-badge">
+                    <!-- SoloFlow Shooting Star SVG Logo -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28">
+                        <path d="M15 65 C 15 35, 45 30, 80 35" stroke="#ff2e2e" stroke-width="8" fill="none" stroke-linecap="round"/>
+                        <path d="M22 75 C 22 45, 48 40, 75 43" stroke="#ff2e2e" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M75 20 Q 80 35 95 40 Q 80 45 75 60 Q 70 45 55 40 Q 70 35 75 20 Z" fill="#ff2e2e"/>
+                        <path d="M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z" fill="#ffb82e"/>
+                    </svg>
+                </div>
+                <div class="soloflow-title-group">
+                    <h1>SoloFlow</h1>
+                    <span>Task &amp; Events Workspace</span>
+                </div>
+            </div>
+            <div class="soloflow-header-badge">
+                ✨ Productivity Suite
+            </div>
+        </header>
+
+        <!-- Dynamic Banner Image -->
         <div id="bannerImage"></div>
-        <h2 id="pageTitle" contenteditable="true" spellcheck="false" title="Click to edit title">Rob's Globe and ADMU Task and Events Tracker</h2>
+
+        <!-- Editable Workspace Subtitle/Title -->
+        <h2 id="pageTitle" contenteditable="true" spellcheck="false" title="Click to edit workspace name">Rob's Globe and ADMU Task and Events Tracker</h2>
 
         <!-- Floating Rich Text Toolbar -->
         <div id="formatToolbar" class="format-toolbar">
@@ -373,10 +464,47 @@
                 </div>
             </div>
 
+            <!-- EXPANDED BANNER IMAGE & RESOLUTION SETTINGS -->
             <div class="settings-group">
-                <h4>Banner Image</h4>
-                <div class="setting-item" style="grid-column: 1 / -1;">
-                    <input type="text" id="setBannerUrl" placeholder="Paste an image URL here...">
+                <h4>Banner Image &amp; Resolution Settings</h4>
+                <div class="settings-grid">
+                    <div class="setting-item" style="grid-column: 1 / -1;">
+                        <label>Banner Image URL</label>
+                        <input type="text" id="setBannerUrl" placeholder="Paste an image URL here...">
+                    </div>
+                    <div class="setting-item">
+                        <label>Height (px)</label>
+                        <input type="number" id="setBannerHeight" value="180" min="60" max="800" step="10">
+                    </div>
+                    <div class="setting-item">
+                        <label>Width</label>
+                        <select id="setBannerWidth">
+                            <option value="100%">100% (Full Width)</option>
+                            <option value="90%">90%</option>
+                            <option value="80%">80%</option>
+                            <option value="75%">75%</option>
+                            <option value="50%">50%</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Resolution / Sizing Fit</label>
+                        <select id="setBannerFit">
+                            <option value="cover">Cover (Fill &amp; Crop to Aspect)</option>
+                            <option value="contain">Contain (Show Full Resolution / No Crop)</option>
+                            <option value="100% 100%">Stretch (100% Width &amp; Height)</option>
+                            <option value="auto">Original Resolution (Auto)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Image Alignment</label>
+                        <select id="setBannerPosition">
+                            <option value="center">Center</option>
+                            <option value="top">Top</option>
+                            <option value="bottom">Bottom</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -450,7 +578,7 @@
         <div class="control-panel">
             <div class="search-input-wrapper">
                 <div class="search-logo-icon">
-                    <!-- Soloflow Shooting Star Arc & Star SVG Logo -->
+                    <!-- SoloFlow Shooting Star Arc & Star SVG Logo -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22">
                         <path d="M15 65 C 15 35, 45 30, 80 35" stroke="#ff2e2e" stroke-width="8" fill="none" stroke-linecap="round"/>
                         <path d="M22 75 C 22 45, 48 40, 75 43" stroke="#ff2e2e" stroke-width="5" fill="none" stroke-linecap="round"/>
@@ -458,7 +586,7 @@
                         <path d="M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z" fill="#ffb82e"/>
                     </svg>
                 </div>
-                <input type="text" id="searchInput" placeholder="Search Soloflow tasks & events..." oninput="renderTasks()">
+                <input type="text" id="searchInput" placeholder="Search SoloFlow tasks & events..." oninput="renderTasks()">
             </div>
             <select id="categoryFilter" onchange="renderTasks()">
                 <option value="All">All Categories</option>
@@ -670,9 +798,20 @@
         };
 
         const defaultSettings = {
-            title: "Rob's Globe and ADMU Task and Events Tracker", bgColor: '#f4f4f9', surfaceColor: '#ffffff',
-            textColor: '#333333', cardTextColor: '#333333', primaryColor: '#4a90e2', todoBg: '#ffeaea',
-            inprogBg: '#fffbe6', doneBg: '#f6ffed', bannerUrl: ''
+            title: "Rob's Globe and ADMU Task and Events Tracker",
+            bgColor: '#f4f4f9',
+            surfaceColor: '#ffffff',
+            textColor: '#333333',
+            cardTextColor: '#333333',
+            primaryColor: '#4a90e2',
+            todoBg: '#ffeaea',
+            inprogBg: '#fffbe6',
+            doneBg: '#f6ffed',
+            bannerUrl: '',
+            bannerHeight: '180',
+            bannerWidth: '100%',
+            bannerFit: 'cover',
+            bannerPosition: 'center'
         };
 
         window.settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
@@ -748,7 +887,11 @@
                 todoBg: document.getElementById('setTodoColor').value,
                 inprogBg: document.getElementById('setInprogColor').value,
                 doneBg: document.getElementById('setDoneColor').value,
-                bannerUrl: document.getElementById('setBannerUrl').value.trim()
+                bannerUrl: document.getElementById('setBannerUrl').value.trim(),
+                bannerHeight: document.getElementById('setBannerHeight').value || '180',
+                bannerWidth: document.getElementById('setBannerWidth').value || '100%',
+                bannerFit: document.getElementById('setBannerFit').value || 'cover',
+                bannerPosition: document.getElementById('setBannerPosition').value || 'center'
             };
             localStorage.setItem('trackerSettings', JSON.stringify(window.settings));
             applySettings();
@@ -797,10 +940,16 @@
             root.style.setProperty('--done-bg', window.settings.doneBg);
             
             const bannerDiv = document.getElementById('bannerImage');
-            if (window.settings.bannerUrl.trim()) {
+            if (window.settings.bannerUrl && window.settings.bannerUrl.trim()) {
                 bannerDiv.style.backgroundImage = `url('${window.settings.bannerUrl}')`;
+                bannerDiv.style.height = `${window.settings.bannerHeight || '180'}px`;
+                bannerDiv.style.width = window.settings.bannerWidth || '100%';
+                bannerDiv.style.backgroundSize = window.settings.bannerFit || 'cover';
+                bannerDiv.style.backgroundPosition = window.settings.bannerPosition || 'center';
                 bannerDiv.style.display = 'block';
-            } else { bannerDiv.style.display = 'none'; }
+            } else {
+                bannerDiv.style.display = 'none';
+            }
 
             document.getElementById('setBgColor').value = window.settings.bgColor;
             document.getElementById('setSurfaceColor').value = window.settings.surfaceColor;
@@ -811,13 +960,23 @@
             document.getElementById('setInprogColor').value = window.settings.inprogBg;
             document.getElementById('setDoneColor').value = window.settings.doneBg;
             document.getElementById('setBannerUrl').value = window.settings.bannerUrl;
+            document.getElementById('setBannerHeight').value = window.settings.bannerHeight || '180';
+            document.getElementById('setBannerWidth').value = window.settings.bannerWidth || '100%';
+            document.getElementById('setBannerFit').value = window.settings.bannerFit || 'cover';
+            document.getElementById('setBannerPosition').value = window.settings.bannerPosition || 'center';
         }
 
         document.getElementById('pageTitle').addEventListener('blur', window.saveSettings);
         ['Bg','Surface','Text','CardText','Primary','Todo','Inprog','Done'].forEach(id => {
             document.getElementById('set' + id + 'Color').addEventListener('change', window.saveSettings);
         });
-        document.getElementById('setBannerUrl').addEventListener('change', window.saveSettings);
+        ['Url','Height','Width','Fit','Position'].forEach(id => {
+            const el = document.getElementById('setBanner' + id);
+            if (el) {
+                el.addEventListener('change', window.saveSettings);
+                el.addEventListener('input', window.saveSettings);
+            }
+        });
         applySettings();
 
         // --- TASK TRACKER LOGIC ---
