@@ -1218,16 +1218,59 @@
             background: rgba(var(--primary-rgb, 59, 130, 246), 0.1);
             color: var(--primary);
         }
+
+        /* =========================================================
+           FIX 2: Productivity Hub Analytics Card (.deep-dive-cta)
+           ========================================================= */
         .deep-dive-cta {
-            background: linear-gradient(135deg, rgba(var(--primary-rgb, 59, 130, 246), 0.05) 0%, rgba(142, 68, 173, 0.05) 100%);
+            background: linear-gradient(135deg, rgba(var(--primary-rgb, 59, 130, 246), 0.12) 0%, rgba(142, 68, 173, 0.12) 100%), var(--surface);
             border: 1px dashed var(--primary);
             border-radius: var(--radius-lg);
-            padding: 20px;
+            padding: 22px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: var(--shadow-sm);
+            color: var(--card-text);
+        }
+
+        /* =========================================================
+           FIX 1: Floating Rich Text Formatting Toolbar
+           ========================================================= */
+        .format-toolbar {
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            background: var(--surface);
+            border: 1px solid var(--surface-border-strong);
+            border-radius: var(--radius-md);
+            padding: 6px 8px;
+            box-shadow: var(--shadow-lg);
+            align-items: center;
+            gap: 4px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: opacity 0.15s ease;
+        }
+
+        .format-toolbar button {
+            padding: 4px 10px;
+            min-height: 30px;
+            font-size: 13px;
+            background: transparent;
+            color: var(--card-text);
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            box-shadow: none;
+        }
+
+        .format-toolbar button:hover {
+            background: rgba(15, 23, 42, 0.06);
+            border-color: var(--surface-border);
         }
 
         /* Section Dividers & Toast */
@@ -1314,8 +1357,8 @@
         <!-- Editable Workspace Subtitle/Title -->
         <h2 id="pageTitle" contenteditable="true" spellcheck="false" title="Click to edit workspace name">Rob's Globe and ADMU Task and Events Tracker</h2>
 
-        <!-- Floating Rich Text Toolbar -->
-        <div id="formatToolbar" class="format-toolbar">
+        <!-- Floating Rich Text Toolbar (Updated with initial style="display: none;") -->
+        <div id="formatToolbar" class="format-toolbar" style="display: none;">
             <button onmousedown="event.preventDefault(); formatText('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
             <button onmousedown="event.preventDefault(); formatText('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
             <button onmousedown="event.preventDefault(); formatText('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
@@ -1335,7 +1378,7 @@
             </div>
             
             <div style="border-left: 1px solid var(--surface-border); margin-left: 2px; padding-left: 4px;">
-                <button onmousedown="event.preventDefault(); closeToolbar()" style="font-size: 12px; font-weight: bold; color: var(--primary);">Done</button>
+                <button onmousedown="event.preventDefault(); closeToolbar()" style="font-size: 12px; font-weight: bold; color: var(--primary); background: transparent; border: none;">Done</button>
             </div>
         </div>
 
@@ -2750,14 +2793,18 @@
                         </div>
                     </div>
 
+                    <!-- Updated Analytics Card with improved contrast & styling -->
                     <div class="deep-dive-portal deep-dive-cta">
                         <div>
-                            <strong style="font-size: 15px; color: var(--card-text);">Detailed Financial & Time Analytics</strong>
-                            <div style="font-size: 13px; opacity: 0.8; margin-top: 2px;">
+                            <strong style="font-size: 16px; font-weight: 700; color: var(--card-text); display: block;">
+                                Detailed Financial &amp; Time Analytics
+                            </strong>
+                            <div style="font-size: 13px; opacity: 0.85; margin-top: 4px; color: var(--card-text);">
                                 Inspect deep revenue breakdown, allocated budgets, and complete time logs.
                             </div>
                         </div>
-                        <button class="btn-alt" onclick="window.navigateToCustomizeAnalytics()" style="background: var(--surface);">
+                        <button class="btn-alt" onclick="window.navigateToCustomizeAnalytics()" 
+                            style="background: var(--primary); color: var(--primary-contrast-text, #ffffff); border: none; font-weight: 600; padding: 10px 18px; box-shadow: var(--shadow-sm);">
                             📊 Open Analytics Settings →
                         </button>
                     </div>
