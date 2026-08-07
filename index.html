@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SoloFlow - Task and Events Tracker</title>
+    <!-- Soloflow Favicon for Browser Tab & URL Address Bar -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M15 65 C 15 35, 45 30, 80 35' stroke='%23ff2e2e' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M22 75 C 22 45, 48 40, 75 43' stroke='%23ff2e2e' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M75 20 Q 80 35 95 40 Q 80 45 75 60 Q 70 45 55 40 Q 70 35 75 20 Z' fill='%23ff2e2e'/%3E%3Cpath d='M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z' fill='%23ffb82e'/%3E%3C/svg%3E">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         :root {
@@ -96,12 +98,34 @@
         button:hover { opacity: 0.9; }
         .input-label { font-size: 13px; color: var(--card-text); opacity: 0.8; margin-right: -5px; }
 
-        /* Control Panel (Search/Filter) */
+        /* Control Panel (Search/Filter) with Soloflow Logo inside Search Bar */
         .control-panel {
             display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
             background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            align-items: center;
         }
-        .control-panel input { flex-grow: 1; min-width: 200px; }
+        .search-input-wrapper {
+            position: relative;
+            flex-grow: 1;
+            min-width: 220px;
+            display: flex;
+            align-items: center;
+        }
+        .search-logo-icon {
+            position: absolute;
+            left: 12px;
+            width: 24px;
+            height: 24px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-input-wrapper input {
+            width: 100%;
+            padding-left: 44px !important;
+            box-sizing: border-box;
+        }
         
         /* View Switcher Tabs */
         .view-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; white-space: nowrap;}
@@ -422,8 +446,20 @@
             <div id="calendar-grid" class="calendar-grid"></div>
         </div>
 
+        <!-- SEARCH BAR WITH SOLOFLOW LOGO EMBEDDED INSIDE -->
         <div class="control-panel">
-            <input type="text" id="searchInput" placeholder="🔍 Search tasks..." oninput="renderTasks()">
+            <div class="search-input-wrapper">
+                <div class="search-logo-icon">
+                    <!-- Soloflow Shooting Star Arc & Star SVG Logo -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22">
+                        <path d="M15 65 C 15 35, 45 30, 80 35" stroke="#ff2e2e" stroke-width="8" fill="none" stroke-linecap="round"/>
+                        <path d="M22 75 C 22 45, 48 40, 75 43" stroke="#ff2e2e" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M75 20 Q 80 35 95 40 Q 80 45 75 60 Q 70 45 55 40 Q 70 35 75 20 Z" fill="#ff2e2e"/>
+                        <path d="M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z" fill="#ffb82e"/>
+                    </svg>
+                </div>
+                <input type="text" id="searchInput" placeholder="Search Soloflow tasks & events..." oninput="renderTasks()">
+            </div>
             <select id="categoryFilter" onchange="renderTasks()">
                 <option value="All">All Categories</option>
             </select>
@@ -455,7 +491,6 @@
                 <input type="text" id="taskSubtasks" class="flex-grow" placeholder="Subtasks (comma separated)">
             </div>
             
-            <!-- NEW: Upload OR Link Photo Row -->
             <div class="form-row">
                 <input type="url" id="taskPhotoUrl" class="flex-grow" placeholder="Photo URL (https://...) OR upload a file ->">
                 <input type="file" id="taskPhotoFile" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
@@ -786,8 +821,6 @@
         applySettings();
 
         // --- TASK TRACKER LOGIC ---
-        
-        // NEW: Handle Photo File Upload in Form
         window.handlePhotoUpload = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -799,7 +832,6 @@
             reader.readAsDataURL(file);
         };
 
-        // NEW: Handle Photo Upload/Link editing on Existing Card
         window.editTaskPhoto = function(taskId) {
             const task = window.tasks.find(t => t.id === taskId);
             if (!task) return;
@@ -831,7 +863,6 @@
             }
         };
 
-        // NEW: Dynamic Subtask Addition
         window.addSubtask = function(taskId) {
             const task = window.tasks.find(t => t.id === taskId);
             if (!task) return;
@@ -1418,7 +1449,6 @@
                 const descText = task.description || '';
                 const descHtml = `<div class="task-desc editable" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${descText}</div>`;
                 
-                // NEW: Dynamic subtask renderer with "+ Add Subtask" inside expandable area
                 let subtasksHtml = '<div class="subtasks-list">';
                 if(task.subtasks && task.subtasks.length > 0) {
                     task.subtasks.forEach((st, idx) => {
