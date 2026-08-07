@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoloFlow — Task and Events Tracker</title>
+    <title>SoloFlow — Rob's Globe and ADMU Task and Events Tracker</title>
     <!-- SoloFlow Favicon for Browser Tab & URL Address Bar -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M15 65 C 15 35, 45 30, 80 35' stroke='%23ff2e2e' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M22 75 C 22 45, 48 40, 75 43' stroke='%23ff2e2e' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M75 20 Q 80 35 95 40 Q 80 45 75 60 Q 70 45 55 40 Q 70 35 75 20 Z' fill='%23ff2e2e'/%3E%3Cpath d='M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z' fill='%23ffb82e'/%3E%3C/svg%3E">
     <style>
@@ -118,7 +118,7 @@
         #pageTitle:hover, #pageTitle:focus { border-color: var(--border); background: rgba(128, 128, 128, 0.1); }
 
         /* ALL BOXES/CONTAINERS USE --card-text */
-        details.customize-menu, .form-card, .column, .control-panel, .event-card, .setting-item {
+        details.customize-menu, .form-card, .column, .control-panel, .event-card, .setting-item, .inbox-card, .inbox-header {
             color: var(--card-text) !important;
         }
 
@@ -360,6 +360,48 @@
             text-overflow: ellipsis; font-weight: bold; max-width: 100%; box-sizing: border-box;
         }
         .calendar-task.done { background: var(--success); opacity: 0.7; text-decoration: line-through; }
+
+        /* PHASE 2: GMAIL API INBOX TAB STYLES */
+        .inbox-container {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: none;
+            margin-bottom: 20px;
+        }
+        .inbox-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .inbox-header h3 { margin: 0; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .inbox-list { display: flex; flex-direction: column; gap: 12px; }
+        .inbox-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            background: rgba(0,0,0,0.015);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .inbox-card:hover { border-color: var(--primary); background: rgba(74, 144, 226, 0.03); }
+        .inbox-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+        .inbox-subject { font-weight: bold; font-size: 15px; color: var(--card-text); }
+        .inbox-date { font-size: 11px; opacity: 0.7; color: var(--card-text); }
+        .inbox-sender { font-size: 12px; color: var(--primary); font-weight: 500; }
+        .inbox-snippet { font-size: 13px; color: var(--card-text); opacity: 0.85; line-height: 1.4; }
+        .inbox-actions { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+        .btn-inbox-convert { background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .btn-inbox-convert:hover { opacity: 0.9; }
         
         /* Section Dividers */
         .section-divider { margin: 40px 0 20px 0; border: 0; border-top: 2px solid var(--border); }
@@ -557,6 +599,8 @@
             <button class="view-tab" id="tab-backlog" onclick="setView('backlog')">Backlog</button>
             <button class="view-tab" id="tab-schedule" onclick="setView('schedule')">📅 Weekly Schedule</button>
             <button class="view-tab" id="tab-calendar" onclick="setView('calendar')">📆 Calendar</button>
+            <!-- NEW PHASE 2: GMAIL INBOX TAB -->
+            <button class="view-tab" id="tab-inbox" onclick="setView('inbox')">📧 Email Inbox</button>
         </div>
 
         <!-- Weekly Schedule Container (Hidden by default) -->
@@ -574,6 +618,22 @@
                 <button class="btn-alt" onclick="changeMonth(1)">Next ▶</button>
             </div>
             <div id="calendar-grid" class="calendar-grid"></div>
+        </div>
+
+        <!-- NEW PHASE 2: GMAIL INBOX CONTAINER -->
+        <div id="inbox-container" class="inbox-container">
+            <div class="inbox-header">
+                <h3>📧 Gmail REST API Inbox</h3>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn-alt" onclick="connectGmailInbox()">🔑 Connect Gmail Inbox</button>
+                    <button class="btn-alt" onclick="fetchGmailMessages()">🔄 Refresh Messages</button>
+                </div>
+            </div>
+            <div id="inbox-list" class="inbox-list">
+                <div style="text-align: center; opacity: 0.7; padding: 30px;">
+                    Click <strong>🔑 Connect Gmail Inbox</strong> above to authorize read-only access and fetch your latest messages.
+                </div>
+            </div>
         </div>
 
         <!-- SEARCH BAR WITH SOLOFLOW LOGO EMBEDDED INSIDE -->
@@ -698,6 +758,7 @@
         let unsubscribers = [];
 
         window.expandedCards = window.expandedCards || new Set();
+        window.gmailAccessToken = sessionStorage.getItem('gmailAccessToken') || null;
 
         // UI Toast replacement for alerts
         window.showToast = function(msg, type='info') {
@@ -982,24 +1043,151 @@
         });
         applySettings();
 
+        // --- PHASE 2: GMAIL REST API INBOX LOGIC ---
+        window.connectGmailInbox = async function() {
+            const provider = new GoogleAuthProvider();
+            provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+            try {
+                window.showToast("Opening Google Auth for Gmail access...");
+                const result = await signInWithPopup(auth, provider);
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                if (credential && credential.accessToken) {
+                    window.gmailAccessToken = credential.accessToken;
+                    sessionStorage.setItem('gmailAccessToken', window.gmailAccessToken);
+                    window.showToast("Gmail Inbox authorized successfully!", "success");
+                    window.fetchGmailMessages();
+                } else {
+                    window.showToast("Could not retrieve Gmail token from Google.", "error");
+                }
+            } catch (error) {
+                console.error("Gmail Auth Error:", error);
+                window.showToast("Gmail authorization cancelled or failed.", "error");
+            }
+        };
+
+        window.fetchGmailMessages = async function() {
+            const container = document.getElementById('inbox-list');
+            if (!window.gmailAccessToken) {
+                container.innerHTML = `<div style="text-align: center; opacity: 0.7; padding: 30px;">
+                    Please click <strong>🔑 Connect Gmail Inbox</strong> above to authorize read-only access to your emails.
+                </div>`;
+                return;
+            }
+
+            container.innerHTML = `<div style="text-align: center; padding: 30px;">⏳ Fetching your latest 10 messages from Gmail...</div>`;
+
+            try {
+                const listRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10', {
+                    headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
+                });
+
+                if (listRes.status === 401 || listRes.status === 403) {
+                    window.gmailAccessToken = null;
+                    sessionStorage.removeItem('gmailAccessToken');
+                    container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
+                        Your Gmail session expired. Please click <strong>🔑 Connect Gmail Inbox</strong> to re-authenticate.
+                    </div>`;
+                    return;
+                }
+
+                const listData = await listRes.json();
+                const messages = listData.messages || [];
+
+                if (messages.length === 0) {
+                    container.innerHTML = `<div style="text-align: center; padding: 30px;">No messages found in your inbox.</div>`;
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                for (const msg of messages) {
+                    const detailRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=full`, {
+                        headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
+                    });
+                    const msgData = await detailRes.json();
+                    
+                    const headers = msgData.payload ? (msgData.payload.headers || []) : [];
+                    const getHeader = (name) => {
+                        const found = headers.find(h => h.name.toLowerCase() === name.toLowerCase());
+                        return found ? found.value : '';
+                    };
+
+                    const subject = getHeader('Subject') || '(No Subject)';
+                    const sender = getHeader('From') || 'Unknown Sender';
+                    const dateStr = getHeader('Date') || '';
+                    const snippet = msgData.snippet || '';
+                    const permalink = `https://mail.google.com/mail/u/0/#inbox/${msgData.id}`;
+
+                    const card = document.createElement('div');
+                    card.className = 'inbox-card';
+                    card.innerHTML = `
+                        <div class="inbox-card-header">
+                            <div class="inbox-subject">${subject}</div>
+                            <div class="inbox-date">${dateStr}</div>
+                        </div>
+                        <div class="inbox-sender">${sender}</div>
+                        <div class="inbox-snippet">${snippet}</div>
+                        <div class="inbox-actions">
+                            <button class="btn-inbox-convert" onclick="convertEmailToTask('${encodeURIComponent(subject)}', '${encodeURIComponent(snippet)}', '${encodeURIComponent(sender)}', '${encodeURIComponent(permalink)}')">✨ Convert to SoloFlow Task</button>
+                            <a href="${permalink}" target="_blank" class="task-link" style="margin: 0;">🔗 Open in Gmail</a>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            } catch (err) {
+                console.error("Fetch Gmail Error:", err);
+                container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
+                    Failed to fetch Gmail messages. Please check your connection or re-authenticate.
+                </div>`;
+            }
+        };
+
+        window.convertEmailToTask = function(encSubject, encSnippet, encSender, encPermalink) {
+            const subject = decodeURIComponent(encSubject);
+            const snippet = decodeURIComponent(encSnippet);
+            const sender = decodeURIComponent(encSender);
+            const permalink = decodeURIComponent(encPermalink);
+
+            const senderEmailMatch = sender.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+            const assigneeStr = senderEmailMatch ? senderEmailMatch[0] : sender;
+
+            const newTask = {
+                id: Date.now().toString(),
+                title: subject,
+                category: 'Email Task',
+                priority: 'Medium',
+                financeType: 'Profit',
+                budget: '',
+                description: snippet,
+                subtasks: [],
+                photoUrl: '',
+                linkUrl: '',
+                workspaceUrl: permalink,
+                assignee: assigneeStr,
+                dateAssigned: new Date().toISOString().split('T')[0],
+                dueDate: '',
+                dueTime: '',
+                blockedBy: '',
+                status: 'todo',
+                syncedToCalendar: false
+            };
+
+            window.tasks.push(newTask);
+            window.saveTasks();
+            window.showToast("Email converted into SoloFlow task!", "success");
+        };
+
         // --- TASK TRACKER LOGIC ---
-        
-        // EMAIL INTEGRATION: Parse Email Text into Form
         window.parseEmailToTask = function() {
             const emailText = prompt("Paste copied text from your email (Subject, Sender, Body, or URL):");
             if (!emailText || !emailText.trim()) return;
 
             const lines = emailText.split('\n').map(l => l.trim()).filter(l => l);
             if (lines.length > 0) {
-                // First non-empty line becomes Subject/Title
                 document.getElementById('taskTitle').value = lines[0];
-                
-                // Remaining lines become Description
                 if (lines.length > 1) {
                     document.getElementById('taskDescription').value = lines.slice(1).join('\n');
                 }
-                
-                // Look for any URLs in the text to put into Reference or Workspace link
                 const urlMatch = emailText.match(/https?:\/\/[^\s]+/i);
                 if (urlMatch && urlMatch[0]) {
                     if (urlMatch[0].includes('mail.google.com') || urlMatch[0].includes('outlook') || urlMatch[0].includes('docs.google.com')) {
@@ -1008,18 +1196,14 @@
                         document.getElementById('taskLinkUrl').value = urlMatch[0];
                     }
                 }
-
-                // Look for any email address (@) to pre-fill assignee
                 const emailMatch = emailText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
                 if (emailMatch && emailMatch[0]) {
                     document.getElementById('taskAssignee').value = emailMatch[0];
                 }
-
                 window.showToast("Email parsed into task fields!", "success");
             }
         };
 
-        // EMAIL INTEGRATION: Draft Outbound Status Mailto Link
         window.emailTaskUpdate = function(taskId) {
             const task = window.tasks.find(t => t.id === taskId);
             if (!task) return;
@@ -1446,12 +1630,14 @@
             
             const scheduleContainer = document.getElementById('schedule-container');
             const calendarContainer = document.getElementById('calendar-container');
+            const inboxContainer = document.getElementById('inbox-container');
             const kanbanControls = document.querySelector('.control-panel');
             const kanbanForm = document.querySelector('.form-card');
             const kanbanBoard = document.querySelector('.board');
 
             scheduleContainer.style.display = 'none';
             calendarContainer.style.display = 'none';
+            inboxContainer.style.display = 'none';
             kanbanControls.style.display = 'none';
             kanbanForm.style.display = 'none';
             kanbanBoard.style.display = 'none';
@@ -1462,6 +1648,9 @@
             } else if (view === 'calendar') {
                 calendarContainer.style.display = 'block';
                 window.renderCalendar();
+            } else if (view === 'inbox') {
+                inboxContainer.style.display = 'block';
+                window.fetchGmailMessages();
             } else {
                 kanbanControls.style.display = 'flex';
                 kanbanForm.style.display = 'flex';
