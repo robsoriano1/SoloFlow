@@ -156,7 +156,7 @@
         }
 
         /* ALL BOXES/CONTAINERS USE --card-text */
-        details.customize-menu, .form-card, .column, .control-panel, .event-card, .setting-item, .inbox-card, .inbox-header {
+        details.customize-menu, .form-card, .column, .control-panel, .event-card, .setting-item, .inbox-card, .inbox-header, .productivity-container {
             color: var(--card-text) !important;
         }
 
@@ -405,7 +405,7 @@
             margin-right: -4px; 
         }
 
-        /* Control Panel (Search/Filter) with SoloFlow Logo inside Search Bar */
+        /* Control Panel (Search/Filter) */
         .control-panel {
             display: flex; 
             gap: 12px; 
@@ -834,7 +834,7 @@
         }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
         
-        /* Schedule Styles (Scrollable + Sticky Headers) */
+        /* Schedule Styles */
         .schedule-container { 
             background: var(--surface); 
             padding: 20px; 
@@ -902,7 +902,7 @@
             box-shadow: inset 0 0 0 2px var(--primary); 
         }
         
-        /* Calendar Styles (Fixed UI Stretching) */
+        /* Calendar Styles */
         .calendar-container { 
             background: var(--surface); 
             padding: 20px; 
@@ -989,7 +989,7 @@
             text-decoration: line-through; 
         }
 
-        /* PHASE 2: GMAIL API INBOX TAB STYLES */
+        /* GMAIL API INBOX TAB STYLES */
         .inbox-container {
             background: var(--surface);
             padding: 24px;
@@ -1090,6 +1090,105 @@
         .btn-inbox-convert:hover { 
             opacity: 0.9; 
             box-shadow: var(--shadow-md);
+        }
+
+        /* DEDICATED PRODUCTIVITY DASHBOARD STYLES */
+        .productivity-container {
+            display: none;
+            margin-bottom: 24px;
+        }
+        .productivity-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            color: var(--card-text);
+        }
+        .prod-grid-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .prod-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .prod-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-strong);
+        }
+        .prod-card-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--card-text);
+            opacity: 0.65;
+            margin-bottom: 8px;
+        }
+        .prod-card-value {
+            font-size: 24px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: var(--card-text);
+        }
+        .prod-progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(15, 23, 42, 0.08);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .prod-progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 9999px;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .workspace-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+        @media(max-width: 868px) {
+            .workspace-layout { grid-template-columns: 1fr; }
+        }
+        .active-task-hero {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .active-task-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+        }
+        .deep-dive-cta {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(142, 68, 173, 0.05) 100%);
+            border: 1px dashed var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
         }
         
         /* Section Dividers */
@@ -1342,8 +1441,9 @@
             <button class="view-tab" id="tab-backlog" onclick="setView('backlog')">Backlog</button>
             <button class="view-tab" id="tab-schedule" onclick="setView('schedule')">📅 Weekly Schedule</button>
             <button class="view-tab" id="tab-calendar" onclick="setView('calendar')">📆 Calendar</button>
-            <!-- NEW PHASE 2: GMAIL INBOX TAB -->
             <button class="view-tab" id="tab-inbox" onclick="setView('inbox')">📧 Email Inbox</button>
+            <!-- DEDICATED PRODUCTIVITY TAB -->
+            <button class="view-tab" id="tab-productivity" onclick="setView('productivity')">🚀 Productivity Hub</button>
         </div>
 
         <!-- Weekly Schedule Container (Hidden by default) -->
@@ -1363,7 +1463,7 @@
             <div id="calendar-grid" class="calendar-grid"></div>
         </div>
 
-        <!-- NEW PHASE 2: GMAIL INBOX CONTAINER -->
+        <!-- GMAIL INBOX CONTAINER -->
         <div id="inbox-container" class="inbox-container">
             <div class="inbox-header">
                 <h3>📧 Gmail REST API Inbox</h3>
@@ -1378,6 +1478,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- DEDICATED PRODUCTIVITY DASHBOARD CONTAINER -->
+        <div id="productivity-container" class="productivity-container"></div>
 
         <!-- SEARCH BAR WITH SOLOFLOW LOGO EMBEDDED INSIDE -->
         <div class="control-panel">
@@ -1650,6 +1753,9 @@
                         window.tasks = cloudTasks;
                         localStorage.setItem('tasks', JSON.stringify(window.tasks));
                         window.renderTasks();
+                        if (currentView === 'productivity') {
+                            window.renderProductivityDashboard();
+                        }
                     }
                 }
             }, (error) => console.error("Tasks Sync Error:", error));
@@ -1712,6 +1818,9 @@
             localStorage.setItem('tasks', JSON.stringify(window.tasks));
             if(!skipRender) {
                 window.renderTasks();
+            }
+            if (currentView === 'productivity') {
+                window.renderProductivityDashboard();
             }
             if (userId) {
                 setDoc(getDocPath('trackerData', 'tasks'), { data: window.tasks }).catch(e => console.error("Failed to sync tasks", e));
@@ -1786,115 +1895,113 @@
         });
         applySettings();
 
-        // --- PHASE 2: GMAIL REST API INBOX LOGIC ---
-       window.connectGmailInbox = async function() {
-    const provider = new GoogleAuthProvider();
-    // 1. Explicitly request the read-only Gmail scope
-    provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
-    // 2. Force Google to re-prompt so it generates a fresh OAuth access token
-    provider.setCustomParameters({ prompt: 'consent' });
+        // --- GMAIL REST API INBOX LOGIC ---
+        window.connectGmailInbox = async function() {
+            const provider = new GoogleAuthProvider();
+            provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+            provider.setCustomParameters({ prompt: 'consent' });
 
-    try {
-        window.showToast("Opening Google Auth for Gmail access...");
-        const result = await signInWithPopup(auth, provider);
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        
-        if (credential && credential.accessToken) {
-            window.gmailAccessToken = credential.accessToken;
-            sessionStorage.setItem('gmailAccessToken', window.gmailAccessToken);
-            window.showToast("Gmail Inbox authorized successfully!", "success");
-            window.fetchGmailMessages();
-        } else {
-            window.showToast("Could not retrieve Gmail access token.", "error");
-        }
-    } catch (error) {
-        console.error("Gmail Auth Error:", error);
-        window.showToast("Gmail authorization cancelled or failed.", "error");
-    }
-};
+            try {
+                window.showToast("Opening Google Auth for Gmail access...");
+                const result = await signInWithPopup(auth, provider);
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                
+                if (credential && credential.accessToken) {
+                    window.gmailAccessToken = credential.accessToken;
+                    sessionStorage.setItem('gmailAccessToken', window.gmailAccessToken);
+                    window.showToast("Gmail Inbox authorized successfully!", "success");
+                    window.fetchGmailMessages();
+                } else {
+                    window.showToast("Could not retrieve Gmail access token.", "error");
+                }
+            } catch (error) {
+                console.error("Gmail Auth Error:", error);
+                window.showToast("Gmail authorization cancelled or failed.", "error");
+            }
+        };
 
-window.fetchGmailMessages = async function() {
-    const container = document.getElementById('inbox-list');
-    
-    // Check if token exists in session memory
-    if (!window.gmailAccessToken) {
-        window.gmailAccessToken = sessionStorage.getItem('gmailAccessToken');
-    }
-
-    if (!window.gmailAccessToken) {
-        container.innerHTML = `<div style="text-align: center; opacity: 0.7; padding: 30px;">
-            Please click <strong>🔑 Connect Gmail Inbox</strong> above to authorize read-only access to your emails.
-        </div>`;
-        return;
-    }
-
-    container.innerHTML = `<div style="text-align: center; padding: 30px;">⏳ Fetching your latest 10 messages from Gmail...</div>`;
-
-    try {
-        const listRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10', {
-            headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
-        });
-
-        if (listRes.status === 401 || listRes.status === 403) {
-            window.gmailAccessToken = null;
-            sessionStorage.removeItem('gmailAccessToken');
-            container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
-                Your Gmail session expired or access was denied. Please click <strong>🔑 Connect Gmail Inbox</strong> to re-authenticate.
-            </div>`;
-            return;
-        }
-
-        const listData = await listRes.json();
-        const messages = listData.messages || [];
-
-        if (messages.length === 0) {
-            container.innerHTML = `<div style="text-align: center; padding: 30px;">No messages found in your inbox.</div>`;
-            return;
-        }
-
-        container.innerHTML = '';
-
-        for (const msg of messages) {
-            const detailRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=full`, {
-                headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
-            });
-            const msgData = await detailRes.json();
+        window.fetchGmailMessages = async function() {
+            const container = document.getElementById('inbox-list');
             
-            const headers = msgData.payload ? (msgData.payload.headers || []) : [];
-            const getHeader = (name) => {
-                const found = headers.find(h => h.name.toLowerCase() === name.toLowerCase());
-                return found ? found.value : '';
-            };
+            if (!window.gmailAccessToken) {
+                window.gmailAccessToken = sessionStorage.getItem('gmailAccessToken');
+            }
 
-            const subject = getHeader('Subject') || '(No Subject)';
-            const sender = getHeader('From') || 'Unknown Sender';
-            const dateStr = getHeader('Date') || '';
-            const snippet = msgData.snippet || '';
-            const permalink = `https://mail.google.com/mail/u/0/#inbox/${msgData.id}`;
+            if (!window.gmailAccessToken) {
+                container.innerHTML = `<div style="text-align: center; opacity: 0.7; padding: 30px;">
+                    Please click <strong>🔑 Connect Gmail Inbox</strong> above to authorize read-only access to your emails.
+                </div>`;
+                return;
+            }
 
-            const card = document.createElement('div');
-            card.className = 'inbox-card';
-            card.innerHTML = `
-                <div class="inbox-card-header">
-                    <div class="inbox-subject">${subject}</div>
-                    <div class="inbox-date">${dateStr}</div>
-                </div>
-                <div class="inbox-sender">${sender}</div>
-                <div class="inbox-snippet">${snippet}</div>
-                <div class="inbox-actions">
-                    <button class="btn-inbox-convert" onclick="convertEmailToTask('${encodeURIComponent(subject)}', '${encodeURIComponent(snippet)}', '${encodeURIComponent(sender)}', '${encodeURIComponent(permalink)}')">✨ Convert to SoloFlow Task</button>
-                    <a href="${permalink}" target="_blank" class="task-link" style="margin: 0;">🔗 Open in Gmail</a>
-                </div>
-            `;
-            container.appendChild(card);
-        }
-    } catch (err) {
-        console.error("Fetch Gmail Error:", err);
-        container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
-            Failed to fetch Gmail messages. Please check your connection or re-authenticate.
-        </div>`;
-    }
-};
+            container.innerHTML = `<div style="text-align: center; padding: 30px;">⏳ Fetching your latest 10 messages from Gmail...</div>`;
+
+            try {
+                const listRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10', {
+                    headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
+                });
+
+                if (listRes.status === 401 || listRes.status === 403) {
+                    window.gmailAccessToken = null;
+                    sessionStorage.removeItem('gmailAccessToken');
+                    container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
+                        Your Gmail session expired or access was denied. Please click <strong>🔑 Connect Gmail Inbox</strong> to re-authenticate.
+                    </div>`;
+                    return;
+                }
+
+                const listData = await listRes.json();
+                const messages = listData.messages || [];
+
+                if (messages.length === 0) {
+                    container.innerHTML = `<div style="text-align: center; padding: 30px;">No messages found in your inbox.</div>`;
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                for (const msg of messages) {
+                    const detailRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=full`, {
+                        headers: { Authorization: `Bearer ${window.gmailAccessToken}` }
+                    });
+                    const msgData = await detailRes.json();
+                    
+                    const headers = msgData.payload ? (msgData.payload.headers || []) : [];
+                    const getHeader = (name) => {
+                        const found = headers.find(h => h.name.toLowerCase() === name.toLowerCase());
+                        return found ? found.value : '';
+                    };
+
+                    const subject = getHeader('Subject') || '(No Subject)';
+                    const sender = getHeader('From') || 'Unknown Sender';
+                    const dateStr = getHeader('Date') || '';
+                    const snippet = msgData.snippet || '';
+                    const permalink = `https://mail.google.com/mail/u/0/#inbox/${msgData.id}`;
+
+                    const card = document.createElement('div');
+                    card.className = 'inbox-card';
+                    card.innerHTML = `
+                        <div class="inbox-card-header">
+                            <div class="inbox-subject">${subject}</div>
+                            <div class="inbox-date">${dateStr}</div>
+                        </div>
+                        <div class="inbox-sender">${sender}</div>
+                        <div class="inbox-snippet">${snippet}</div>
+                        <div class="inbox-actions">
+                            <button class="btn-inbox-convert" onclick="convertEmailToTask('${encodeURIComponent(subject)}', '${encodeURIComponent(snippet)}', '${encodeURIComponent(sender)}', '${encodeURIComponent(permalink)}')">✨ Convert to SoloFlow Task</button>
+                            <a href="${permalink}" target="_blank" class="task-link" style="margin: 0;">🔗 Open in Gmail</a>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            } catch (err) {
+                console.error("Fetch Gmail Error:", err);
+                container.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 30px;">
+                    Failed to fetch Gmail messages. Please check your connection or re-authenticate.
+                </div>`;
+            }
+        };
+
         // --- TASK TRACKER LOGIC ---
         window.parseEmailToTask = function() {
             const emailText = prompt("Paste copied text from your email (Subject, Sender, Body, or URL):");
@@ -2338,17 +2445,153 @@ window.fetchGmailMessages = async function() {
             reader.readAsText(file);
         };
 
+        // --- DEDICATED PRODUCTIVITY DASHBOARD MODULE ---
+        window.renderProductivityDashboard = function() {
+            const container = document.getElementById('productivity-container');
+            if (!container) return;
+
+            const tasks = window.tasks || [];
+            const totalTasks = tasks.length;
+            const completedTasks = tasks.filter(t => t.status === 'done');
+            const inProgressTasks = tasks.filter(t => t.status === 'inprogress');
+            const highPriorityTasks = tasks.filter(t => t.priority === 'High' && t.status !== 'done');
+            
+            const completionRate = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
+            
+            let totalSecondsTracked = 0;
+            let totalProfitEarned = 0;
+            
+            tasks.forEach(t => {
+                if (t.timeSpent) totalSecondsTracked += t.timeSpent;
+                if (t.status === 'done' && t.budget) {
+                    const val = parseFloat(t.budget) || 0;
+                    if ((t.financeType || 'Profit') === 'Profit') totalProfitEarned += val;
+                }
+            });
+
+            const focusHours = Math.floor(totalSecondsTracked / 3600);
+            const focusMins = Math.floor((totalSecondsTracked % 3600) / 60);
+
+            const activeTask = inProgressTasks[0] || highPriorityTasks[0] || tasks.find(t => t.status === 'todo');
+
+            container.innerHTML = `
+                <div class="productivity-dashboard">
+                    <!-- 1. DAILY OVERVIEW / FOCUS SNAPSHOT -->
+                    <div class="prod-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div class="prod-card-title">Daily Focus Snapshot</div>
+                                <div style="font-size: 18px; font-weight: 700;">
+                                    ${completedTasks.length} of ${totalTasks} Tasks Completed (${completionRate}%)
+                                </div>
+                            </div>
+                            <span style="font-size: 28px;">🎯</span>
+                        </div>
+                        <div class="prod-progress-bar-bg">
+                            <div class="prod-progress-bar-fill" style="width: ${completionRate}%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- 2. QUICK ANALYTICS SUMMARY CARDS -->
+                    <div class="prod-grid-summary">
+                        <div class="prod-card">
+                            <div class="prod-card-title">Total Focus Time</div>
+                            <div class="prod-card-value" style="color: #8e44ad;">${focusHours}h ${focusMins}m</div>
+                        </div>
+                        <div class="prod-card">
+                            <div class="prod-card-title">Completion Rate</div>
+                            <div class="prod-card-value" style="color: var(--primary);">${completionRate}%</div>
+                        </div>
+                        <div class="prod-card">
+                            <div class="prod-card-title">Completed Output</div>
+                            <div class="prod-card-value" style="color: var(--success);">₱${totalProfitEarned.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                        </div>
+                        <div class="prod-card">
+                            <div class="prod-card-title">7-Day Velocity</div>
+                            <div class="prod-card-value" style="color: var(--warning);">${(completedTasks.length / 7).toFixed(1)} / day</div>
+                        </div>
+                    </div>
+
+                    <!-- 3. ACTIVE WORKSPACE & FOCUS MODULE -->
+                    <div class="workspace-layout">
+                        <div class="active-task-hero">
+                            <div>
+                                <div class="active-task-badge">⚡ Priority Focus Target</div>
+                                <h3 style="margin: 12px 0 6px 0; font-family: 'Poppins', sans-serif; font-size: 20px;">
+                                    ${activeTask ? activeTask.title : 'All tasks completed! Take a break.'}
+                                </h3>
+                                <p style="margin: 0; opacity: 0.8; font-size: 14px;">
+                                    ${activeTask ? (activeTask.description || 'No description added.') : 'No pending tasks in queue.'}
+                                </p>
+                            </div>
+
+                            ${activeTask ? `
+                                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px;">
+                                    <button class="btn-timer ${window.activeTaskId === activeTask.id ? 'active' : ''}" 
+                                        onclick="window.toggleTimer('${activeTask.id}'); window.renderProductivityDashboard();">
+                                        ${window.activeTaskId === activeTask.id ? '⏹ Stop Pomodoro' : '▶ Start Pomodoro Focus'}
+                                    </button>
+                                    ${activeTask.status !== 'done' ? `
+                                        <button class="btn-alt" onclick="window.moveTask('${activeTask.id}', 'done'); window.renderProductivityDashboard();">
+                                            ✓ Mark Complete
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- QUICK ACTIVE TASK QUEUE -->
+                        <div class="prod-card" style="display: flex; flex-direction: column; gap: 12px;">
+                            <div class="prod-card-title">Active Queue (${inProgressTasks.length + highPriorityTasks.length})</div>
+                            <div style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
+                                ${[...inProgressTasks, ...highPriorityTasks].slice(0, 5).map(t => `
+                                    <div style="padding: 8px 12px; background: rgba(15, 23, 42, 0.03); border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 13px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 170px;">${t.title}</span>
+                                        <button class="btn-small" onclick="window.moveTask('${t.id}', 'done'); window.renderProductivityDashboard();" style="padding: 2px 8px; min-height: 26px;">✓</button>
+                                    </div>
+                                `).join('') || '<div style="font-size: 13px; opacity: 0.6;">Queue is clear!</div>'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. DEEP-DIVE PORTAL CTA -->
+                    <div class="deep-dive-portal deep-dive-cta">
+                        <div>
+                            <strong style="font-size: 15px; color: var(--card-text);">Detailed Financial & Time Analytics</strong>
+                            <div style="font-size: 13px; opacity: 0.8; margin-top: 2px;">
+                                Inspect deep revenue breakdown, allocated budgets, and complete time logs.
+                            </div>
+                        </div>
+                        <button class="btn-alt" onclick="window.navigateToCustomizeAnalytics()" style="background: var(--surface);">
+                            📊 Open Analytics Settings →
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+
+        window.navigateToCustomizeAnalytics = function() {
+            const detailsMenu = document.querySelector('details.customize-menu');
+            if (detailsMenu) {
+                detailsMenu.open = true;
+                detailsMenu.scrollIntoView({ behavior: 'smooth' });
+            }
+        };
+
         // --- RENDER LOGIC & VIEWS ---
         let currentView = 'all';
 
         window.setView = function(view) {
             currentView = view;
             document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(`tab-${view}`).classList.add('active');
+            
+            const activeTab = document.getElementById(`tab-${view}`);
+            if (activeTab) activeTab.classList.add('active');
             
             const scheduleContainer = document.getElementById('schedule-container');
             const calendarContainer = document.getElementById('calendar-container');
             const inboxContainer = document.getElementById('inbox-container');
+            const prodContainer = document.getElementById('productivity-container');
             const kanbanControls = document.querySelector('.control-panel');
             const kanbanForm = document.querySelector('.form-card');
             const kanbanBoard = document.querySelector('.board');
@@ -2356,6 +2599,7 @@ window.fetchGmailMessages = async function() {
             scheduleContainer.style.display = 'none';
             calendarContainer.style.display = 'none';
             inboxContainer.style.display = 'none';
+            if (prodContainer) prodContainer.style.display = 'none';
             kanbanControls.style.display = 'none';
             kanbanForm.style.display = 'none';
             kanbanBoard.style.display = 'none';
@@ -2369,6 +2613,11 @@ window.fetchGmailMessages = async function() {
             } else if (view === 'inbox') {
                 inboxContainer.style.display = 'block';
                 window.fetchGmailMessages();
+            } else if (view === 'productivity') {
+                if (prodContainer) {
+                    prodContainer.style.display = 'block';
+                    window.renderProductivityDashboard();
+                }
             } else {
                 kanbanControls.style.display = 'flex';
                 kanbanForm.style.display = 'flex';
