@@ -162,7 +162,7 @@
         }
 
         /* ALL BOXES/CONTAINERS USE --card-text */
-        details.customize-menu, .form-card, .column, .control-panel, .event-card, .setting-item, .inbox-card, .inbox-header, .productivity-container {
+        details.customize-menu, .form-card, .column, .control-panel, .event-card, .setting-item, .inbox-card, .inbox-header, .productivity-container, .finance-container {
             color: var(--card-text) !important;
         }
 
@@ -1223,67 +1223,54 @@
            FIX 2: Productivity Hub Analytics Card (.deep-dive-cta)
            ========================================================= */
         .deep-dive-cta {
-            background-color: var(--surface) !important;
-            background-image: linear-gradient(135deg, rgba(var(--primary-rgb, 59, 130, 246), 0.12) 0%, rgba(142, 68, 173, 0.12) 100%) !important;
-            border: 1px dashed var(--primary) !important;
-            border-radius: var(--radius-lg) !important;
-            padding: 22px 24px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            flex-wrap: wrap !important;
-            gap: 16px !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            box-shadow: var(--shadow-sm) !important;
-            color: var(--card-text) !important;
+            background: linear-gradient(135deg, rgba(var(--primary-rgb, 59, 130, 246), 0.12) 0%, rgba(142, 68, 173, 0.12) 100%), var(--surface);
+            border: 1px dashed var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: var(--shadow-sm);
+            color: var(--card-text);
         }
 
         /* =========================================================
-           FIX 1: Floating Rich Text Formatting Toolbar (Bulletproof)
+           FIX 1: Floating Rich Text Formatting Toolbar
            ========================================================= */
-        #formatToolbar.format-toolbar {
+        .format-toolbar {
             display: none;
             position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 99999;
-            background: var(--surface) !important;
-            border: 1px solid var(--surface-border-strong) !important;
-            border-radius: var(--radius-md) !important;
-            padding: 6px 10px !important;
-            box-shadow: var(--shadow-lg) !important;
-            align-items: center !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            width: max-content !important;
-            gap: 6px !important;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            z-index: 1000;
+            background: var(--surface);
+            border: 1px solid var(--surface-border-strong);
+            border-radius: var(--radius-md);
+            padding: 6px 8px;
+            box-shadow: var(--shadow-lg);
+            align-items: center;
+            gap: 4px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: opacity 0.15s ease;
         }
 
-        #formatToolbar.format-toolbar button {
-            padding: 6px 10px !important;
-            min-height: 30px !important;
-            font-size: 13px !important;
-            font-weight: 700 !important;
-            background: rgba(15, 23, 42, 0.05) !important;
-            color: var(--card-text) !important;
-            border: 1px solid var(--surface-border) !important;
-            border-radius: var(--radius-sm) !important;
-            box-shadow: none !important;
-            cursor: pointer !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            line-height: 1 !important;
+        .format-toolbar button {
+            padding: 4px 10px;
+            min-height: 30px;
+            font-size: 13px;
+            background: transparent;
+            color: var(--card-text);
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            box-shadow: none;
         }
 
-        #formatToolbar.format-toolbar button:hover {
-            background: rgba(var(--primary-rgb, 59, 130, 246), 0.15) !important;
-            border-color: var(--primary) !important;
-            color: var(--primary) !important;
-            transform: none !important;
+        .format-toolbar button:hover {
+            background: rgba(15, 23, 42, 0.06);
+            border-color: var(--surface-border);
         }
 
         /* Section Dividers & Toast */
@@ -1592,6 +1579,7 @@
             <button class="view-tab" id="tab-calendar" onclick="setView('calendar')">📆 Calendar</button>
             <button class="view-tab" id="tab-inbox" onclick="setView('inbox')">📧 Email Inbox</button>
             <button class="view-tab" id="tab-productivity" onclick="setView('productivity')">🚀 Productivity Hub</button>
+            <button class="view-tab" id="tab-finance" onclick="setView('finance')">💰 Finance Tracker</button>
         </div>
 
         <!-- Weekly Schedule Container -->
@@ -1627,6 +1615,90 @@
 
         <!-- PRODUCTIVITY DASHBOARD CONTAINER -->
         <div id="productivity-container" class="productivity-container"></div>
+        
+        <!-- FINANCE TRACKER CONTAINER -->
+        <div id="finance-container" class="finance-container" style="display: none; margin-bottom: 24px;">
+            
+            <!-- Top Level Stats (Updated with Burn Rate) -->
+            <div class="analytics-grid-elevated" style="margin-bottom: 24px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                <div class="metric-card-elevated card-profit">
+                    <div class="metric-header"><span class="metric-label">Net Balance</span><span class="status-dot dot-success"></span></div>
+                    <div id="finance-balance" class="metric-value-display" style="color: var(--success);">₱0.00</div>
+                </div>
+                <div class="metric-card-elevated card-finished">
+                    <div class="metric-header"><span class="metric-label">Total Income</span><span class="status-dot dot-primary"></span></div>
+                    <div id="finance-income" class="metric-value-display" style="color: var(--primary);">₱0.00</div>
+                </div>
+                <div class="metric-card-elevated card-overdue">
+                    <div class="metric-header"><span class="metric-label">Total Expenses</span><span class="status-dot dot-danger"></span></div>
+                    <div id="finance-expenses" class="metric-value-display" style="color: var(--danger);">₱0.00</div>
+                </div>
+                <div class="metric-card-elevated card-velocity">
+                    <div class="metric-header"><span class="metric-label">30-Day Burn Rate</span><span class="status-dot dot-warning"></span></div>
+                    <div id="finance-burn-rate" class="metric-value-display" style="color: var(--warning);">₱0.00 / day</div>
+                </div>
+            </div>
+
+            <!-- Dashboard Split Layout -->
+            <div class="workspace-layout" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
+                
+                <!-- Quick Add Form with Editable Categories -->
+                <div class="form-card" style="margin-bottom: 0;">
+                    <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 16px;">➕ Record New Transaction</h3>
+                    <div class="form-row">
+                        <input type="text" id="financePayee" class="flex-grow" placeholder="Merchant or Payee (e.g., Steam, BYD)" required>
+                        <input type="number" id="financeAmount" placeholder="Amount (₱)" step="0.01" style="max-width: 140px;" required>
+                    </div>
+                    <div class="form-row" style="margin-top: 12px;">
+                        <select id="financeType" style="min-width: 130px;">
+                            <option value="expense">Expense (-)</option>
+                            <option value="income">Income (+)</option>
+                        </select>
+                        <input type="text" id="financeCategory" list="financeCategoryList" class="flex-grow" placeholder="Category (Type or Select)" required>
+                        <datalist id="financeCategoryList">
+                            <option value="PC Parts & Electronics">
+                            <option value="Musical Instruments">
+                            <option value="Real Estate & Properties">
+                            <option value="Vehicle Mods">
+                            <option value="Food & Dining">
+                            <option value="Server Hosting & Cloud">
+                            <option value="Subscriptions">
+                        </datalist>
+                        <select id="financeSpendingType" style="min-width: 140px;" title="Applies to expenses only">
+                            <option value="Discretionary">Discretionary</option>
+                            <option value="Fixed">Fixed Cost</option>
+                        </select>
+                    </div>
+                    <button onclick="addFinanceTransaction()" style="margin-top: 12px; width: 100%;">Record Transaction</button>
+                </div>
+
+                <!-- YTD Spending Pie Chart -->
+                <div class="form-card" style="margin-bottom: 0; justify-content: center;">
+                    <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 16px;">📊 YTD Expense Breakdown</h3>
+                    <div style="display: flex; align-items: center; gap: 32px; padding: 0 12px;">
+                        <div id="finance-ytd-pie" style="width: 130px; height: 130px; border-radius: 50%; background: conic-gradient(var(--purple) 0% 50%, var(--warning) 50% 100%); flex-shrink: 0; box-shadow: var(--shadow-sm);"></div>
+                        <div style="font-size: 14px; line-height: 1.8;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="display: block; width: 12px; height: 12px; background: var(--purple); border-radius: 2px;"></span>
+                                <strong>Fixed:</strong> <span id="ytd-fixed-text">₱0.00</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="display: block; width: 12px; height: 12px; background: var(--warning); border-radius: 2px;"></span>
+                                <strong>Discretionary:</strong> <span id="ytd-disc-text">₱0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Ledger -->
+            <div class="column" style="min-height: auto;">
+                <h3>Transaction Ledger</h3>
+                <div id="finance-list" style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Transactions will render here -->
+                </div>
+            </div>
+        </div>
 
         <!-- SEARCH BAR -->
         <div class="control-panel">
@@ -1650,7 +1722,7 @@
         </div>
 
         <!-- Add Task Form -->
-        <div class="form-card">
+        <div class="form-card" id="kanban-task-form">
             <div class="form-row">
                 <input type="text" id="taskTitle" class="flex-grow" placeholder="What needs to be done?" required>
                 <button type="button" class="btn-email" onclick="parseEmailToTask()" title="Paste text copied from Gmail, Outlook, or Apple Mail">📧 Paste Email to Task</button>
@@ -2398,7 +2470,8 @@
                 dueTime: document.getElementById('taskDueTime').value,
                 blockedBy: document.getElementById('taskBlockedBy').value,
                 status: 'todo',
-                syncedToCalendar: false
+                syncedToCalendar: false,
+                financeSynced: false
             };
 
             window.tasks.push(newTask);
@@ -2454,7 +2527,38 @@
 
         window.moveTask = function(id, newStatus) {
             const task = window.tasks.find(t => t.id === id);
-            if (task) { task.status = newStatus; window.saveTasks(); }
+            if (task) { 
+                const previousStatus = task.status;
+                task.status = newStatus; 
+
+                // Automatic Sync: Record into Finance Tracker when marked as Done (One-time guard check)
+                if (newStatus === 'done' && previousStatus !== 'done' && task.budget && !task.financeSynced) {
+                    const amountFloat = parseFloat(task.budget);
+                    if (!isNaN(amountFloat) && amountFloat > 0) {
+                        const isProfit = (task.financeType || 'Profit') === 'Profit';
+                        const amountCents = Math.round(amountFloat * 100) * (isProfit ? 1 : -1);
+
+                        window.financeTransactions.push({
+                            id: Date.now().toString(),
+                            payee: task.title,
+                            amountCents: amountCents,
+                            category: task.category || 'Kanban Task',
+                            spendingType: isProfit ? 'N/A' : 'Discretionary',
+                            date: new Date().toISOString()
+                        });
+
+                        task.financeSynced = true;
+
+                        localStorage.setItem('soloflow_finance', JSON.stringify(window.financeTransactions));
+                        if (typeof window.renderFinance === 'function') {
+                            window.renderFinance();
+                        }
+                        window.showToast(`Synced ${isProfit ? 'Profit' : 'Expense'} to Finance Tracker!`, 'success');
+                    }
+                }
+
+                window.saveTasks(); 
+            }
         };
 
         window.deleteTask = function(id) {
@@ -2581,28 +2685,16 @@
         };
 
         window.closeToolbar = function() {
-            const tb = document.getElementById('formatToolbar');
-            if (tb) tb.style.display = 'none';
-            if (document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('editable')) {
+            document.getElementById('formatToolbar').style.display = 'none';
+            if (document.activeElement && document.activeElement.classList.contains('editable')) {
                 document.activeElement.blur();
             }
         };
 
         window.activeScheduleCell = null;
 
-        // Global mousedown listener to close the formatting toolbar whenever clicking outside
-        document.addEventListener('mousedown', function(e) {
-            const tb = document.getElementById('formatToolbar');
-            if (!tb || tb.style.display === 'none') return;
-            if (!e.target.closest('.editable') && !e.target.closest('#formatToolbar')) {
-                tb.style.display = 'none';
-            }
-        });
-
         document.addEventListener('focusin', function(e) {
             if(e.target.classList && e.target.classList.contains('editable')) {
-                // Prevent toolbar from showing on initial page load / automatic focus restoration
-                if (!document.hasFocus()) return;
                 const toolbar = document.getElementById('formatToolbar');
                 const schedTools = document.getElementById('scheduleTools');
                 
@@ -2616,8 +2708,8 @@
 
                 toolbar.style.display = 'flex';
                 const rect = e.target.getBoundingClientRect();
-                toolbar.style.top = Math.max(10, window.scrollY + rect.top - 48) + 'px';
-                toolbar.style.left = Math.max(10, window.scrollX + rect.left) + 'px';
+                toolbar.style.top = (window.scrollY + rect.top - 45) + 'px';
+                toolbar.style.left = (window.scrollX + rect.left) + 'px';
             }
         });
 
@@ -2818,6 +2910,7 @@
                         </div>
                     </div>
 
+                    <!-- Updated Analytics Card with improved contrast & styling -->
                     <div class="deep-dive-portal deep-dive-cta">
                         <div>
                             <strong style="font-size: 16px; font-weight: 700; color: var(--card-text); display: block;">
@@ -2828,7 +2921,7 @@
                             </div>
                         </div>
                         <button class="btn-alt" onclick="window.navigateToCustomizeAnalytics()" 
-                            style="background: var(--primary); color: var(--primary-contrast-text, #ffffff); border: none; font-weight: 600; padding: 10px 20px; border-radius: 9999px; box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition);">
+                            style="background: var(--primary); color: var(--primary-contrast-text, #ffffff); border: none; font-weight: 600; padding: 10px 18px; box-shadow: var(--shadow-sm);">
                             📊 Open Analytics Settings →
                         </button>
                     </div>
@@ -2849,8 +2942,6 @@
 
         window.setView = function(view) {
             currentView = view;
-            const tb = document.getElementById('formatToolbar');
-            if (tb) tb.style.display = 'none';
             document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
             
             const activeTab = document.getElementById(`tab-${view}`);
@@ -2860,14 +2951,16 @@
             const calendarContainer = document.getElementById('calendar-container');
             const inboxContainer = document.getElementById('inbox-container');
             const prodContainer = document.getElementById('productivity-container');
+            const financeContainer = document.getElementById('finance-container');
             const kanbanControls = document.querySelector('.control-panel');
-            const kanbanForm = document.querySelector('.form-card');
+            const kanbanForm = document.getElementById('kanban-task-form');
             const kanbanBoard = document.querySelector('.board');
 
             scheduleContainer.style.display = 'none';
             calendarContainer.style.display = 'none';
             inboxContainer.style.display = 'none';
             if (prodContainer) prodContainer.style.display = 'none';
+            if (financeContainer) financeContainer.style.display = 'none';
             kanbanControls.style.display = 'none';
             kanbanForm.style.display = 'none';
             kanbanBoard.style.display = 'none';
@@ -2885,6 +2978,11 @@
                 if (prodContainer) {
                     prodContainer.style.display = 'block';
                     window.renderProductivityDashboard();
+                }
+            } else if (view === 'finance') {
+                if (financeContainer) {
+                    financeContainer.style.display = 'block';
+                    window.renderFinance();
                 }
             } else {
                 kanbanControls.style.display = 'flex';
@@ -3199,6 +3297,7 @@
                     <div class="badges">
                         <span class="badge ${task.priority.toLowerCase()}">${task.priority}</span>
                         <span class="badge">${task.category}</span>
+                        ${task.financeSynced ? `<span class="badge" style="border-color: var(--success); color: var(--success);">✓ Finance Logged</span>` : ''}
                     </div>
 
                     <div class="actions" style="margin-top: 8px;">
@@ -3453,13 +3552,171 @@
             cell.focus();
         };
 
+        // --- FINANCE TRACKER LOGIC ---
+        window.financeTransactions = JSON.parse(localStorage.getItem('soloflow_finance')) || [];
+
+        window.saveFinance = function() {
+            localStorage.setItem('soloflow_finance', JSON.stringify(window.financeTransactions));
+            window.renderFinance();
+        };
+
+        window.addFinanceTransaction = function() {
+            const payee = document.getElementById('financePayee').value.trim();
+            const amountFloat = parseFloat(document.getElementById('financeAmount').value);
+            const type = document.getElementById('financeType').value;
+            const category = document.getElementById('financeCategory').value.trim();
+            const spendingType = document.getElementById('financeSpendingType').value;
+
+            if (!payee || isNaN(amountFloat) || !category) {
+                window.showToast("Please enter a valid payee, amount, and category.", "error");
+                return;
+            }
+
+            const amountCents = Math.round(amountFloat * 100) * (type === 'expense' ? -1 : 1);
+
+            window.financeTransactions.push({
+                id: Date.now().toString(),
+                payee,
+                amountCents,
+                category,
+                spendingType: type === 'expense' ? spendingType : 'N/A',
+                date: new Date().toISOString()
+            });
+
+            document.getElementById('financePayee').value = '';
+            document.getElementById('financeAmount').value = '';
+            document.getElementById('financeCategory').value = '';
+            window.saveFinance();
+            window.showToast("Transaction recorded!", "success");
+        };
+
+        window.deleteFinanceTransaction = function(id) {
+            window.financeTransactions = window.financeTransactions.filter(t => t.id !== id);
+            window.saveFinance();
+        };
+
+        window.renderFinance = function() {
+            const list = document.getElementById('finance-list');
+            if (!list) return;
+            
+            list.innerHTML = '';
+            let totalIncome = 0;
+            let totalExpense = 0;
+            let expenses30D = 0;
+            let ytdFixed = 0;
+            let ytdDisc = 0;
+
+            const now = new Date();
+            const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+            const currentYear = now.getFullYear();
+
+            const sorted = [...window.financeTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (sorted.length === 0) {
+                list.innerHTML = `<div style="opacity: 0.6; font-size: 13px; text-align: center; padding: 20px;">No transactions recorded yet.</div>`;
+            }
+
+            sorted.forEach(tx => {
+                const txDate = new Date(tx.date);
+
+                if (tx.amountCents > 0) {
+                    totalIncome += tx.amountCents;
+                } else {
+                    const absExpense = Math.abs(tx.amountCents);
+                    totalExpense += absExpense;
+
+                    // 1. Calculate 30-Day Burn Rate
+                    if (txDate >= thirtyDaysAgo) {
+                        expenses30D += absExpense;
+                    }
+
+                    // 2. Calculate YTD Split (Auto-classifies legacy items)
+                    if (txDate.getFullYear() === currentYear) {
+                        let sType = tx.spendingType;
+                        
+                        if (!sType || sType === 'N/A') {
+                            const textInfo = (tx.payee + ' ' + tx.category).toLowerCase();
+                            // Matches context to auto-classify fixed vs discretionary 
+                            if (textInfo.includes('spotify') || textInfo.includes('server') || textInfo.includes('cloud') || textInfo.includes('hosting') || textInfo.includes('shockbyte') || textInfo.includes('google ai')) {
+                                sType = 'Fixed';
+                            } else if (textInfo.includes('steam') || textInfo.includes('car') || textInfo.includes('mod') || textInfo.includes('byd')) {
+                                sType = 'Discretionary';
+                            } else {
+                                sType = 'Discretionary';
+                            }
+                        }
+
+                        if (sType === 'Fixed') ytdFixed += absExpense;
+                        else ytdDisc += absExpense;
+                    }
+                }
+
+                const amountDisplay = (Math.abs(tx.amountCents) / 100).toLocaleString(undefined, {minimumFractionDigits: 2});
+                const isIncome = tx.amountCents > 0;
+                const color = isIncome ? 'var(--success)' : 'var(--danger)';
+                const sign = isIncome ? '+' : '-';
+
+                let typeBadge = '';
+                if (!isIncome && tx.spendingType && tx.spendingType !== 'N/A') {
+                    const badgeColor = tx.spendingType === 'Fixed' ? 'var(--purple)' : 'var(--warning)';
+                    typeBadge = `<span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid ${badgeColor}; color: ${badgeColor}; margin-left: 6px;">${tx.spendingType}</span>`;
+                }
+
+                list.innerHTML += `
+                    <div class="task-card" style="display: flex; justify-content: space-between; align-items: center; cursor: default; margin-bottom: 0;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 15px;">${tx.payee}</div>
+                            <div style="font-size: 12px; opacity: 0.7; margin-top: 4px; display: flex; align-items: center;">
+                                <span class="badge">${tx.category}</span> ${typeBadge} <span style="margin-left: 6px;">• ${txDate.toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 16px; color: ${color};">
+                                ${sign}₱${amountDisplay}
+                            </div>
+                            <button class="btn-small btn-danger" onclick="deleteFinanceTransaction('${tx.id}')">✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 3. Render Top Metrics
+            const balance = totalIncome - totalExpense;
+            const balEl = document.getElementById('finance-balance');
+            const incEl = document.getElementById('finance-income');
+            const expEl = document.getElementById('finance-expenses');
+            const burnEl = document.getElementById('finance-burn-rate');
+
+            if (balEl) {
+                balEl.innerText = `₱${(balance / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                balEl.style.color = balance >= 0 ? 'var(--success)' : 'var(--danger)';
+            }
+            if (incEl) incEl.innerText = `₱${(totalIncome / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            if (expEl) expEl.innerText = `₱${(totalExpense / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            if (burnEl) {
+                const dailyBurn = (expenses30D / 30) / 100;
+                burnEl.innerText = `₱${dailyBurn.toLocaleString(undefined, {minimumFractionDigits: 2})} / day`;
+            }
+
+            // 4. Render YTD Pie Chart via CSS Conic Gradient
+            const ytdTotal = ytdFixed + ytdDisc;
+            const fixedPct = ytdTotal === 0 ? 0 : (ytdFixed / ytdTotal) * 100;
+            
+            const pieEl = document.getElementById('finance-ytd-pie');
+            const fixedText = document.getElementById('ytd-fixed-text');
+            const discText = document.getElementById('ytd-disc-text');
+
+            if (pieEl) {
+                pieEl.style.background = `conic-gradient(var(--purple) 0% ${fixedPct}%, var(--warning) ${fixedPct}% 100%)`;
+            }
+            if (fixedText) fixedText.innerText = `₱${(ytdFixed / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} (${Math.round(fixedPct)}%)`;
+            if (discText) discText.innerText = `₱${(ytdDisc / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} (${Math.round(100 - fixedPct)}%)`;
+        };
+
         // Initialize UI
-        document.addEventListener('DOMContentLoaded', () => {
-            const tb = document.getElementById('formatToolbar');
-            if (tb) tb.style.display = 'none';
-        });
         window.renderTasks();
         window.renderEvents();
+        window.renderFinance();
     </script>
 </body>
 </html>
