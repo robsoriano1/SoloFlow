@@ -2277,7 +2277,22 @@
                 }
             }, (error) => console.error("Schedule Sync Error:", error));
 
-            unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub);
+            const financeUnsub = onSnapshot(getDocPath('trackerData', 'finance'), (doc) => {
+                if (doc.exists()) {
+                    const cloudFinance = doc.data().data || [];
+                    if (JSON.stringify(cloudFinance) !== JSON.stringify(window.financeTransactions)) {
+                        window.financeTransactions = cloudFinance;
+                        localStorage.setItem('soloflow_finance', JSON.stringify(window.financeTransactions));
+                        
+                        // Only re-render if the user is currently looking at the finance tab
+                        if (typeof currentView !== 'undefined' && currentView === 'finance') {
+                            window.renderFinance();
+                        }
+                    }
+                }
+            }, (error) => console.error("Finance Sync Error:", error));
+
+            unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub, financeUnsub);
         }
 
         window.saveSettings = function() {
@@ -3777,6 +3792,10 @@
         window.saveFinance = function() {
             localStorage.setItem('soloflow_finance', JSON.stringify(window.financeTransactions));
             window.renderFinance();
+            if (userId) {
+                setDoc(getDocPath('trackerData', 'finance'), { data: window.financeTransactions })
+                    .catch(e => console.error("Failed to sync finance data", e));
+            }
         };
 
         window.addFinanceTransaction = function() {
