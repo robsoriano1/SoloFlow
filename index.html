@@ -10,37 +10,39 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
         
         :root {
-            /* Dynamic variables controlled by JS */
-            --bg: #f8fafc; 
-            --surface: #ffffff;
-            --text: #0f172a;       /* Outside Text (Title, section headers, tabs) */
-            --card-text: #0f172a;  /* Inside Box/Card Text */
-            --primary: #3b82f6; 
-            --todo-bg: #fff1f2;
-            --inprog-bg: #fefce8;
-            --done-bg: #f0fdf4;
+            /* Dynamic variables controlled by JS — Cozy Warm default theme */
+            --bg: #FBF9F1;
+            --surface: #FFFFFF;
+            --text: #1E1E1E;       /* Outside Text (Title, section headers, tabs) */
+            --card-text: #1E1E1E;  /* Inside Box/Card Text */
+            --primary: #D97706;
+            --todo-bg: #FBEAE2;
+            --inprog-bg: #FBF2DC;
+            --done-bg: #EAF0E1;
 
             /* Alpha-layer mappings for soft surface elevation */
-            --primary-rgb: 59, 130, 246;
+            --primary-rgb: 217, 119, 6;
+            --primary-contrast-text: #ffffff;
             --surface-overlay: rgba(255, 255, 255, 0.75);
-            --surface-border: rgba(15, 23, 42, 0.08);
-            --surface-border-strong: rgba(15, 23, 42, 0.14);
+            --surface-border: #E5E0D8;
+            --surface-border-strong: #D9D1C2;
+            --focus-ring: rgba(217, 119, 6, 0.18);
             
             /* Status Accents */
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
+            --danger: #C0392B;
+            --warning: #C08A1E;
+            --success: #4E7A51;
             --purple: #8b5cf6;
-            --text-muted: rgba(15, 23, 42, 0.65);
+            --text-muted: rgba(30, 30, 30, 0.62);
             
             /* Design system tokens */
             --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
+            --radius-md: 14px;
+            --radius-lg: 14px;
             --radius-xl: 20px;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 10px 30px -4px rgba(0, 0, 0, 0.08);
+            --shadow-sm: 0 1px 2px rgba(30, 22, 10, 0.04);
+            --shadow-md: 0 4px 20px rgba(30, 22, 10, 0.05);
+            --shadow-lg: 0 10px 30px -4px rgba(30, 22, 10, 0.10);
             --transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
@@ -51,7 +53,7 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg);
-            background-image: radial-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+            background-image: radial-gradient(rgba(30, 30, 30, 0.05) 1px, transparent 1px);
             background-size: 24px 24px;
             color: var(--text);
             margin: 0;
@@ -89,11 +91,11 @@
             width: 48px;
             height: 48px;
             border-radius: var(--radius-md);
-            background: rgba(255, 46, 46, 0.08);
+            background: rgba(var(--primary-rgb, 217, 119, 6), 0.10);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(255, 46, 46, 0.18);
+            border: 1px solid rgba(var(--primary-rgb, 217, 119, 6), 0.20);
             flex-shrink: 0;
             box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8);
         }
@@ -119,11 +121,11 @@
         .soloflow-header-badge {
             font-size: 12px;
             font-weight: 600;
-            background: rgba(var(--primary-rgb, 59, 130, 246), 0.08);
+            background: rgba(var(--primary-rgb, 217, 119, 6), 0.08);
             color: var(--primary);
             padding: 8px 14px;
             border-radius: 9999px;
-            border: 1px solid rgba(var(--primary-rgb, 59, 130, 246), 0.2);
+            border: 1px solid rgba(var(--primary-rgb, 217, 119, 6), 0.2);
             white-space: nowrap;
             letter-spacing: 0.01em;
         }
@@ -158,7 +160,7 @@
         }
         #pageTitle:hover, #pageTitle:focus { 
             border-color: var(--surface-border-strong); 
-            background: rgba(100, 116, 139, 0.08); 
+            background: rgba(120, 113, 98, 0.08); 
         }
 
         /* ALL BOXES/CONTAINERS USE --card-text */
@@ -269,7 +271,7 @@
         }
         .color-swatch-wrapper:hover {
             border-color: var(--primary);
-            box-shadow: 0 2px 8px -1px rgba(var(--primary-rgb, 59, 130, 246), 0.15);
+            box-shadow: 0 2px 8px -1px rgba(var(--primary-rgb, 217, 119, 6), 0.15);
         }
         .setting-item input[type="color"] { 
             width: 100%; 
@@ -307,14 +309,157 @@
         .setting-item select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 59, 130, 246), 0.15);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 217, 119, 6), 0.15);
         }
         
+        /* THEME PRESETS, ACCENT PICKER & LIVE PREVIEW */
+        .micro-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--card-text);
+            opacity: 0.6;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .theme-live-layout {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 800px) {
+            .theme-live-layout { grid-template-columns: 1fr; }
+        }
+        .theme-preset-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+        @media (max-width: 640px) {
+            .theme-preset-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        .theme-preset-swatch {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--surface-border-strong);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--card-text);
+            cursor: pointer;
+            box-shadow: none;
+            min-height: 0;
+            transition: var(--transition);
+        }
+        .theme-preset-swatch:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        .theme-preset-swatch.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--focus-ring, rgba(217, 119, 6, 0.18));
+        }
+        .preset-dots {
+            width: 100%;
+            height: 22px;
+            border-radius: 6px;
+            display: block;
+            border: 1px solid var(--surface-border);
+        }
+        .accent-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .accent-picker-hint {
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--card-text);
+            opacity: 0.65;
+        }
+        details.advanced-colors {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--surface-border);
+        }
+        details.advanced-colors summary {
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            list-style: none;
+            outline: none;
+            user-select: none;
+        }
+        details.advanced-colors summary::-webkit-details-marker { display: none; }
+        details.advanced-colors summary::before {
+            content: "▸ ";
+        }
+        details.advanced-colors[open] summary::before {
+            content: "▾ ";
+        }
+        .live-preview-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 18px;
+            color: var(--card-text);
+            position: sticky;
+            top: 16px;
+        }
+        .live-preview-card-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+        .live-preview-card-desc {
+            font-size: 12px;
+            opacity: 0.75;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+        .live-preview-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .live-preview-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--surface-border);
+            color: var(--card-text);
+        }
+        .live-preview-badge.todo { background: var(--todo-bg); }
+        .live-preview-badge.inprog { background: var(--inprog-bg); }
+        .live-preview-badge.done { background: var(--done-bg); }
+        .live-preview-btn {
+            background: var(--primary);
+            color: var(--primary-contrast-text, #ffffff);
+            border: none;
+            padding: 9px 18px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+
         .auth-status { 
             font-size: 13px; 
             padding: 16px 20px; 
             border-radius: var(--radius-md); 
-            background: rgba(15, 23, 42, 0.03); 
+            background: rgba(30, 30, 30, 0.03); 
             margin-bottom: 8px; 
             display: flex; 
             align-items: center; 
@@ -369,7 +514,7 @@
             box-shadow: var(--shadow-sm);
         }
         .btn-alt:hover { 
-            background: rgba(15, 23, 42, 0.04); 
+            background: rgba(30, 30, 30, 0.04); 
             border-color: var(--card-text);
             transform: translateY(-1px);
             box-shadow: var(--shadow-md);
@@ -433,7 +578,7 @@
         }
         .dot-success { background: var(--success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
         .dot-warning { background: var(--warning); box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
-        .dot-primary { background: var(--primary); box-shadow: 0 0 8px rgba(var(--primary-rgb, 59, 130, 246), 0.6); }
+        .dot-primary { background: var(--primary); box-shadow: 0 0 8px rgba(var(--primary-rgb, 217, 119, 6), 0.6); }
         .dot-danger { background: var(--danger); box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
         .dot-purple { background: var(--purple); box-shadow: 0 0 8px rgba(139, 92, 246, 0.6); }
 
@@ -447,7 +592,7 @@
         
         .card-profit   { background: rgba(16, 185, 129, 0.04); border-color: rgba(16, 185, 129, 0.18); }
         .card-budget   { background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.18); }
-        .card-finished { background: rgba(var(--primary-rgb, 59, 130, 246), 0.04); border-color: rgba(var(--primary-rgb, 59, 130, 246), 0.18); }
+        .card-finished { background: rgba(var(--primary-rgb, 217, 119, 6), 0.04); border-color: rgba(var(--primary-rgb, 217, 119, 6), 0.18); }
         .card-overdue  { background: rgba(239, 68, 68, 0.04); border-color: rgba(239, 68, 68, 0.18); }
         .card-velocity { background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.18); }
         .card-time     { background: rgba(139, 92, 246, 0.04); border-color: rgba(139, 92, 246, 0.18); }
@@ -485,7 +630,7 @@
         input:not([type="color"]):not([type="file"]):not([type="checkbox"]):focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 59, 130, 246), 0.15);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 217, 119, 6), 0.15);
         }
         ::placeholder { 
             color: var(--card-text); 
@@ -554,6 +699,12 @@
             min-width: 240px;
             display: flex;
             align-items: center;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+        .search-input-wrapper:focus-within {
+            box-shadow: 0 0 0 3px var(--focus-ring, rgba(217, 119, 6, 0.18));
+            border-radius: var(--radius-sm);
         }
         .search-logo-icon {
             position: absolute;
@@ -580,6 +731,11 @@
             padding-bottom: 12px; 
             overflow-x: auto; 
             white-space: nowrap;
+            scrollbar-width: none;      /* Firefox */
+            -ms-overflow-style: none;   /* IE / legacy Edge */
+        }
+        .view-tabs::-webkit-scrollbar {
+            display: none;              /* Chrome, Safari, Opera */
         }
         .view-tab { 
             background: none; 
@@ -587,7 +743,7 @@
             font-size: 14px; 
             font-weight: 600; 
             color: var(--text); 
-            opacity: 0.7; 
+            opacity: 0.62; 
             cursor: pointer; 
             padding: 10px 18px; 
             border-radius: 9999px; 
@@ -596,15 +752,16 @@
             box-shadow: none;
         }
         .view-tab:hover { 
-            background: rgba(15, 23, 42, 0.04); 
+            background: rgba(30, 30, 30, 0.04); 
             opacity: 1; 
             transform: none;
         }
         .view-tab.active { 
-            color: var(--primary); 
+            color: var(--card-text); 
             opacity: 1; 
-            background: rgba(var(--primary-rgb, 59, 130, 246), 0.08); 
-            border-color: rgba(var(--primary-rgb, 59, 130, 246), 0.2);
+            font-weight: 800;
+            background: rgba(var(--primary-rgb, 217, 119, 6), 0.14); 
+            border-color: rgba(var(--primary-rgb, 217, 119, 6), 0.28);
         }
 
         /* Board Styles */
@@ -639,7 +796,7 @@
         }
         .column.drag-over { 
             border-color: var(--primary); 
-            background: rgba(var(--primary-rgb, 59, 130, 246), 0.03); 
+            background: rgba(var(--primary-rgb, 217, 119, 6), 0.03); 
             border-style: dashed; 
         }
         .col-total { 
@@ -735,7 +892,7 @@
             background-color: rgba(255, 255, 255, 0.95); 
             border-color: var(--primary); 
             cursor: text; 
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 59, 130, 246), 0.15);
+            box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 217, 119, 6), 0.15);
         }
 
         .task-title { 
@@ -881,7 +1038,7 @@
         .btn-expand { 
             color: var(--primary); 
             font-weight: 600; 
-            border-color: rgba(var(--primary-rgb, 59, 130, 246), 0.3); 
+            border-color: rgba(var(--primary-rgb, 217, 119, 6), 0.3); 
             background: rgba(255, 255, 255, 0.9); 
         }
         .btn-danger { 
@@ -900,7 +1057,7 @@
             align-items: center; 
             gap: 10px; 
             margin-bottom: 12px; 
-            background: rgba(15, 23, 42, 0.04); 
+            background: rgba(30, 30, 30, 0.04); 
             padding: 8px 12px; 
             border-radius: var(--radius-sm); 
             border: 1px solid var(--surface-border); 
@@ -1040,7 +1197,7 @@
             padding-bottom: 8px; 
         }
         .calendar-day { 
-            background: rgba(15, 23, 42, 0.02); 
+            background: rgba(30, 30, 30, 0.02); 
             border: 1px solid var(--surface-border); 
             border-radius: var(--radius-sm); 
             min-height: 100px; 
@@ -1053,7 +1210,7 @@
             word-wrap: break-word;
         }
         .calendar-day.today { 
-            background: rgba(var(--primary-rgb, 59, 130, 246), 0.05); 
+            background: rgba(var(--primary-rgb, 217, 119, 6), 0.05); 
             border-color: var(--primary); 
         }
         .calendar-date { 
@@ -1121,7 +1278,7 @@
             border: 1px solid var(--surface-border);
             border-radius: var(--radius-md);
             padding: 18px;
-            background: rgba(15, 23, 42, 0.015);
+            background: rgba(30, 30, 30, 0.015);
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -1129,7 +1286,7 @@
         }
         .inbox-card:hover { 
             border-color: var(--primary); 
-            background: rgba(var(--primary-rgb, 59, 130, 246), 0.03); 
+            background: rgba(var(--primary-rgb, 217, 119, 6), 0.03); 
         }
         .inbox-subject { font-weight: 700; font-size: 15px; }
         .inbox-date { font-size: 12px; opacity: 0.7; }
@@ -1177,7 +1334,7 @@
         .prod-progress-bar-bg {
             width: 100%;
             height: 10px;
-            background: rgba(15, 23, 42, 0.08);
+            background: rgba(30, 30, 30, 0.08);
             border-radius: 9999px;
             overflow: hidden;
             margin-top: 10px;
@@ -1215,7 +1372,7 @@
             font-weight: 700;
             padding: 4px 10px;
             border-radius: 9999px;
-            background: rgba(var(--primary-rgb, 59, 130, 246), 0.1);
+            background: rgba(var(--primary-rgb, 217, 119, 6), 0.1);
             color: var(--primary);
         }
 
@@ -1223,7 +1380,7 @@
            FIX 2: Productivity Hub Analytics Card (.deep-dive-cta)
            ========================================================= */
         .deep-dive-cta {
-            background: linear-gradient(135deg, rgba(var(--primary-rgb, 59, 130, 246), 0.12) 0%, rgba(142, 68, 173, 0.12) 100%), var(--surface);
+            background: linear-gradient(135deg, rgba(var(--primary-rgb, 217, 119, 6), 0.12) 0%, rgba(142, 68, 173, 0.12) 100%), var(--surface);
             border: 1px dashed var(--primary);
             border-radius: var(--radius-lg);
             padding: 22px 24px;
@@ -1269,7 +1426,7 @@
         }
 
         .format-toolbar button:hover {
-            background: rgba(15, 23, 42, 0.06);
+            background: rgba(30, 30, 30, 0.06);
             border-color: var(--surface-border);
         }
 
@@ -1385,12 +1542,12 @@
         <!-- CUSTOMIZE & DATA MANAGEMENT DASHBOARD PANEL -->
         <details class="customize-menu">
             <summary>
-                <span>🎨 Customize, Theme Architecture &amp; Data Management</span>
+                <span>🎨 Customize &amp; Data Management</span>
             </summary>
-            
-            <!-- 1. CLOUD SYNC SECTION -->
+
+            <!-- 1. CLOUD & AUTH -->
             <div class="settings-group">
-                <h4>☁️ Cloud Sync (Firebase)</h4>
+                <h4>☁️ Cloud &amp; Auth</h4>
                 <div class="auth-status" id="auth-status-container">
                     <div>
                         <span id="auth-status-text" style="font-weight: 600;">Connecting to Firebase...</span><br>
@@ -1404,71 +1561,108 @@
                 </div>
             </div>
 
-            <!-- 2. GLOBAL UI COLORS -->
+            <!-- 2. THEMES & CANVAS -->
             <div class="settings-group">
-                <h4>Global UI Colors</h4>
-                <div class="settings-grid">
-                    <div class="setting-item">
-                        <label>App Background</label>
-                        <div class="color-swatch-wrapper">
-                            <input type="color" id="setBgColor">
+                <h4>🎨 Themes &amp; Canvas</h4>
+
+                <div class="theme-live-layout">
+                    <div class="theme-controls-col">
+                        <label class="micro-label">Preset Themes</label>
+                        <div class="theme-preset-row">
+                            <button type="button" class="theme-preset-swatch active" data-preset="cozyWarm" onclick="window.applyThemePreset('cozyWarm')" title="Cozy Warm">
+                                <span class="preset-dots" style="background: linear-gradient(135deg, #FBF9F1 50%, #D97706 50%);"></span>
+                                Cozy Warm
+                            </button>
+                            <button type="button" class="theme-preset-swatch" data-preset="minimalLatte" onclick="window.applyThemePreset('minimalLatte')" title="Minimal Latte">
+                                <span class="preset-dots" style="background: linear-gradient(135deg, #F4EFE6 50%, #C08552 50%);"></span>
+                                Minimal Latte
+                            </button>
+                            <button type="button" class="theme-preset-swatch" data-preset="sageCream" onclick="window.applyThemePreset('sageCream')" title="Sage & Cream">
+                                <span class="preset-dots" style="background: linear-gradient(135deg, #F6F5EE 50%, #6B8E5A 50%);"></span>
+                                Sage &amp; Cream
+                            </button>
+                            <button type="button" class="theme-preset-swatch" data-preset="charcoalDark" onclick="window.applyThemePreset('charcoalDark')" title="Charcoal Dark">
+                                <span class="preset-dots" style="background: linear-gradient(135deg, #1B1A17 50%, #E08A3C 50%);"></span>
+                                Charcoal Dark
+                            </button>
                         </div>
-                    </div>
-                    <div class="setting-item">
-                        <label>Surface Panels</label>
-                        <div class="color-swatch-wrapper">
-                            <input type="color" id="setSurfaceColor">
+
+                        <label class="micro-label" style="margin-top: 18px;">Primary Accent</label>
+                        <div class="accent-picker-row">
+                            <div class="color-swatch-wrapper" style="width: 56px; height: 44px; flex-shrink: 0;">
+                                <input type="color" id="setPrimaryColor">
+                            </div>
+                            <span class="accent-picker-hint">Tints, hover states &amp; focus rings recalculate automatically for AA-safe contrast.</span>
                         </div>
+
+                        <details class="advanced-colors">
+                            <summary>Fine-tune every surface &amp; text color</summary>
+                            <div class="settings-grid" style="margin-top: 14px;">
+                                <div class="setting-item">
+                                    <label>App Background</label>
+                                    <div class="color-swatch-wrapper">
+                                        <input type="color" id="setBgColor">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Surface Panels</label>
+                                    <div class="color-swatch-wrapper">
+                                        <input type="color" id="setSurfaceColor">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Outside Text</label>
+                                    <div class="color-swatch-wrapper">
+                                        <input type="color" id="setTextColor">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Card Text</label>
+                                    <div class="color-swatch-wrapper">
+                                        <input type="color" id="setCardTextColor">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>To Do Surface</label>
+                                    <div class="color-swatch-wrapper">
+                                        <input type="color" id="setTodoColor">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>In Progress Surface</label>
+                                    <div class="color-swatch-wrapper">
+                                        <input type="color" id="setInprogColor">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Done Surface</label>
+                                    <div class="color-swatch-wrapper">
+                                        <input type="color" id="setDoneColor">
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
                     </div>
-                    <div class="setting-item">
-                        <label>Outside Text</label>
-                        <div class="color-swatch-wrapper">
-                            <input type="color" id="setTextColor">
-                        </div>
-                    </div>
-                    <div class="setting-item">
-                        <label>Card Text</label>
-                        <div class="color-swatch-wrapper">
-                            <input type="color" id="setCardTextColor">
-                        </div>
-                    </div>
-                    <div class="setting-item">
-                        <label>Accent &amp; Buttons</label>
-                        <div class="color-swatch-wrapper">
-                            <input type="color" id="setPrimaryColor">
+
+                    <div class="theme-preview-col">
+                        <label class="micro-label">Live Preview</label>
+                        <div class="live-preview-card">
+                            <div class="live-preview-card-title">Design a cozy homepage</div>
+                            <div class="live-preview-card-desc">Sample card text reflects your Card Text color on the Surface background.</div>
+                            <div class="live-preview-badges">
+                                <span class="live-preview-badge todo">To&nbsp;Do</span>
+                                <span class="live-preview-badge inprog">In&nbsp;Progress</span>
+                                <span class="live-preview-badge done">Done</span>
+                            </div>
+                            <button type="button" class="live-preview-btn">Primary Action</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 3. TASK CARD STATUS COLORS -->
+            <!-- 3. BANNER & HERO -->
             <div class="settings-group">
-                <h4>Task Card Status Colors</h4>
-                <div class="settings-grid">
-                    <div class="setting-item">
-                        <label>To Do Surface</label>
-                        <div class="color-swatch-wrapper">
-                            <input type="color" id="setTodoColor">
-                        </div>
-                    </div>
-                    <div class="setting-item">
-                        <label>In Progress Surface</label>
-                        <div class="color-swatch-wrapper">
-                            <input type="color" id="setInprogColor">
-                        </div>
-                    </div>
-                    <div class="setting-item">
-                        <label>Done Surface</label>
-                        <div class="color-swatch-wrapper">
-                            <input type="color" id="setDoneColor">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. BANNER IMAGE & RESOLUTION SETTINGS -->
-            <div class="settings-group">
-                <h4>Banner Image &amp; Resolution Settings</h4>
+                <h4>🖼️ Banner &amp; Hero</h4>
                 <div class="settings-grid">
                     <div class="setting-item" style="grid-column: span 2;">
                         <label>Banner Image URL</label>
@@ -1510,7 +1704,7 @@
                 </div>
             </div>
 
-            <!-- 5. PRODUCTIVITY ANALYTICS -->
+            <!-- 4. PRODUCTIVITY ANALYTICS -->
             <div class="settings-group">
                 <h4>📊 Productivity Analytics</h4>
                 <div class="analytics-grid-elevated">
@@ -1526,7 +1720,7 @@
                             <span class="metric-label">Total Budget Allocated</span>
                             <span class="status-dot dot-warning"></span>
                         </div>
-                        <div id="stat-budget" class="metric-value-display" style="color: #d97706;">₱0.00</div>
+                        <div id="stat-budget" class="metric-value-display" style="color: var(--primary);">₱0.00</div>
                     </div>
                     <div class="metric-card-elevated card-finished">
                         <div class="metric-header">
@@ -1559,9 +1753,9 @@
                 </div>
             </div>
 
-            <!-- 6. MANUAL DATA BACKUP -->
+            <!-- 5. DATA BACKUP -->
             <div class="settings-group">
-                <h4>Manual Data Backup</h4>
+                <h4>💾 Data Backup</h4>
                 <div class="data-buttons">
                     <button class="btn-alt" onclick="exportTasks()">⬇️ Export JSON</button>
                     <button class="btn-alt" onclick="document.getElementById('importFile').click()">⬆️ Import JSON</button>
@@ -1856,12 +2050,12 @@
                 const bgRgb = this.hexToRgb(bgHex);
                 const bgLuminance = this.getRelativeLuminance(bgRgb);
                 const whiteLuminance = 1.0;
-                const darkLuminance = 0.01; // #0f172a
+                const darkLuminance = 0.01; // #1E1E1E
 
                 const whiteContrast = this.getContrastRatio(bgLuminance, whiteLuminance);
                 const darkContrast = this.getContrastRatio(bgLuminance, darkLuminance);
 
-                return whiteContrast >= darkContrast ? '#ffffff' : '#0f172a';
+                return whiteContrast >= darkContrast ? '#ffffff' : '#1E1E1E';
             },
 
             applyThemeVariables(root, tokenPrefix, hexColor) {
@@ -1981,19 +2175,44 @@
 
         const defaultSettings = {
             title: "Rob's Globe and ADMU Task and Events Tracker",
-            bgColor: '#f8fafc',
-            surfaceColor: '#ffffff',
-            textColor: '#0f172a',
-            cardTextColor: '#0f172a',
-            primaryColor: '#3b82f6',
-            todoBg: '#fff1f2',
-            inprogBg: '#fefce8',
-            doneBg: '#f0fdf4',
+            bgColor: '#FBF9F1',
+            surfaceColor: '#FFFFFF',
+            textColor: '#1E1E1E',
+            cardTextColor: '#1E1E1E',
+            primaryColor: '#D97706',
+            todoBg: '#FBEAE2',
+            inprogBg: '#FBF2DC',
+            doneBg: '#EAF0E1',
             bannerUrl: '',
             bannerHeight: '180',
             bannerWidth: '100%',
             bannerFit: 'cover',
             bannerPosition: 'center'
+        };
+
+        // --- PRESET THEME SWATCHES (additive; does not alter existing save/apply logic) ---
+        const THEME_PRESETS = {
+            cozyWarm:     { bgColor: '#FBF9F1', surfaceColor: '#FFFFFF', textColor: '#1E1E1E', cardTextColor: '#1E1E1E', primaryColor: '#D97706', todoBg: '#FBEAE2', inprogBg: '#FBF2DC', doneBg: '#EAF0E1' },
+            minimalLatte: { bgColor: '#F4EFE6', surfaceColor: '#FFFDF9', textColor: '#2B2620', cardTextColor: '#2B2620', primaryColor: '#C08552', todoBg: '#F2E8DD', inprogBg: '#EFE6D8', doneBg: '#E9E2D3' },
+            sageCream:    { bgColor: '#F6F5EE', surfaceColor: '#FFFFFF', textColor: '#26301F', cardTextColor: '#26301F', primaryColor: '#6B8E5A', todoBg: '#EDEAD9', inprogBg: '#E7EEDD', doneBg: '#DCE8D3' },
+            charcoalDark: { bgColor: '#1B1A17', surfaceColor: '#252320', textColor: '#F3EFE6', cardTextColor: '#F3EFE6', primaryColor: '#E08A3C', todoBg: '#3A2E27', inprogBg: '#3A3424', doneBg: '#28352A' }
+        };
+
+        window.applyThemePreset = function(name) {
+            const preset = THEME_PRESETS[name];
+            if (!preset) return;
+            document.getElementById('setBgColor').value = preset.bgColor;
+            document.getElementById('setSurfaceColor').value = preset.surfaceColor;
+            document.getElementById('setTextColor').value = preset.textColor;
+            document.getElementById('setCardTextColor').value = preset.cardTextColor;
+            document.getElementById('setPrimaryColor').value = preset.primaryColor;
+            document.getElementById('setTodoColor').value = preset.todoBg;
+            document.getElementById('setInprogColor').value = preset.inprogBg;
+            document.getElementById('setDoneColor').value = preset.doneBg;
+            window.saveSettings();
+            document.querySelectorAll('.theme-preset-swatch').forEach(function(el) {
+                el.classList.toggle('active', el.dataset.preset === name);
+            });
         };
 
         window.settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
@@ -2901,7 +3120,7 @@
                             <div class="prod-card-title">Active Queue (${inProgressTasks.length + highPriorityTasks.length})</div>
                             <div style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
                                 ${[...inProgressTasks, ...highPriorityTasks].slice(0, 5).map(t => `
-                                    <div style="padding: 8px 12px; background: rgba(15, 23, 42, 0.03); border-radius: var(--radius-sm); border: 1px solid var(--surface-border); display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="padding: 8px 12px; background: rgba(30, 30, 30, 0.03); border-radius: var(--radius-sm); border: 1px solid var(--surface-border); display: flex; justify-content: space-between; align-items: center;">
                                         <span style="font-size: 13px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 170px;">${t.title}</span>
                                         <button class="btn-small" onclick="window.moveTask('${t.id}', 'done'); window.renderProductivityDashboard();" style="padding: 2px 8px; min-height: 26px;">✓</button>
                                     </div>
@@ -3223,7 +3442,7 @@
                         `;
                     });
                 }
-                subtasksHtml += `<button class="btn-small" style="margin-top: 4px; align-self: flex-start; color: var(--primary); border-color: rgba(var(--primary-rgb, 59, 130, 246), 0.4); font-weight: bold;" onclick="addSubtask('${task.id}')">+ Add Subtask</button>`;
+                subtasksHtml += `<button class="btn-small" style="margin-top: 4px; align-self: flex-start; color: var(--primary); border-color: rgba(var(--primary-rgb, 217, 119, 6), 0.4); font-weight: bold;" onclick="addSubtask('${task.id}')">+ Add Subtask</button>`;
                 subtasksHtml += '</div>';
 
                 let dueBadgeHtml = '';
