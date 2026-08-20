@@ -1793,7 +1793,10 @@
         <div id="calendar-container" class="calendar-container" style="display: none;">
             <div class="calendar-header">
                 <button class="btn-alt" onclick="changeMonth(-1)">◀ Prev</button>
-                <h3 id="calendar-month-year"></h3>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <h3 id="calendar-month-year" style="margin: 0;"></h3>
+                    <button class="btn-small" style="color: var(--primary); border-color: rgba(var(--primary-rgb), 0.4);" onclick="fetchGoogleCalendarEvents()">🔄 Fetch GCal</button>
+                </div>
                 <button class="btn-alt" onclick="changeMonth(1)">Next ▶</button>
             </div>
             <div id="calendar-grid" class="calendar-grid"></div>
@@ -2496,6 +2499,44 @@
             } catch (err) {
                 console.error("Calendar Sync Error:", err);
                 window.showToast("Failed to push event to Google Calendar.", "error");
+            }
+        };
+
+        window.gcalEvents = [];
+
+        window.fetchGoogleCalendarEvents = async function() {
+            if (!window.calendarAccessToken) {
+                window.calendarAccessToken = sessionStorage.getItem('calendarAccessToken');
+            }
+            if (!window.calendarAccessToken) {
+                window.showToast("Please connect Google Calendar in the Customize menu first.", "error");
+                return;
+            }
+
+            try {
+                window.showToast("Fetching Google Calendar events...");
+                
+                // Get boundaries for the currently viewed month
+                const year = currentCalendarDate.getFullYear();
+                const month = currentCalendarDate.getMonth();
+                const timeMin = new Date(year, month, 1).toISOString();
+                const timeMax = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
+
+                const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`, {
+                    headers: { 'Authorization': `Bearer ${window.calendarAccessToken}` }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    window.gcalEvents = data.items || [];
+                    window.renderCalendar(); // Re-render to show the new events
+                    window.showToast("Google Calendar events synced!", "success");
+                } else {
+                    window.showToast("Session expired. Please reconnect Google Calendar.", "error");
+                }
+            } catch (err) {
+                console.error("Fetch GCal Error:", err);
+                window.showToast("Error connecting to Google Calendar.", "error");
             }
         };
 
@@ -3363,6 +3404,20 @@
                     if (task.syncedToCalendar && task.dueDate === dateStr) {
                         const statusClass = task.status === 'done' ? 'done' : '';
                         dayHtml += `<div class="calendar-task ${statusClass}" title="${task.title}" onclick="setView('all')">${task.dueTime ? formatTime(task.dueTime) + ' ' : ''}📋 ${task.title}</div>`;
+                    }
+                });
+
+                window.gcalEvents.forEach(ev => {
+                    if (ev.start && (ev.start.dateTime || ev.start.date)) {
+                        const evDateStr = (ev.start.dateTime || ev.start.date).split('T')[0];
+                        if (evDateStr === dateStr) {
+                            let evTime = '';
+                            if (ev.start.dateTime) {
+                                const dateObj = new Date(ev.start.dateTime);
+                                evTime = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ' ';
+                            }
+                            dayHtml += `<div class="calendar-task" style="background: #4285F4; color: #ffffff;" title="${ev.summary}">${evTime}🔵 ${ev.summary}</div>`;
+                        }
                     }
                 });
 
