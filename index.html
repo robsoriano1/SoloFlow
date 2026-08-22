@@ -14,17 +14,15 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
         
         :root {
-            /* Dynamic variables controlled by JS — Cozy Warm default theme */
             --bg: #FBF9F1;
             --surface: #FFFFFF;
-            --text: #1E1E1E;       /* Outside Text (Title, section headers, tabs) */
-            --card-text: #1E1E1E;  /* Inside Box/Card Text */
+            --text: #1E1E1E;
+            --card-text: #1E1E1E;
             --primary: #D97706;
             --todo-bg: #FBEAE2;
             --inprog-bg: #FBF2DC;
             --done-bg: #EAF0E1;
 
-            /* Alpha-layer mappings for soft surface elevation */
             --primary-rgb: 217, 119, 6;
             --primary-contrast-text: #ffffff;
             --surface-overlay: rgba(255, 255, 255, 0.75);
@@ -32,14 +30,12 @@
             --surface-border-strong: #D9D1C2;
             --focus-ring: rgba(217, 119, 6, 0.18);
             
-            /* Status Accents */
             --danger: #C0392B;
             --warning: #C08A1E;
             --success: #4E7A51;
             --purple: #8b5cf6;
             --text-muted: rgba(30, 30, 30, 0.62);
             
-            /* Design system tokens */
             --radius-sm: 8px;
             --radius-md: 14px;
             --radius-lg: 14px;
@@ -72,7 +68,6 @@
             margin: 0 auto; 
         }
         
-        /* SOLOFLOW AESTHETIC HEADER */
         .soloflow-header {
             background: var(--surface);
             border: 1px solid var(--surface-border);
@@ -134,7 +129,6 @@
             letter-spacing: 0.01em;
         }
 
-        /* Banner & Header Styles */
         #bannerImage {
             width: 100%;
             height: 180px;
@@ -167,12 +161,10 @@
             background: rgba(120, 113, 98, 0.08); 
         }
 
-        /* ALL BOXES/CONTAINERS USE --card-text */
-        details.customize-menu, .form-card, .column, .control-panel, .event-card, .setting-item, .inbox-card, .inbox-header, .productivity-container, .finance-container {
+        details.customize-menu, details.collapsible-ledger, .form-card, .column, .control-panel, .event-card, .setting-item, .inbox-card, .inbox-header, .productivity-container, .finance-container {
             color: var(--card-text) !important;
         }
 
-        /* CUSTOMIZE & DATA MANAGEMENT DASHBOARD PANEL */
         details.customize-menu {
             background: var(--surface);
             backdrop-filter: blur(16px);
@@ -213,6 +205,46 @@
         details.customize-menu[open] summary::after {
             transform: rotate(-180deg);
         }
+
+        /* Collapsible Ledger Styles */
+        details.collapsible-ledger {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--surface-border);
+            transition: var(--transition);
+        }
+        details.collapsible-ledger summary {
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--card-text);
+            user-select: none;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            list-style: none;
+        }
+        details.collapsible-ledger summary::-webkit-details-marker {
+            display: none;
+        }
+        details.collapsible-ledger summary::after {
+            content: "▼";
+            font-size: 11px;
+            opacity: 0.6;
+            transition: transform var(--transition);
+        }
+        details.collapsible-ledger[open] summary::after {
+            transform: rotate(-180deg);
+        }
+        details.collapsible-ledger[open] summary {
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+        }
         
         .settings-group { 
             margin-top: 24px; 
@@ -228,11 +260,11 @@
             font-size: 11px; 
             font-weight: 700;
             text-transform: uppercase; 
-            letter-spacing: 0.08em;
+            letter-spacing: 0.08em; 
             color: var(--card-text); 
             opacity: 0.6; 
-            display: flex;
-            align-items: center;
+            display: flex; 
+            align-items: center; 
             gap: 8px;
         }
         
@@ -316,7 +348,6 @@
             box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 217, 119, 6), 0.15);
         }
         
-        /* THEME PRESETS, ACCENT PICKER & LIVE PREVIEW */
         .micro-label {
             font-size: 11px;
             font-weight: 700;
@@ -508,8 +539,8 @@
             border-radius: 9999px; 
             cursor: pointer; 
             font-size: 13px; 
-            font-weight: 600;
-            min-height: 40px;
+            font-weight: 600; 
+            min-height: 40px; 
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -527,7 +558,6 @@
             transform: translateY(0);
         }
 
-        /* ANALYTICS METRICS GRID */
         .analytics-grid-elevated {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -601,7 +631,6 @@
         .card-velocity { background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.18); }
         .card-time     { background: rgba(139, 92, 246, 0.04); border-color: rgba(139, 92, 246, 0.18); }
 
-        /* FORM & GENERAL UI */
         .form-card {
             background: var(--surface); 
             padding: 24px; 
@@ -684,7 +713,6 @@
             margin-right: -4px; 
         }
 
-        /* Control Panel */
         .control-panel {
             display: flex; 
             gap: 12px; 
@@ -726,7 +754,6 @@
             box-sizing: border-box;
         }
         
-        /* View Switcher Tabs */
         .view-tabs { 
             display: flex; 
             gap: 8px; 
@@ -735,11 +762,11 @@
             padding-bottom: 12px; 
             overflow-x: auto; 
             white-space: nowrap;
-            scrollbar-width: none;      /* Firefox */
-            -ms-overflow-style: none;   /* IE / legacy Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .view-tabs::-webkit-scrollbar {
-            display: none;              /* Chrome, Safari, Opera */
+            display: none;
         }
         .view-tab { 
             background: none; 
@@ -751,29 +778,28 @@
             cursor: pointer; 
             padding: 10px 18px; 
             border-radius: 9999px; 
-            transition: var(--transition);
-            min-height: 42px;
-            box-shadow: none;
+            transition: var(--transition); 
+            min-height: 42px; 
+            box-shadow: none; 
         }
         .view-tab:hover { 
             background: rgba(30, 30, 30, 0.04); 
             opacity: 1; 
-            transform: none;
+            transform: none; 
         }
         .view-tab.active { 
             color: var(--card-text); 
             opacity: 1; 
-            font-weight: 800;
+            font-weight: 800; 
             background: rgba(var(--primary-rgb, 217, 119, 6), 0.14); 
-            border-color: rgba(var(--primary-rgb, 217, 119, 6), 0.28);
+            border-color: rgba(var(--primary-rgb, 217, 119, 6), 0.28); 
         }
 
-        /* Board Styles */
         .board { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
             gap: 24px; 
-            align-items: start;
+            align-items: start; 
         }
         .column { 
             background: var(--surface); 
@@ -781,22 +807,22 @@
             padding: 18px; 
             box-shadow: var(--shadow-sm); 
             border: 1px solid var(--surface-border); 
-            transition: var(--transition);
+            transition: var(--transition); 
             display: flex; 
             flex-direction: column; 
-            min-height: 260px;
+            min-height: 260px; 
         }
         .column h3 { 
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
+            font-family: 'Poppins', sans-serif; 
+            font-size: 16px; 
+            font-weight: 700; 
             margin: 0 0 16px 0; 
             border-bottom: 1px solid var(--surface-border); 
             padding-bottom: 12px; 
             color: var(--card-text); 
             display: flex; 
-            justify-content: space-between;
-            align-items: center;
+            justify-content: space-between; 
+            align-items: center; 
         }
         .column.drag-over { 
             border-color: var(--primary); 
@@ -804,7 +830,7 @@
             border-style: dashed; 
         }
         .col-total { 
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', sans-serif; 
             font-size: 13px; 
             opacity: 0.75; 
             font-weight: 600; 
@@ -814,16 +840,16 @@
             padding: 18px; 
             border-radius: var(--radius-md); 
             margin-bottom: 14px; 
-            position: relative;
+            position: relative; 
             transition: var(--transition); 
-            border: 1px solid var(--surface-border);
+            border: 1px solid var(--surface-border); 
             cursor: grab; 
-            color: var(--card-text);
-            box-shadow: var(--shadow-sm);
+            color: var(--card-text); 
+            box-shadow: var(--shadow-sm); 
         }
-        .task-card:hover {
-            box-shadow: var(--shadow-md);
-            border-color: var(--surface-border-strong);
+        .task-card:hover { 
+            box-shadow: var(--shadow-md); 
+            border-color: var(--surface-border-strong); 
         }
         .task-card:active { 
             cursor: grabbing; 
@@ -831,7 +857,6 @@
             box-shadow: var(--shadow-lg); 
         }
         
-        /* Dynamic Contrast-Compliant Task Status Cards */
         .card-todo { 
             background-color: var(--todo-bg); 
             color: var(--todo-contrast-text, var(--card-text)); 
@@ -845,7 +870,6 @@
             color: var(--done-contrast-text, var(--card-text)); 
         }
 
-        /* Attachments & Links */
         .task-photo { 
             width: 100%; 
             height: auto; 
@@ -864,8 +888,8 @@
         }
         .task-link { 
             display: inline-flex; 
-            align-items: center;
-            gap: 4px;
+            align-items: center; 
+            gap: 4px; 
             font-size: 12px; 
             font-weight: 600; 
             color: var(--primary); 
@@ -873,8 +897,8 @@
             background: rgba(255, 255, 255, 0.85); 
             padding: 6px 12px; 
             border-radius: var(--radius-sm); 
-            border: 1px solid var(--surface-border);
-            transition: var(--transition);
+            border: 1px solid var(--surface-border); 
+            transition: var(--transition); 
         }
         .task-link:hover { 
             background: var(--primary); 
@@ -882,7 +906,6 @@
             border-color: var(--primary); 
         }
 
-        /* Inline Editing */
         .editable { 
             outline: none; 
             border: 1px dashed transparent; 
@@ -896,14 +919,14 @@
             background-color: rgba(255, 255, 255, 0.95); 
             border-color: var(--primary); 
             cursor: text; 
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 217, 119, 6), 0.15);
+            box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 217, 119, 6), 0.15); 
         }
 
         .task-title { 
             font-weight: 700; 
             margin-bottom: 8px; 
             font-size: 15px; 
-            line-height: 1.35;
+            line-height: 1.35; 
         }
         .task-desc { 
             font-size: 13px; 
@@ -933,7 +956,7 @@
             font-weight: 700; 
             margin-bottom: 10px; 
             display: inline-flex; 
-            align-items: center;
+            align-items: center; 
             padding: 4px 10px; 
             border-radius: var(--radius-sm); 
             background: rgba(255, 255, 255, 0.75); 
@@ -960,12 +983,12 @@
         .meta-input-date, .meta-input-time {
             padding: 4px 8px; 
             border: 1px solid var(--surface-border-strong); 
-            border-radius: 4px;
+            border-radius: 4px; 
             background: rgba(255, 255, 255, 0.9); 
             color: var(--card-text); 
             font-size: 11px; 
-            font-family: inherit;
-            font-weight: 500;
+            font-family: inherit; 
+            font-weight: 500; 
         }
         
         .subtasks-list { 
@@ -985,9 +1008,9 @@
         .subtask-item input[type="checkbox"] { 
             cursor: pointer; 
             margin: 3px 0 0 0; 
-            width: 16px;
-            height: 16px;
-            accent-color: var(--primary);
+            width: 16px; 
+            height: 16px; 
+            accent-color: var(--primary); 
         }
         .subtask-text-container { flex-grow: 1; }
         .subtask-item.completed .subtask-text-container { 
@@ -1000,7 +1023,7 @@
             gap: 6px; 
             margin-bottom: 12px; 
             font-size: 11px; 
-            font-weight: 600;
+            font-weight: 600; 
             flex-wrap: wrap; 
         }
         .badge { 
@@ -1030,14 +1053,14 @@
             border-radius: var(--radius-sm); 
             cursor: pointer; 
             font-weight: 600; 
-            min-height: 32px;
-            box-shadow: none;
-            transition: var(--transition);
+            min-height: 32px; 
+            box-shadow: none; 
+            transition: var(--transition); 
         }
         .btn-small:hover { 
             background: rgba(255, 255, 255, 1); 
-            border-color: var(--card-text);
-            transform: none;
+            border-color: var(--card-text); 
+            transform: none; 
         }
         .btn-expand { 
             color: var(--primary); 
@@ -1055,7 +1078,6 @@
             color: #ffffff; 
         }
 
-        /* Timer Styles */
         .timer-container { 
             display: flex; 
             align-items: center; 
@@ -1081,17 +1103,16 @@
             font-size: 12px; 
             cursor: pointer; 
             font-weight: 600; 
-            min-height: 32px;
+            min-height: 32px; 
             transition: var(--transition); 
         }
         .btn-timer.active { 
             background: var(--danger); 
-            color: #ffffff;
+            color: #ffffff; 
             animation: pulse 1.5s infinite; 
         }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
         
-        /* Schedule Styles */
         .schedule-container { 
             background: var(--surface); 
             padding: 20px; 
@@ -1102,7 +1123,7 @@
             max-height: 700px; 
             max-width: 100%; 
             margin-bottom: 24px; 
-            position: relative;
+            position: relative; 
         }
         .schedule-grid { 
             display: grid; 
@@ -1112,7 +1133,7 @@
             border: 1px solid var(--surface-border); 
             border-radius: var(--radius-sm); 
             overflow: hidden; 
-            min-width: 800px;
+            min-width: 800px; 
         }
         .schedule-header { 
             background: var(--surface); 
@@ -1124,7 +1145,7 @@
             position: sticky; 
             top: 0; 
             z-index: 10; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06); 
         }
         .schedule-time { 
             background: var(--surface); 
@@ -1140,7 +1161,7 @@
             position: sticky; 
             left: 0; 
             z-index: 5; 
-            box-shadow: 1px 0 2px rgba(0,0,0,0.05);
+            box-shadow: 1px 0 2px rgba(0,0,0,0.05); 
         }
         .schedule-cell { 
             background: var(--surface); 
@@ -1151,14 +1172,13 @@
             outline: none; 
             transition: var(--transition); 
             word-wrap: break-word; 
-            cursor: text;
+            cursor: text; 
         }
         .schedule-cell:focus { 
             background: rgba(255, 255, 255, 0.98); 
             box-shadow: inset 0 0 0 2px var(--primary); 
         }
         
-        /* Calendar Styles */
         .calendar-container { 
             background: var(--surface); 
             padding: 20px; 
@@ -1169,7 +1189,7 @@
             margin-bottom: 24px; 
             max-width: 100%; 
             box-sizing: border-box; 
-            overflow-x: auto;
+            overflow-x: auto; 
         }
         .calendar-header { 
             display: flex; 
@@ -1179,10 +1199,10 @@
             color: var(--card-text); 
         }
         .calendar-header h3 { 
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', sans-serif; 
             margin: 0; 
             font-size: 18px; 
-            font-weight: 700;
+            font-weight: 700; 
         }
         .calendar-grid { 
             display: grid; 
@@ -1190,7 +1210,7 @@
             gap: 8px; 
             min-width: 650px; 
             width: 100%; 
-            box-sizing: border-box;
+            box-sizing: border-box; 
         }
         .calendar-day-header { 
             font-weight: 700; 
@@ -1211,7 +1231,7 @@
             gap: 4px; 
             overflow: hidden; 
             min-width: 0; 
-            word-wrap: break-word;
+            word-wrap: break-word; 
         }
         .calendar-day.today { 
             background: rgba(var(--primary-rgb, 217, 119, 6), 0.05); 
@@ -1239,12 +1259,11 @@
         }
         .calendar-task.done { 
             background: var(--success); 
-            color: #ffffff;
+            color: #ffffff; 
             opacity: 0.75; 
             text-decoration: line-through; 
         }
 
-        /* GMAIL INBOX STYLES */
         .inbox-container {
             background: var(--surface);
             padding: 24px;
@@ -1265,10 +1284,10 @@
             gap: 12px;
         }
         .inbox-header h3 { 
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', sans-serif; 
             margin: 0; 
             font-size: 18px; 
-            font-weight: 700;
+            font-weight: 700; 
             display: flex; 
             align-items: center; 
             gap: 10px; 
@@ -1297,7 +1316,6 @@
         .inbox-sender { font-size: 13px; color: var(--primary); font-weight: 600; }
         .inbox-snippet { font-size: 13px; opacity: 0.85; line-height: 1.5; }
 
-        /* PRODUCTIVITY DASHBOARD STYLES */
         .productivity-container { display: none; margin-bottom: 24px; }
         .productivity-dashboard {
             display: flex;
@@ -1380,9 +1398,6 @@
             color: var(--primary);
         }
 
-        /* =========================================================
-           FIX 2: Productivity Hub Analytics Card (.deep-dive-cta)
-           ========================================================= */
         .deep-dive-cta {
             background: linear-gradient(135deg, rgba(var(--primary-rgb, 217, 119, 6), 0.12) 0%, rgba(142, 68, 173, 0.12) 100%), var(--surface);
             border: 1px dashed var(--primary);
@@ -1399,9 +1414,6 @@
             color: var(--card-text);
         }
 
-        /* =========================================================
-           FIX 1: Floating Rich Text Formatting Toolbar
-           ========================================================= */
         .format-toolbar {
             display: none;
             position: absolute;
@@ -1434,7 +1446,6 @@
             border-color: var(--surface-border);
         }
 
-        /* Section Dividers & Toast */
         .section-divider { 
             margin: 48px 0 24px 0; 
             border: 0; 
@@ -1449,13 +1460,13 @@
             border-radius: var(--radius-md); 
             border: 1px solid var(--surface-border); 
             margin-bottom: 12px; 
-            color: var(--card-text);
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
+            color: var(--card-text); 
+            box-shadow: var(--shadow-sm); 
+            transition: var(--transition); 
         }
-        .event-card:hover {
-            box-shadow: var(--shadow-md);
-            border-color: var(--surface-border-strong);
+        .event-card:hover { 
+            box-shadow: var(--shadow-md); 
+            border-color: var(--surface-border-strong); 
         }
         .toast { 
             position: fixed; 
@@ -1494,7 +1505,6 @@
         <header class="soloflow-header">
             <div class="soloflow-brand">
                 <div class="soloflow-logo-badge">
-                    <!-- SoloFlow Shooting Star SVG Logo -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28">
                         <path d="M15 65 C 15 35, 45 30, 80 35" stroke="#ff2e2e" stroke-width="8" fill="none" stroke-linecap="round"/>
                         <path d="M22 75 C 22 45, 48 40, 75 43" stroke="#ff2e2e" stroke-width="5" fill="none" stroke-linecap="round"/>
@@ -1518,7 +1528,7 @@
         <!-- Editable Workspace Subtitle/Title -->
         <h2 id="pageTitle" contenteditable="true" spellcheck="false" title="Click to edit workspace name">Rob's Globe and ADMU Task and Events Tracker</h2>
 
-        <!-- Floating Rich Text Toolbar (Updated with initial style="display: none;") -->
+        <!-- Floating Rich Text Toolbar -->
         <div id="formatToolbar" class="format-toolbar" style="display: none;">
             <button onmousedown="event.preventDefault(); formatText('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
             <button onmousedown="event.preventDefault(); formatText('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
@@ -1824,7 +1834,7 @@
         <!-- FINANCE TRACKER CONTAINER -->
         <div id="finance-container" class="finance-container" style="display: none; margin-bottom: 24px;">
             
-            <!-- Top Level Stats (Updated with Burn Rate) -->
+            <!-- Top Level Stats -->
             <div class="analytics-grid-elevated" style="margin-bottom: 24px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
                 <div class="metric-card-elevated card-profit">
                     <div class="metric-header"><span class="metric-label">Net Balance</span><span class="status-dot dot-success"></span></div>
@@ -1847,7 +1857,7 @@
             <!-- Dashboard Split Layout -->
             <div class="workspace-layout" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
                 
-                <!-- Quick Add Form with Editable Categories -->
+                <!-- Quick Add Form -->
                 <div class="form-card" style="margin-bottom: 0;">
                     <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 16px;">➕ Record New Transaction</h3>
                     <div class="form-row">
@@ -1896,13 +1906,18 @@
                 </div>
             </div>
 
-            <!-- Transaction Ledger -->
-            <div class="column" style="min-height: auto;">
-                <h3>Transaction Ledger</h3>
-                <div id="finance-list" style="display: flex; flex-direction: column; gap: 12px;">
-                    <!-- Transactions will render here -->
+            <!-- Collapsible Transaction Ledger -->
+            <details class="collapsible-ledger" open>
+                <summary>
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <span>📜 Transaction Ledger</span>
+                        <span id="finance-tx-count" class="badge" style="font-size: 11px; font-weight: 700; background: rgba(var(--primary-rgb, 217, 119, 6), 0.12); color: var(--primary); border: 1px solid rgba(var(--primary-rgb, 217, 119, 6), 0.25);">0 Records</span>
+                    </span>
+                </summary>
+                <div id="finance-list" style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                    <!-- Transactions render here -->
                 </div>
-            </div>
+            </details>
         </div>
 
         <!-- SEARCH BAR -->
@@ -2062,7 +2077,7 @@
                 const bgRgb = this.hexToRgb(bgHex);
                 const bgLuminance = this.getRelativeLuminance(bgRgb);
                 const whiteLuminance = 1.0;
-                const darkLuminance = 0.01; // #1E1E1E
+                const darkLuminance = 0.01;
 
                 const whiteContrast = this.getContrastRatio(bgLuminance, whiteLuminance);
                 const darkContrast = this.getContrastRatio(bgLuminance, darkLuminance);
@@ -2152,21 +2167,13 @@
             }
         });
 
-        // -------------------------------------------------------------
-        // Modified Login Button with reCAPTCHA Enterprise Integration
-        // -------------------------------------------------------------
         document.getElementById('btn-google-login').addEventListener('click', async (e) => {
             e.preventDefault(); 
             
             grecaptcha.enterprise.ready(async () => {
                 try {
-                    // Generate the reCAPTCHA token 
                     const token = await grecaptcha.enterprise.execute('6Lcvq4otAAAAAGNDRtcejDcv3A5IKBTFEMBc7jz4', {action: 'LOGIN'});
                     console.log("reCAPTCHA Token Generated:", token);
-
-                    // Note: You would normally pass 'token' to your backend here to verify 
-                    // it before proceeding. Since this is frontend-only Firebase Auth, 
-                    // we proceed with the standard popup after generating the token.
 
                     const provider = new GoogleAuthProvider();
                     window.showToast("Opening Google Sign-in...");
@@ -2180,7 +2187,6 @@
                 }
             });
         });
-        // -------------------------------------------------------------
 
         document.getElementById('btn-google-logout').addEventListener('click', async () => {
             try {
@@ -2194,7 +2200,6 @@
 
         initAuth();
 
-        // --- GLOBAL VARIABLES & DATA MANAGEMENT ---
         window.formatTime = function(time24) {
             if (!time24) return '';
             const [hours, minutes] = time24.split(':');
@@ -2221,7 +2226,6 @@
             bannerPosition: 'center'
         };
 
-        // --- PRESET THEME SWATCHES (additive; does not alter existing save/apply logic) ---
         const THEME_PRESETS = {
             cozyWarm:     { bgColor: '#FBF9F1', surfaceColor: '#FFFFFF', textColor: '#1E1E1E', cardTextColor: '#1E1E1E', primaryColor: '#D97706', todoBg: '#FBEAE2', inprogBg: '#FBF2DC', doneBg: '#EAF0E1' },
             minimalLatte: { bgColor: '#F4EFE6', surfaceColor: '#FFFDF9', textColor: '#2B2620', cardTextColor: '#2B2620', primaryColor: '#C08552', todoBg: '#F2E8DD', inprogBg: '#EFE6D8', doneBg: '#E9E2D3' },
@@ -2250,6 +2254,7 @@
         window.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
         window.events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
         window.scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
+        window.financeTransactions = JSON.parse(localStorage.getItem('soloflow_finance')) || [];
 
         function setupFirestoreListeners() {
             if (!userId) return;
@@ -2308,7 +2313,23 @@
                 }
             }, (error) => console.error("Schedule Sync Error:", error));
 
-            unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub);
+            // Real-time Firestore Sync for Finance Transactions
+            const financeUnsub = onSnapshot(getDocPath('trackerData', 'finance'), (doc) => {
+                if (doc.metadata && doc.metadata.hasPendingWrites) return;
+
+                if (doc.exists()) {
+                    const cloudFinance = doc.data().data || [];
+                    if (JSON.stringify(cloudFinance) !== JSON.stringify(window.financeTransactions)) {
+                        window.financeTransactions = cloudFinance;
+                        localStorage.setItem('soloflow_finance', JSON.stringify(window.financeTransactions));
+                        if (typeof window.renderFinance === 'function') {
+                            window.renderFinance();
+                        }
+                    }
+                }
+            }, (error) => console.error("Finance Sync Error:", error));
+
+            unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub, financeUnsub);
         }
 
         window.saveSettings = function() {
@@ -2364,7 +2385,14 @@
             }
         };
 
-        // --- DYNAMIC THEME ENGINE & ACCESSIBILITY-COMPLIANT SETTINGS APPLY ---
+        window.saveFinance = function() {
+            localStorage.setItem('soloflow_finance', JSON.stringify(window.financeTransactions));
+            window.renderFinance();
+            if (userId) {
+                setDoc(getDocPath('trackerData', 'finance'), { data: window.financeTransactions }).catch(e => console.error("Failed to sync finance", e));
+            }
+        };
+
         function applySettings() {
             document.getElementById('pageTitle').innerText = window.settings.title;
             const root = document.documentElement;
@@ -2378,7 +2406,6 @@
             root.style.setProperty('--inprog-bg', window.settings.inprogBg);
             root.style.setProperty('--done-bg', window.settings.doneBg);
 
-            // Execute Theme Accessibility Engine Tokens Calculation
             ThemeAccessibilityEngine.applyThemeVariables(root, 'primary', window.settings.primaryColor);
             ThemeAccessibilityEngine.applyThemeVariables(root, 'todo', window.settings.todoBg);
             ThemeAccessibilityEngine.applyThemeVariables(root, 'inprog', window.settings.inprogBg);
@@ -2515,8 +2542,6 @@
 
             try {
                 window.showToast("Fetching Google Calendar events...");
-                
-                // Get boundaries for the currently viewed month
                 const year = currentCalendarDate.getFullYear();
                 const month = currentCalendarDate.getMonth();
                 const timeMin = new Date(year, month, 1).toISOString();
@@ -2529,7 +2554,7 @@
                 if (res.ok) {
                     const data = await res.json();
                     window.gcalEvents = data.items || [];
-                    window.renderCalendar(); // Re-render to show the new events
+                    window.renderCalendar();
                     window.showToast("Google Calendar events synced!", "success");
                 } else {
                     window.showToast("Session expired. Please reconnect Google Calendar.", "error");
@@ -2898,7 +2923,6 @@
                 const previousStatus = task.status;
                 task.status = newStatus; 
 
-                // Automatic Sync: Record into Finance Tracker when marked as Done (One-time guard check)
                 if (newStatus === 'done' && previousStatus !== 'done' && task.budget && !task.financeSynced) {
                     const amountFloat = parseFloat(task.budget);
                     if (!isNaN(amountFloat) && amountFloat > 0) {
@@ -2915,11 +2939,7 @@
                         });
 
                         task.financeSynced = true;
-
-                        localStorage.setItem('soloflow_finance', JSON.stringify(window.financeTransactions));
-                        if (typeof window.renderFinance === 'function') {
-                            window.renderFinance();
-                        }
+                        window.saveFinance();
                         window.showToast(`Synced ${isProfit ? 'Profit' : 'Expense'} to Finance Tracker!`, 'success');
                     }
                 }
@@ -3277,7 +3297,6 @@
                         </div>
                     </div>
 
-                    <!-- Updated Analytics Card with improved contrast & styling -->
                     <div class="deep-dive-portal deep-dive-cta">
                         <div>
                             <strong style="font-size: 16px; font-weight: 700; color: var(--card-text); display: block;">
@@ -3935,13 +3954,6 @@
         };
 
         // --- FINANCE TRACKER LOGIC ---
-        window.financeTransactions = JSON.parse(localStorage.getItem('soloflow_finance')) || [];
-
-        window.saveFinance = function() {
-            localStorage.setItem('soloflow_finance', JSON.stringify(window.financeTransactions));
-            window.renderFinance();
-        };
-
         window.addFinanceTransaction = function() {
             const payee = document.getElementById('financePayee').value.trim();
             const amountFloat = parseFloat(document.getElementById('financeAmount').value);
@@ -3994,6 +4006,11 @@
 
             const sorted = [...window.financeTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
 
+            const countBadge = document.getElementById('finance-tx-count');
+            if (countBadge) {
+                countBadge.innerText = `${sorted.length} Record${sorted.length === 1 ? '' : 's'}`;
+            }
+
             if (sorted.length === 0) {
                 list.innerHTML = `<div style="opacity: 0.6; font-size: 13px; text-align: center; padding: 20px;">No transactions recorded yet.</div>`;
             }
@@ -4007,18 +4024,15 @@
                     const absExpense = Math.abs(tx.amountCents);
                     totalExpense += absExpense;
 
-                    // 1. Calculate 30-Day Burn Rate
                     if (txDate >= thirtyDaysAgo) {
                         expenses30D += absExpense;
                     }
 
-                    // 2. Calculate YTD Split (Auto-classifies legacy items)
                     if (txDate.getFullYear() === currentYear) {
                         let sType = tx.spendingType;
                         
                         if (!sType || sType === 'N/A') {
                             const textInfo = (tx.payee + ' ' + tx.category).toLowerCase();
-                            // Matches context to auto-classify fixed vs discretionary 
                             if (textInfo.includes('spotify') || textInfo.includes('server') || textInfo.includes('cloud') || textInfo.includes('hosting') || textInfo.includes('shockbyte') || textInfo.includes('google ai')) {
                                 sType = 'Fixed';
                             } else if (textInfo.includes('steam') || textInfo.includes('car') || textInfo.includes('mod') || textInfo.includes('byd')) {
@@ -4062,7 +4076,6 @@
                 `;
             });
 
-            // 3. Render Top Metrics
             const balance = totalIncome - totalExpense;
             const balEl = document.getElementById('finance-balance');
             const incEl = document.getElementById('finance-income');
@@ -4080,7 +4093,6 @@
                 burnEl.innerText = `₱${dailyBurn.toLocaleString(undefined, {minimumFractionDigits: 2})} / day`;
             }
 
-            // 4. Render YTD Pie Chart via CSS Conic Gradient
             const ytdTotal = ytdFixed + ytdDisc;
             const fixedPct = ytdTotal === 0 ? 0 : (ytdFixed / ytdTotal) * 100;
             
