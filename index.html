@@ -11,7 +11,7 @@
     <!-- SoloFlow Favicon for Browser Tab & URL Address Bar -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M15 65 C 15 35, 45 30, 80 35' stroke='%23ff2e2e' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M22 75 C 22 45, 48 40, 75 43' stroke='%23ff2e2e' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M75 20 Q 80 35 95 40 Q 80 45 75 60 Q 70 45 55 40 Q 70 35 75 20 Z' fill='%23ff2e2e'/%3E%3Cpath d='M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z' fill='%23ffb82e'/%3E%3C/svg%3E">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
         :root {
             --bg: #FBF9F1;
@@ -44,6 +44,10 @@
             --shadow-md: 0 4px 20px rgba(30, 22, 10, 0.05);
             --shadow-lg: 0 10px 30px -4px rgba(30, 22, 10, 0.10);
             --transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --font-display: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --font-metric: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+            --surface-rgb: 255, 255, 255;
         }
         
         * {
@@ -1496,6 +1500,277 @@
             .event-card { flex-direction: column; align-items: flex-start; gap: 12px; } 
             .form-card { padding: 16px; }
         }
+
+        /* ================================================================
+           SOLOFLOW 2.0 — VISUAL SYSTEM OVERRIDES
+           Presentation-only layer: existing IDs, handlers and data flow are
+           intentionally untouched. Theme/font values are supplied by JS.
+           ================================================================ */
+        html { color-scheme: light dark; scroll-behavior: smooth; }
+        body {
+            min-height: 100vh;
+            padding: clamp(16px, 2.4vw, 36px);
+            font-family: var(--font-body);
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(circle at 8% 0%, rgba(var(--primary-rgb), .16), transparent 29rem),
+                radial-gradient(circle at 92% 12%, rgba(14, 165, 233, .09), transparent 24rem),
+                linear-gradient(180deg, rgba(var(--surface-rgb), .02), transparent 38rem);
+            background-attachment: fixed;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .24;
+            background-image: radial-gradient(rgba(var(--surface-rgb), .52) .7px, transparent .7px);
+            background-size: 22px 22px;
+            mask-image: linear-gradient(to bottom, black, transparent 70%);
+            z-index: -1;
+        }
+        .container { max-width: 1480px; }
+        .soloflow-header {
+            position: sticky;
+            top: 16px;
+            z-index: 100;
+            padding: 14px 18px;
+            border-radius: 18px;
+            background: rgba(var(--surface-rgb), .78);
+            border-color: rgba(var(--primary-rgb), .18);
+            box-shadow: 0 18px 50px -28px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.08);
+            backdrop-filter: blur(22px) saturate(145%);
+            -webkit-backdrop-filter: blur(22px) saturate(145%);
+        }
+        .soloflow-logo-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+            background: linear-gradient(145deg, rgba(var(--primary-rgb), .22), rgba(var(--primary-rgb), .06));
+            box-shadow: inset 0 1px rgba(255,255,255,.22), 0 10px 28px -14px rgba(var(--primary-rgb), .8);
+        }
+        .soloflow-title-group h1,
+        #pageTitle,
+        .column h3,
+        .calendar-header h3,
+        .inbox-header h3,
+        .live-preview-card-title { font-family: var(--font-display); }
+        .soloflow-title-group h1 { font-size: 20px; letter-spacing: -.045em; }
+        .soloflow-title-group span { color: var(--primary); letter-spacing: .13em; }
+        .soloflow-header-badge {
+            position: relative;
+            padding-left: 30px;
+            background: rgba(var(--primary-rgb), .1);
+            box-shadow: inset 0 0 0 1px rgba(var(--primary-rgb), .08);
+        }
+        .soloflow-header-badge::before {
+            content: "";
+            position: absolute;
+            left: 13px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 0 5px rgba(var(--primary-rgb), .12), 0 0 15px var(--primary);
+            animation: soloflowPulse 2.4s ease-out infinite;
+        }
+        #pageTitle {
+            display: block;
+            margin: 34px 0 22px;
+            padding: 0;
+            max-width: 980px;
+            font-size: clamp(26px, 4vw, 46px);
+            font-weight: 800;
+            line-height: 1.08;
+            letter-spacing: -.05em;
+            background: linear-gradient(110deg, var(--text) 20%, var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        #pageTitle:hover, #pageTitle:focus { padding: 8px 12px; margin: 26px 0 14px -12px; }
+
+        details.customize-menu,
+        details.collapsible-ledger,
+        .form-card,
+        .control-panel,
+        .column,
+        .calendar-container,
+        .inbox-container,
+        .prod-card,
+        .active-task-hero,
+        .event-card {
+            background: rgba(var(--surface-rgb), .82);
+            border-color: rgba(var(--primary-rgb), .12);
+            box-shadow: 0 18px 60px -42px rgba(0,0,0,.65), inset 0 1px rgba(255,255,255,.06);
+            backdrop-filter: blur(18px) saturate(125%);
+            -webkit-backdrop-filter: blur(18px) saturate(125%);
+        }
+        details.customize-menu { padding: 18px 22px 24px; }
+        details.customize-menu summary { font-family: var(--font-display); }
+        details.customize-menu[open] { border-color: rgba(var(--primary-rgb), .3); }
+        .settings-group h4 { color: var(--primary); letter-spacing: .12em; }
+        .theme-preset-row { grid-template-columns: repeat(5, minmax(112px, 1fr)); }
+        .theme-preset-swatch {
+            min-height: 76px;
+            border-radius: 14px;
+            background: rgba(var(--surface-rgb), .56);
+        }
+        .theme-preset-swatch:hover { transform: translateY(-3px); }
+        .theme-preset-swatch.active { box-shadow: 0 0 0 3px var(--focus-ring), 0 14px 30px -18px var(--primary); }
+        .preset-dots { height: 27px; border-radius: 9px; }
+        .font-preset-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+        .font-preset-button {
+            min-height: 70px;
+            padding: 11px 13px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 3px;
+            border: 1px solid var(--surface-border-strong);
+            border-radius: 14px;
+            background: rgba(var(--surface-rgb), .5);
+            color: var(--card-text);
+            box-shadow: none;
+        }
+        .font-preset-button strong { font-size: 13px; }
+        .font-preset-button span { font-size: 10px; opacity: .6; }
+        .font-preset-button.active { border-color: var(--primary); box-shadow: 0 0 0 3px var(--focus-ring); }
+        .font-preset-button[data-font="tech"] strong { font-family: 'Space Grotesk', sans-serif; }
+        .font-preset-button[data-font="editorial"] strong { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        .view-tabs {
+            position: sticky;
+            top: 96px;
+            z-index: 90;
+            margin-bottom: 22px;
+            padding: 7px;
+            gap: 4px;
+            border: 1px solid rgba(var(--primary-rgb), .12);
+            border-radius: 16px;
+            background: rgba(var(--surface-rgb), .78);
+            box-shadow: 0 14px 45px -34px rgba(0,0,0,.65);
+            backdrop-filter: blur(20px);
+        }
+        .view-tab { min-height: 38px; padding: 8px 15px; font-size: 12px; }
+        .view-tab.active {
+            color: var(--primary-contrast-text);
+            background: var(--primary);
+            border-color: transparent;
+            box-shadow: 0 8px 24px -12px rgba(var(--primary-rgb), .9);
+        }
+        .control-panel { display: grid; grid-template-columns: minmax(240px, 1fr) auto auto; padding: 12px; gap: 10px; }
+        .search-input-wrapper input { background: rgba(var(--surface-rgb), .52); }
+        input:not([type="color"]):not([type="file"]):not([type="checkbox"]), select, textarea {
+            border-radius: 12px;
+            background: rgba(var(--surface-rgb), .58);
+            border-color: rgba(var(--primary-rgb), .16);
+        }
+        input:not([type="color"]):not([type="file"]):not([type="checkbox"]):hover, select:hover, textarea:hover { border-color: rgba(var(--primary-rgb), .4); }
+        input:not([type="color"]):not([type="file"]):not([type="checkbox"]):focus, select:focus, textarea:focus {
+            background: var(--surface);
+            box-shadow: 0 0 0 4px var(--focus-ring), 0 12px 30px -20px rgba(var(--primary-rgb), .8);
+        }
+        button { border-radius: 12px; box-shadow: 0 8px 22px -14px rgba(var(--primary-rgb), .8); }
+        button:hover { transform: translateY(-2px); }
+        button:active { transform: scale(.975); }
+
+        .analytics-grid-elevated { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+        .metric-card-elevated {
+            min-height: 124px;
+            padding: 17px;
+            border-radius: 17px;
+            background:
+                linear-gradient(145deg, rgba(var(--primary-rgb), .08), transparent 62%),
+                rgba(var(--surface-rgb), .76);
+            border-color: rgba(var(--primary-rgb), .17);
+            box-shadow: inset 0 1px rgba(255,255,255,.08), 0 18px 38px -30px rgba(0,0,0,.7);
+        }
+        .metric-card-elevated::after {
+            content: "";
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            right: -28px;
+            bottom: -30px;
+            border: 10px solid rgba(var(--primary-rgb), .12);
+            border-radius: 50%;
+        }
+        .metric-card-elevated:hover { transform: translateY(-4px) scale(1.01); border-color: rgba(var(--primary-rgb), .42); }
+        .metric-label { letter-spacing: .09em; }
+        .metric-value-display, .prod-card-value, .timer-display, .task-timer { font-family: var(--font-metric); font-variant-numeric: tabular-nums; }
+        .metric-value-display { font-size: clamp(20px, 2.1vw, 28px); }
+        .status-dot { animation: soloflowPulse 2s ease-out infinite; }
+
+        .form-card { padding: clamp(18px, 2.3vw, 30px); border-radius: 20px; }
+        #kanban-task-form { position: relative; overflow: hidden; }
+        #kanban-task-form::before {
+            content: "QUICK CAPTURE";
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            color: var(--primary);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .16em;
+            opacity: .65;
+        }
+        .board { grid-template-columns: repeat(3, minmax(280px, 1fr)); gap: clamp(14px, 1.7vw, 24px); }
+        .column { padding: 14px; min-height: 380px; border-radius: 20px; }
+        .column h3 { position: sticky; top: 150px; z-index: 2; padding: 5px 4px 13px; background: rgba(var(--surface-rgb), .82); backdrop-filter: blur(10px); }
+        .col-total { font-family: var(--font-metric); padding: 4px 8px; border-radius: 999px; background: rgba(var(--primary-rgb), .1); color: var(--primary); opacity: 1; }
+        .task-card {
+            padding: 16px;
+            border-radius: 16px;
+            border-color: rgba(var(--primary-rgb), .13);
+            box-shadow: 0 10px 25px -22px rgba(0,0,0,.8), inset 0 1px rgba(255,255,255,.07);
+        }
+        .task-card:hover { transform: translateY(-3px); border-color: rgba(var(--primary-rgb), .42); box-shadow: 0 22px 42px -28px rgba(0,0,0,.7); }
+        .card-todo { background: linear-gradient(145deg, rgba(var(--surface-rgb), .28), transparent), var(--todo-bg); }
+        .card-inprogress { background: linear-gradient(145deg, rgba(var(--surface-rgb), .28), transparent), var(--inprog-bg); }
+        .card-done { background: linear-gradient(145deg, rgba(var(--surface-rgb), .28), transparent), var(--done-bg); }
+        .badge, .active-task-badge { border-radius: 999px; border: 1px solid rgba(var(--primary-rgb), .2); background: rgba(var(--primary-rgb), .1); color: var(--primary); }
+        .event-card:hover, .inbox-card:hover, .prod-card:hover { transform: translateY(-2px); }
+        .schedule-container, .calendar-container, .inbox-container, .finance-container { border-radius: 20px; }
+        .calendar-day { background: rgba(var(--surface-rgb), .38); border-radius: 12px; }
+        .calendar-day:hover { border-color: rgba(var(--primary-rgb), .42); }
+        .prod-progress-bar-bg { height: 8px; background: rgba(var(--primary-rgb), .1); }
+        .prod-progress-bar-fill { box-shadow: 0 0 16px rgba(var(--primary-rgb), .6); }
+        .toast { border-radius: 14px; backdrop-filter: blur(20px); }
+
+        @keyframes soloflowPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), .3); }
+            50% { box-shadow: 0 0 0 7px rgba(var(--primary-rgb), 0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+        }
+        @media (max-width: 1180px) {
+            .analytics-grid-elevated { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .theme-preset-row { grid-template-columns: repeat(3, minmax(112px, 1fr)); }
+        }
+        @media (max-width: 860px) {
+            .board { grid-template-columns: 1fr; }
+            .column { min-height: 220px; }
+            .column h3 { position: static; }
+            .control-panel { grid-template-columns: 1fr 1fr; }
+            .search-input-wrapper { grid-column: 1 / -1; }
+            .font-preset-row { grid-template-columns: 1fr; }
+            .view-tabs { top: 88px; }
+        }
+        @media (max-width: 620px) {
+            body { padding: 12px; }
+            .soloflow-header { top: 8px; }
+            .soloflow-header-badge { display: none; }
+            #pageTitle { font-size: 28px; margin-top: 26px; }
+            .view-tabs { top: 76px; border-radius: 13px; }
+            .analytics-grid-elevated { grid-template-columns: 1fr 1fr; }
+            .theme-preset-row { grid-template-columns: 1fr 1fr; }
+            .control-panel { grid-template-columns: 1fr; }
+            .search-input-wrapper { grid-column: auto; min-width: 0; }
+            .form-row > * { width: 100%; max-width: none !important; }
+            .calendar-header { align-items: flex-start; gap: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -1587,21 +1862,38 @@
                     <div class="theme-controls-col">
                         <label class="micro-label">Preset Themes</label>
                         <div class="theme-preset-row">
-                            <button type="button" class="theme-preset-swatch active" data-preset="cozyWarm" onclick="window.applyThemePreset('cozyWarm')" title="Cozy Warm">
-                                <span class="preset-dots" style="background: linear-gradient(135deg, #FBF9F1 50%, #D97706 50%);"></span>
-                                Cozy Warm
+                            <button type="button" class="theme-preset-swatch active" data-preset="midnightSlate" onclick="window.applyThemePreset('midnightSlate')" title="Midnight Slate">
+                                <span class="preset-dots" style="background: linear-gradient(135deg, #0f172a 0 58%, #6366f1 58%);"></span>
+                                Midnight Slate
                             </button>
-                            <button type="button" class="theme-preset-swatch" data-preset="minimalLatte" onclick="window.applyThemePreset('minimalLatte')" title="Minimal Latte">
-                                <span class="preset-dots" style="background: linear-gradient(135deg, #F4EFE6 50%, #C08552 50%);"></span>
-                                Minimal Latte
+                            <button type="button" class="theme-preset-swatch" data-preset="emeraldFocus" onclick="window.applyThemePreset('emeraldFocus')" title="Emerald Focus">
+                                <span class="preset-dots" style="background: linear-gradient(135deg, #071a15 0 58%, #10b981 58%);"></span>
+                                Emerald Focus
                             </button>
-                            <button type="button" class="theme-preset-swatch" data-preset="sageCream" onclick="window.applyThemePreset('sageCream')" title="Sage & Cream">
-                                <span class="preset-dots" style="background: linear-gradient(135deg, #F6F5EE 50%, #6B8E5A 50%);"></span>
-                                Sage &amp; Cream
+                            <button type="button" class="theme-preset-swatch" data-preset="cyberSunset" onclick="window.applyThemePreset('cyberSunset')" title="Cyber Sunset">
+                                <span class="preset-dots" style="background: linear-gradient(135deg, #180d2b 0 58%, #f97316 58%);"></span>
+                                Cyber Sunset
                             </button>
-                            <button type="button" class="theme-preset-swatch" data-preset="charcoalDark" onclick="window.applyThemePreset('charcoalDark')" title="Charcoal Dark">
-                                <span class="preset-dots" style="background: linear-gradient(135deg, #1B1A17 50%, #E08A3C 50%);"></span>
-                                Charcoal Dark
+                            <button type="button" class="theme-preset-swatch" data-preset="minimalistStudio" onclick="window.applyThemePreset('minimalistStudio')" title="Minimalist Studio">
+                                <span class="preset-dots" style="background: linear-gradient(135deg, #fafafa 0 58%, #18181b 58%);"></span>
+                                Minimalist Studio
+                            </button>
+                            <button type="button" class="theme-preset-swatch" data-preset="nordicFrost" onclick="window.applyThemePreset('nordicFrost')" title="Nordic Frost">
+                                <span class="preset-dots" style="background: linear-gradient(135deg, #eef7fb 0 58%, #0ea5e9 58%);"></span>
+                                Nordic Frost
+                            </button>
+                        </div>
+
+                        <label class="micro-label" style="margin-top: 18px;">Typography Pairing</label>
+                        <div class="font-preset-row" role="group" aria-label="Typography pairing">
+                            <button type="button" class="font-preset-button active" data-font="modern" onclick="window.applyFontPreset('modern')">
+                                <strong>Modern Clean</strong><span>Inter · Geist-style UI</span>
+                            </button>
+                            <button type="button" class="font-preset-button" data-font="tech" onclick="window.applyFontPreset('tech')">
+                                <strong>Tech / Productivity</strong><span>Space Grotesk · JetBrains Mono</span>
+                            </button>
+                            <button type="button" class="font-preset-button" data-font="editorial" onclick="window.applyFontPreset('editorial')">
+                                <strong>Editorial / Focus</strong><span>Plus Jakarta Sans</span>
                             </button>
                         </div>
 
@@ -2211,14 +2503,16 @@
 
         const defaultSettings = {
             title: "Rob's Globe and ADMU Task and Events Tracker",
-            bgColor: '#FBF9F1',
-            surfaceColor: '#FFFFFF',
-            textColor: '#1E1E1E',
-            cardTextColor: '#1E1E1E',
-            primaryColor: '#D97706',
-            todoBg: '#FBEAE2',
-            inprogBg: '#FBF2DC',
-            doneBg: '#EAF0E1',
+            bgColor: '#0F172A',
+            surfaceColor: '#151E32',
+            textColor: '#F8FAFC',
+            cardTextColor: '#F8FAFC',
+            primaryColor: '#6366F1',
+            todoBg: '#202A44',
+            inprogBg: '#292A52',
+            doneBg: '#123A37',
+            themePreset: 'midnightSlate',
+            fontPair: 'modern',
             bannerUrl: '',
             bannerHeight: '180',
             bannerWidth: '100%',
@@ -2227,15 +2521,35 @@
         };
 
         const THEME_PRESETS = {
-            cozyWarm:     { bgColor: '#FBF9F1', surfaceColor: '#FFFFFF', textColor: '#1E1E1E', cardTextColor: '#1E1E1E', primaryColor: '#D97706', todoBg: '#FBEAE2', inprogBg: '#FBF2DC', doneBg: '#EAF0E1' },
-            minimalLatte: { bgColor: '#F4EFE6', surfaceColor: '#FFFDF9', textColor: '#2B2620', cardTextColor: '#2B2620', primaryColor: '#C08552', todoBg: '#F2E8DD', inprogBg: '#EFE6D8', doneBg: '#E9E2D3' },
-            sageCream:    { bgColor: '#F6F5EE', surfaceColor: '#FFFFFF', textColor: '#26301F', cardTextColor: '#26301F', primaryColor: '#6B8E5A', todoBg: '#EDEAD9', inprogBg: '#E7EEDD', doneBg: '#DCE8D3' },
-            charcoalDark: { bgColor: '#1B1A17', surfaceColor: '#252320', textColor: '#F3EFE6', cardTextColor: '#F3EFE6', primaryColor: '#E08A3C', todoBg: '#3A2E27', inprogBg: '#3A3424', doneBg: '#28352A' }
+            midnightSlate:   { bgColor: '#0F172A', surfaceColor: '#151E32', textColor: '#F8FAFC', cardTextColor: '#F8FAFC', primaryColor: '#6366F1', todoBg: '#202A44', inprogBg: '#292A52', doneBg: '#123A37' },
+            emeraldFocus:    { bgColor: '#071A15', surfaceColor: '#0E2820', textColor: '#ECFDF5', cardTextColor: '#ECFDF5', primaryColor: '#10B981', todoBg: '#15342B', inprogBg: '#17483A', doneBg: '#0B5B43' },
+            cyberSunset:     { bgColor: '#180D2B', surfaceColor: '#25133D', textColor: '#FFF7ED', cardTextColor: '#FFF7ED', primaryColor: '#F97316', todoBg: '#352047', inprogBg: '#4A2438', doneBg: '#3D2B2B' },
+            minimalistStudio:{ bgColor: '#F4F4F5', surfaceColor: '#FFFFFF', textColor: '#18181B', cardTextColor: '#18181B', primaryColor: '#18181B', todoBg: '#F4F4F5', inprogBg: '#E4E4E7', doneBg: '#D4D4D8' },
+            nordicFrost:     { bgColor: '#EAF4F8', surfaceColor: '#F8FCFE', textColor: '#163247', cardTextColor: '#163247', primaryColor: '#0EA5E9', todoBg: '#E0F2FE', inprogBg: '#D8EEF8', doneBg: '#DDF4EF' }
+        };
+
+        const FONT_PRESETS = {
+            modern: {
+                body: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                display: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                metric: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace"
+            },
+            tech: {
+                body: "'Space Grotesk', 'Inter', sans-serif",
+                display: "'Space Grotesk', 'Inter', sans-serif",
+                metric: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace"
+            },
+            editorial: {
+                body: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                display: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                metric: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace"
+            }
         };
 
         window.applyThemePreset = function(name) {
             const preset = THEME_PRESETS[name];
             if (!preset) return;
+            window.activeThemePreset = name;
             document.getElementById('setBgColor').value = preset.bgColor;
             document.getElementById('setSurfaceColor').value = preset.surfaceColor;
             document.getElementById('setTextColor').value = preset.textColor;
@@ -2250,7 +2564,18 @@
             });
         };
 
+        window.applyFontPreset = function(name) {
+            if (!FONT_PRESETS[name]) return;
+            window.activeFontPreset = name;
+            window.saveSettings();
+            document.querySelectorAll('.font-preset-button').forEach(function(el) {
+                el.classList.toggle('active', el.dataset.font === name);
+            });
+        };
+
         window.settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
+        window.activeThemePreset = window.settings.themePreset || 'midnightSlate';
+        window.activeFontPreset = window.settings.fontPair || 'modern';
         window.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
         window.events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
         window.scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
@@ -2343,6 +2668,8 @@
                 todoBg: document.getElementById('setTodoColor').value,
                 inprogBg: document.getElementById('setInprogColor').value,
                 doneBg: document.getElementById('setDoneColor').value,
+                themePreset: window.activeThemePreset || window.settings.themePreset || 'midnightSlate',
+                fontPair: window.activeFontPreset || window.settings.fontPair || 'modern',
                 bannerUrl: document.getElementById('setBannerUrl').value.trim(),
                 bannerHeight: document.getElementById('setBannerHeight').value || '180',
                 bannerWidth: document.getElementById('setBannerWidth').value || '100%',
@@ -2407,9 +2734,26 @@
             root.style.setProperty('--done-bg', window.settings.doneBg);
 
             ThemeAccessibilityEngine.applyThemeVariables(root, 'primary', window.settings.primaryColor);
+            ThemeAccessibilityEngine.applyThemeVariables(root, 'surface', window.settings.surfaceColor);
             ThemeAccessibilityEngine.applyThemeVariables(root, 'todo', window.settings.todoBg);
             ThemeAccessibilityEngine.applyThemeVariables(root, 'inprog', window.settings.inprogBg);
             ThemeAccessibilityEngine.applyThemeVariables(root, 'done', window.settings.doneBg);
+
+            const fontPresetName = window.settings.fontPair || 'modern';
+            const fontPreset = FONT_PRESETS[fontPresetName] || FONT_PRESETS.modern;
+            window.activeFontPreset = fontPresetName;
+            window.activeThemePreset = window.settings.themePreset || window.activeThemePreset || 'midnightSlate';
+            root.style.setProperty('--font-body', fontPreset.body);
+            root.style.setProperty('--font-display', fontPreset.display);
+            root.style.setProperty('--font-metric', fontPreset.metric);
+            document.body.dataset.font = fontPresetName;
+            document.body.dataset.theme = window.activeThemePreset;
+            document.querySelectorAll('.font-preset-button').forEach(function(el) {
+                el.classList.toggle('active', el.dataset.font === fontPresetName);
+            });
+            document.querySelectorAll('.theme-preset-swatch').forEach(function(el) {
+                el.classList.toggle('active', el.dataset.preset === window.activeThemePreset);
+            });
             
             const bannerDiv = document.getElementById('bannerImage');
             if (window.settings.bannerUrl && window.settings.bannerUrl.trim()) {
@@ -2440,7 +2784,10 @@
 
         document.getElementById('pageTitle').addEventListener('blur', window.saveSettings);
         ['Bg','Surface','Text','CardText','Primary','Todo','Inprog','Done'].forEach(id => {
-            document.getElementById('set' + id + 'Color').addEventListener('change', window.saveSettings);
+            document.getElementById('set' + id + 'Color').addEventListener('change', function() {
+                window.activeThemePreset = 'custom';
+                window.saveSettings();
+            });
         });
         ['Url','Height','Width','Fit','Position'].forEach(id => {
             const el = document.getElementById('setBanner' + id);
