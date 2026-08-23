@@ -1589,6 +1589,20 @@
             color: transparent;
         }
         #pageTitle:hover, #pageTitle:focus { padding: 8px 12px; margin: 26px 0 14px -12px; }
+        #pageTitle[contenteditable="true"] { caret-color: var(--primary); cursor: text; }
+        #pageTitle[contenteditable="true"]:focus {
+            color: var(--text) !important;
+            -webkit-text-fill-color: var(--text) !important;
+            background: rgba(var(--surface-rgb), .9) !important;
+            background-clip: border-box;
+            -webkit-background-clip: border-box;
+            border-color: rgba(var(--primary-rgb), .65);
+            box-shadow: 0 0 0 4px var(--focus-ring), 0 16px 36px -24px rgba(var(--primary-rgb), .8);
+            outline: none;
+            position: relative;
+            z-index: 3;
+        }
+        #pageTitle[contenteditable="true"]::selection { color: var(--primary-contrast-text); background: var(--primary); }
 
         details.customize-menu,
         details.collapsible-ledger,
@@ -1771,6 +1785,87 @@
             .form-row > * { width: 100%; max-width: none !important; }
             .calendar-header { align-items: flex-start; gap: 10px; }
         }
+
+        /* FINANCIAL COMMAND CENTER */
+        .finance-command-shell { display: flex; flex-direction: column; gap: 18px; }
+        .finance-toolbar {
+            display: grid;
+            grid-template-columns: 1.4fr repeat(4, minmax(135px, .7fr));
+            gap: 10px;
+            padding: 14px;
+            border: 1px solid rgba(var(--primary-rgb), .16);
+            border-radius: 18px;
+            background: rgba(var(--surface-rgb), .76);
+            backdrop-filter: blur(18px);
+        }
+        .finance-control { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+        .finance-control label, .finance-section-kicker {
+            font-size: 10px;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: .11em;
+            text-transform: uppercase;
+            color: var(--card-text);
+            opacity: .62;
+        }
+        .finance-custom-dates { display: none; grid-template-columns: 1fr 1fr; gap: 8px; grid-column: 1 / -1; }
+        .finance-custom-dates.visible { display: grid; }
+        .finance-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+        .finance-kpi {
+            min-height: 142px;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(var(--primary-rgb), .16);
+            border-radius: 18px;
+            background: linear-gradient(145deg, rgba(var(--primary-rgb), .09), transparent 62%), rgba(var(--surface-rgb), .78);
+            box-shadow: 0 20px 45px -35px rgba(0,0,0,.75), inset 0 1px rgba(255,255,255,.07);
+        }
+        .finance-kpi::after { content: ""; position: absolute; width: 92px; height: 92px; right: -34px; bottom: -38px; border: 12px solid rgba(var(--primary-rgb), .1); border-radius: 50%; }
+        .finance-kpi-value { margin: 15px 0 6px; font: 700 clamp(21px, 2.2vw, 30px)/1 var(--font-metric); letter-spacing: -.04em; }
+        .finance-kpi-meta { font-size: 11px; opacity: .66; }
+        .finance-panel-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; }
+        .finance-panel {
+            min-width: 0;
+            padding: 20px;
+            border: 1px solid rgba(var(--primary-rgb), .14);
+            border-radius: 18px;
+            background: rgba(var(--surface-rgb), .76);
+            box-shadow: 0 18px 48px -40px rgba(0,0,0,.7), inset 0 1px rgba(255,255,255,.06);
+        }
+        .finance-panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+        .finance-panel h3 { margin: 4px 0 0; font: 700 16px/1.25 var(--font-display); }
+        .finance-bar-list, .rank-list, .budget-list, .rule-list { display: flex; flex-direction: column; gap: 12px; }
+        .finance-bar-row { display: grid; grid-template-columns: minmax(105px, .8fr) minmax(130px, 2fr) auto; align-items: center; gap: 10px; font-size: 12px; }
+        .finance-bar-track, .budget-track, .rule-track { height: 9px; overflow: hidden; border-radius: 999px; background: rgba(var(--primary-rgb), .1); }
+        .finance-bar-fill, .budget-fill, .rule-fill { height: 100%; min-width: 2px; border-radius: inherit; background: linear-gradient(90deg, var(--primary), #38bdf8); box-shadow: 0 0 12px rgba(var(--primary-rgb), .45); }
+        .rank-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--surface-border); }
+        .rank-number { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 9px; background: rgba(var(--primary-rgb), .12); color: var(--primary); font: 700 11px var(--font-metric); }
+        .rank-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; font-size: 13px; }
+        .rank-amount { font: 700 12px var(--font-metric); }
+        .rule-row { display: grid; grid-template-columns: 115px 1fr auto; gap: 10px; align-items: center; font-size: 12px; }
+        .rule-fill.needs { background: #38bdf8; } .rule-fill.wants { background: #f97316; } .rule-fill.savings { background: #10b981; }
+        .budget-row { padding: 14px; border: 1px solid rgba(var(--primary-rgb), .12); border-radius: 14px; background: rgba(var(--surface-rgb), .38); }
+        .budget-row-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 9px; font-size: 12px; }
+        .budget-fill.warning { background: #f59e0b; } .budget-fill.danger { background: #ef4444; }
+        .budget-meta { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; font-size: 10px; opacity: .68; }
+        .finance-alert { padding: 9px 11px; margin-top: 10px; border: 1px solid rgba(245,158,11,.3); border-radius: 11px; background: rgba(245,158,11,.08); color: var(--warning); font-size: 11px; }
+        .sparkline { width: 72px; height: 24px; overflow: visible; }
+        .command-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 5px; border: 1px solid rgba(var(--primary-rgb), .14); border-radius: 15px; background: rgba(var(--surface-rgb), .48); }
+        .command-tab { flex: 0 0 auto; min-height: 36px; padding: 7px 13px; background: transparent; color: var(--card-text); box-shadow: none; font-size: 12px; }
+        .command-tab.active { background: var(--primary); color: var(--primary-contrast-text); }
+        .command-view { display: none; } .command-view.active { display: block; }
+        .finance-form-grid { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 10px; }
+        .finance-form-grid .wide { grid-column: span 2; }
+        .finance-table-wrap { overflow-x: auto; margin-top: 16px; }
+        .finance-table { width: 100%; border-collapse: collapse; min-width: 780px; font-size: 12px; }
+        .finance-table th { padding: 10px; text-align: left; color: var(--card-text); opacity: .6; letter-spacing: .08em; text-transform: uppercase; font-size: 9px; border-bottom: 1px solid var(--surface-border-strong); }
+        .finance-table td { padding: 12px 10px; border-bottom: 1px solid var(--surface-border); vertical-align: middle; }
+        .finance-table td.numeric { font-family: var(--font-metric); font-variant-numeric: tabular-nums; }
+        .empty-state { padding: 28px; text-align: center; opacity: .58; font-size: 12px; border: 1px dashed var(--surface-border-strong); border-radius: 14px; }
+        @media (max-width: 1100px) { .finance-toolbar { grid-template-columns: repeat(3, 1fr); } .finance-kpi-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 820px) { .finance-panel-grid { grid-template-columns: 1fr; } .finance-form-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 560px) { .finance-toolbar, .finance-kpi-grid, .finance-form-grid { grid-template-columns: 1fr; } .finance-form-grid .wide { grid-column: auto; } .finance-custom-dates { grid-template-columns: 1fr; } .finance-bar-row { grid-template-columns: 90px 1fr; } .finance-bar-row > :last-child { grid-column: 2; } .rule-row { grid-template-columns: 95px 1fr; } .rule-row > :last-child { grid-column: 2; } }
     </style>
 </head>
 <body>
@@ -1801,7 +1896,7 @@
         <div id="bannerImage"></div>
 
         <!-- Editable Workspace Subtitle/Title -->
-        <h2 id="pageTitle" contenteditable="true" spellcheck="false" title="Click to edit workspace name">Rob's Globe and ADMU Task and Events Tracker</h2>
+        <h2 id="pageTitle" contenteditable="true" role="textbox" aria-label="Editable dashboard title" aria-multiline="false" spellcheck="false" title="Click to edit workspace name">Rob's Globe and ADMU Task and Events Tracker</h2>
 
         <!-- Floating Rich Text Toolbar -->
         <div id="formatToolbar" class="format-toolbar" style="display: none;">
@@ -2125,91 +2220,141 @@
         
         <!-- FINANCE TRACKER CONTAINER -->
         <div id="finance-container" class="finance-container" style="display: none; margin-bottom: 24px;">
-            
-            <!-- Top Level Stats -->
-            <div class="analytics-grid-elevated" style="margin-bottom: 24px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
-                <div class="metric-card-elevated card-profit">
-                    <div class="metric-header"><span class="metric-label">Net Balance</span><span class="status-dot dot-success"></span></div>
-                    <div id="finance-balance" class="metric-value-display" style="color: var(--success);">₱0.00</div>
-                </div>
-                <div class="metric-card-elevated card-finished">
-                    <div class="metric-header"><span class="metric-label">Total Income</span><span class="status-dot dot-primary"></span></div>
-                    <div id="finance-income" class="metric-value-display" style="color: var(--primary);">₱0.00</div>
-                </div>
-                <div class="metric-card-elevated card-overdue">
-                    <div class="metric-header"><span class="metric-label">Total Expenses</span><span class="status-dot dot-danger"></span></div>
-                    <div id="finance-expenses" class="metric-value-display" style="color: var(--danger);">₱0.00</div>
-                </div>
-                <div class="metric-card-elevated card-velocity">
-                    <div class="metric-header"><span class="metric-label">30-Day Burn Rate</span><span class="status-dot dot-warning"></span></div>
-                    <div id="finance-burn-rate" class="metric-value-display" style="color: var(--warning);">₱0.00 / day</div>
-                </div>
-            </div>
-
-            <!-- Dashboard Split Layout -->
-            <div class="workspace-layout" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
-                
-                <!-- Quick Add Form -->
-                <div class="form-card" style="margin-bottom: 0;">
-                    <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 16px;">➕ Record New Transaction</h3>
-                    <div class="form-row">
-                        <input type="text" id="financePayee" class="flex-grow" placeholder="Merchant or Payee (e.g., Steam, BYD)" required>
-                        <input type="number" id="financeAmount" placeholder="Amount (₱)" step="0.01" style="max-width: 140px;" required>
-                    </div>
-                    <div class="form-row" style="margin-top: 12px;">
-                        <select id="financeType" style="min-width: 130px;">
-                            <option value="expense">Expense (-)</option>
-                            <option value="income">Income (+)</option>
-                        </select>
-                        <input type="text" id="financeCategory" list="financeCategoryList" class="flex-grow" placeholder="Category (Type or Select)" required>
-                        <datalist id="financeCategoryList">
-                            <option value="PC Parts & Electronics">
-                            <option value="Musical Instruments">
-                            <option value="Real Estate & Properties">
-                            <option value="Vehicle Mods">
-                            <option value="Food & Dining">
-                            <option value="Server Hosting & Cloud">
-                            <option value="Subscriptions">
-                        </datalist>
-                        <select id="financeSpendingType" style="min-width: 140px;" title="Applies to expenses only">
-                            <option value="Discretionary">Discretionary</option>
-                            <option value="Fixed">Fixed Cost</option>
+            <div class="finance-command-shell">
+                <div class="finance-toolbar" aria-label="Financial analytics filters">
+                    <div class="finance-control">
+                        <label for="financeRangePreset">Reporting period</label>
+                        <select id="financeRangePreset" onchange="updateFinanceFilters()">
+                            <option value="month">This Month</option>
+                            <option value="30d">Last 30 Days</option>
+                            <option value="qtd">Quarter-to-Date (QTD)</option>
+                            <option value="ytd">Year-to-Date (YTD)</option>
+                            <option value="custom">Custom Range</option>
                         </select>
                     </div>
-                    <button onclick="addFinanceTransaction()" style="margin-top: 12px; width: 100%;">Record Transaction</button>
+                    <div class="finance-control">
+                        <label for="financeNatureFilter">Expense / asset</label>
+                        <select id="financeNatureFilter" onchange="updateFinanceFilters()">
+                            <option value="all">All Activity</option>
+                            <option value="expense">Consumer Expenses</option>
+                            <option value="asset">Asset Acquisitions</option>
+                        </select>
+                    </div>
+                    <div class="finance-control">
+                        <label for="financeFrequencyFilter">Frequency</label>
+                        <select id="financeFrequencyFilter" onchange="updateFinanceFilters()">
+                            <option value="all">Recurring + One-Time</option>
+                            <option value="recurring">Recurring Only</option>
+                            <option value="one-time">One-Time Only</option>
+                        </select>
+                    </div>
+                    <div class="finance-control">
+                        <label for="financeLiquidCash">Liquid cash (₱)</label>
+                        <input type="number" id="financeLiquidCash" min="0" step="100" placeholder="Emergency cash" onchange="updateFinanceFilters()">
+                    </div>
+                    <div class="finance-control">
+                        <label for="financeDailyTarget">Daily target (₱)</label>
+                        <input type="number" id="financeDailyTarget" min="0" step="10" placeholder="Daily limit" onchange="updateFinanceFilters()">
+                    </div>
+                    <div id="financeCustomDates" class="finance-custom-dates">
+                        <div class="finance-control"><label for="financeStartDate">Start date</label><input type="date" id="financeStartDate" onchange="updateFinanceFilters()"></div>
+                        <div class="finance-control"><label for="financeEndDate">End date</label><input type="date" id="financeEndDate" onchange="updateFinanceFilters()"></div>
+                    </div>
                 </div>
 
-                <!-- YTD Spending Pie Chart -->
-                <div class="form-card" style="margin-bottom: 0; justify-content: center;">
-                    <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 16px;">📊 YTD Expense Breakdown</h3>
-                    <div style="display: flex; align-items: center; gap: 32px; padding: 0 12px;">
-                        <div id="finance-ytd-pie" style="width: 130px; height: 130px; border-radius: 50%; background: conic-gradient(var(--purple) 0% 50%, var(--warning) 50% 100%); flex-shrink: 0; box-shadow: var(--shadow-sm);"></div>
-                        <div style="font-size: 14px; line-height: 1.8;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="display: block; width: 12px; height: 12px; background: var(--purple); border-radius: 2px;"></span>
-                                <strong>Fixed:</strong> <span id="ytd-fixed-text">₱0.00</span>
+                <div class="finance-kpi-grid">
+                    <article class="finance-kpi"><span class="finance-section-kicker">Net cash flow</span><div id="finance-balance" class="finance-kpi-value">₱0.00</div><div id="finance-net-meta" class="finance-kpi-meta">Inflow minus outflow</div></article>
+                    <article class="finance-kpi"><span class="finance-section-kicker">Daily burn rate</span><div id="finance-burn-rate" class="finance-kpi-value">₱0.00</div><div id="finance-burn-meta" class="finance-kpi-meta">Against your target</div></article>
+                    <article class="finance-kpi"><span class="finance-section-kicker">Emergency runway</span><div id="finance-runway" class="finance-kpi-value">0.0 mo</div><div id="finance-runway-meta" class="finance-kpi-meta">Liquid cash ÷ monthly outflow</div></article>
+                    <article class="finance-kpi"><span class="finance-section-kicker">Savings rate</span><div id="finance-savings-rate" class="finance-kpi-value">0.0%</div><div id="finance-savings-meta" class="finance-kpi-meta">Net savings ÷ gross inflow</div></article>
+                </div>
+                <span id="finance-income" hidden>₱0.00</span><span id="finance-expenses" hidden>₱0.00</span>
+
+                <div class="finance-panel-grid">
+                    <section class="finance-panel">
+                        <div class="finance-panel-header"><div><span class="finance-section-kicker">Allocation analytics</span><h3>Top spending categories</h3></div><span id="finance-period-label" class="badge">This Month</span></div>
+                        <div id="finance-category-bars" class="finance-bar-list"></div>
+                    </section>
+                    <section class="finance-panel">
+                        <div class="finance-panel-header"><div><span class="finance-section-kicker">Merchant intelligence</span><h3>Top 5 merchants</h3></div></div>
+                        <div id="finance-merchant-rank" class="rank-list"></div>
+                    </section>
+                    <section class="finance-panel">
+                        <div class="finance-panel-header"><div><span class="finance-section-kicker">50 / 30 / 20 health</span><h3>Allocation balance</h3></div></div>
+                        <div id="finance-rule-health" class="rule-list"></div>
+                    </section>
+                    <section class="finance-panel">
+                        <div class="finance-panel-header"><div><span class="finance-section-kicker">Budget intelligence</span><h3>Spend, pace &amp; forecast</h3></div></div>
+                        <div id="finance-budget-progress" class="budget-list"></div>
+                        <div class="finance-form-grid" style="grid-template-columns: 1fr 1fr auto; margin-top: 14px;">
+                            <input id="budgetCategory" list="financeCategoryList" placeholder="Category">
+                            <input id="budgetAmount" type="number" min="0" step="100" placeholder="Monthly allocation (₱)">
+                            <button onclick="upsertFinanceBudget()">Set Budget</button>
+                        </div>
+                    </section>
+                </div>
+
+                <section class="finance-panel">
+                    <div class="command-tabs" role="tablist" aria-label="Financial ledgers">
+                        <button class="command-tab active" data-command-view="transactions" onclick="setFinanceCommandView('transactions')">Transactions</button>
+                        <button class="command-tab" data-command-view="assets" onclick="setFinanceCommandView('assets')">Capital &amp; Assets</button>
+                        <button class="command-tab" data-command-view="projects" onclick="setFinanceCommandView('projects')">Project Budgets</button>
+                    </div>
+
+                    <div id="finance-view-transactions" class="command-view active">
+                        <div class="finance-panel-grid" style="margin-top: 18px; grid-template-columns: .9fr 1.1fr;">
+                            <div>
+                                <div class="finance-panel-header"><div><span class="finance-section-kicker">Quick capture</span><h3>Record transaction</h3></div></div>
+                                <div class="finance-form-grid" style="grid-template-columns: 1fr 1fr;">
+                                    <input type="text" id="financePayee" class="wide" placeholder="Merchant or payee" required>
+                                    <input type="number" id="financeAmount" placeholder="Amount (₱)" step="0.01" required>
+                                    <input type="date" id="financeDate">
+                                    <select id="financeType"><option value="expense">Expense (-)</option><option value="income">Income (+)</option></select>
+                                    <input type="text" id="financeCategory" list="financeCategoryList" placeholder="Category" required>
+                                    <datalist id="financeCategoryList"><option value="Food & Dining"><option value="PC Parts & Electronics"><option value="Vehicle & Transport"><option value="Living & Utilities"><option value="Server Hosting & Cloud"><option value="Subscriptions"><option value="Savings & Investments"><option value="Debt Paydown"><option value="Musical Instruments"><option value="Real Estate & Properties"><option value="Vehicle Mods"></datalist>
+                                    <select id="financeSpendingType"><option value="Discretionary">Discretionary</option><option value="Fixed">Fixed Cost</option></select>
+                                    <select id="financeAllocationClass"><option value="needs">Needs (50%)</option><option value="wants">Wants (30%)</option><option value="savings">Savings &amp; Assets (20%)</option></select>
+                                    <select id="financeTransactionNature"><option value="expense">Consumer Expense</option><option value="asset">Asset Acquisition</option></select>
+                                    <select id="financeFrequency"><option value="one-time">One-Time</option><option value="recurring">Recurring</option></select>
+                                    <button class="wide" onclick="addFinanceTransaction()">Record Transaction</button>
+                                </div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="display: block; width: 12px; height: 12px; background: var(--warning); border-radius: 2px;"></span>
-                                <strong>Discretionary:</strong> <span id="ytd-disc-text">₱0.00</span>
+                            <div>
+                                <div class="finance-panel-header"><div><span class="finance-section-kicker">Filtered ledger</span><h3>Transactions</h3></div><span id="finance-tx-count" class="badge">0 Records</span></div>
+                                <div id="finance-list" style="display:flex; flex-direction:column; gap:10px;"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Collapsible Transaction Ledger -->
-            <details class="collapsible-ledger" open>
-                <summary>
-                    <span style="display: flex; align-items: center; gap: 10px;">
-                        <span>📜 Transaction Ledger</span>
-                        <span id="finance-tx-count" class="badge" style="font-size: 11px; font-weight: 700; background: rgba(var(--primary-rgb, 217, 119, 6), 0.12); color: var(--primary); border: 1px solid rgba(var(--primary-rgb, 217, 119, 6), 0.25);">0 Records</span>
-                    </span>
-                </summary>
-                <div id="finance-list" style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
-                    <!-- Transactions render here -->
-                </div>
-            </details>
+                    <div id="finance-view-assets" class="command-view">
+                        <div class="finance-panel-header" style="margin-top:18px;"><div><span class="finance-section-kicker">Net-position tracking</span><h3>Capital &amp; asset ledger</h3></div></div>
+                        <div class="finance-form-grid">
+                            <input id="assetName" class="wide" placeholder="Asset / vehicle / gear name">
+                            <input id="assetCategory" placeholder="Category">
+                            <input id="assetAcquiredCost" type="number" min="0" step="100" placeholder="Acquired cost (₱)">
+                            <input id="assetMarketValue" type="number" min="0" step="100" placeholder="Market value (₱)">
+                            <input id="assetSunkCost" type="number" min="0" step="100" placeholder="Mods / repairs (₱)">
+                            <input id="assetSaleValue" type="number" min="0" step="100" placeholder="Sale value (optional)">
+                            <select id="assetStatus"><option value="Held">Held</option><option value="Listed">Listed</option><option value="Sold">Sold / Traded</option></select>
+                            <button onclick="addFinanceAsset()">Add Asset</button>
+                        </div>
+                        <div id="finance-assets-table" class="finance-table-wrap"></div>
+                    </div>
+
+                    <div id="finance-view-projects" class="command-view">
+                        <div class="finance-panel-header" style="margin-top:18px;"><div><span class="finance-section-kicker">Isolated capital plans</span><h3>One-off project budgets</h3></div></div>
+                        <div class="finance-form-grid">
+                            <input id="projectName" class="wide" placeholder="Project name">
+                            <input id="projectMilestone" placeholder="Current milestone">
+                            <input id="projectBudget" type="number" min="0" step="100" placeholder="Total budget (₱)">
+                            <input id="projectSpent" type="number" min="0" step="100" placeholder="Spent to date (₱)">
+                            <select id="projectStatus"><option value="Planning">Planning</option><option value="Active">Active</option><option value="Paused">Paused</option><option value="Complete">Complete</option></select>
+                            <button onclick="addFinanceProject()">Add Project</button>
+                        </div>
+                        <div id="finance-projects-table" class="finance-table-wrap"></div>
+                    </div>
+                </section>
+            </div>
         </div>
 
         <!-- SEARCH BAR -->
@@ -2580,6 +2725,14 @@
         window.events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
         window.scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
         window.financeTransactions = JSON.parse(localStorage.getItem('soloflow_finance')) || [];
+        window.financeAssets = JSON.parse(localStorage.getItem('soloflow_finance_assets')) || [];
+        window.financeProjects = JSON.parse(localStorage.getItem('soloflow_finance_projects')) || [];
+        window.financeBudgets = JSON.parse(localStorage.getItem('soloflow_finance_budgets')) || [];
+        window.financePreferences = {
+            rangePreset: 'month', startDate: '', endDate: '', natureFilter: 'all', frequencyFilter: 'all',
+            liquidCashCents: 0, dailyTargetCents: 0,
+            ...(JSON.parse(localStorage.getItem('soloflow_finance_preferences')) || {})
+        };
 
         function setupFirestoreListeners() {
             if (!userId) return;
@@ -2654,7 +2807,23 @@
                 }
             }, (error) => console.error("Finance Sync Error:", error));
 
-            unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub, financeUnsub);
+            const financeCommandUnsub = onSnapshot(getDocPath('trackerData', 'financeCommand'), (doc) => {
+                if (doc.metadata && doc.metadata.hasPendingWrites) return;
+                if (doc.exists()) {
+                    const cloud = doc.data() || {};
+                    window.financeAssets = Array.isArray(cloud.assets) ? cloud.assets : window.financeAssets;
+                    window.financeProjects = Array.isArray(cloud.projects) ? cloud.projects : window.financeProjects;
+                    window.financeBudgets = Array.isArray(cloud.budgets) ? cloud.budgets : window.financeBudgets;
+                    window.financePreferences = { ...window.financePreferences, ...(cloud.preferences || {}) };
+                    localStorage.setItem('soloflow_finance_assets', JSON.stringify(window.financeAssets));
+                    localStorage.setItem('soloflow_finance_projects', JSON.stringify(window.financeProjects));
+                    localStorage.setItem('soloflow_finance_budgets', JSON.stringify(window.financeBudgets));
+                    localStorage.setItem('soloflow_finance_preferences', JSON.stringify(window.financePreferences));
+                    if (typeof window.renderFinance === 'function') window.renderFinance();
+                }
+            }, (error) => console.error("Finance Command Sync Error:", error));
+
+            unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub, financeUnsub, financeCommandUnsub);
         }
 
         window.saveSettings = function() {
@@ -2720,6 +2889,22 @@
             }
         };
 
+        window.saveFinanceCommand = function() {
+            localStorage.setItem('soloflow_finance_assets', JSON.stringify(window.financeAssets));
+            localStorage.setItem('soloflow_finance_projects', JSON.stringify(window.financeProjects));
+            localStorage.setItem('soloflow_finance_budgets', JSON.stringify(window.financeBudgets));
+            localStorage.setItem('soloflow_finance_preferences', JSON.stringify(window.financePreferences));
+            window.renderFinance();
+            if (userId) {
+                setDoc(getDocPath('trackerData', 'financeCommand'), {
+                    assets: window.financeAssets,
+                    projects: window.financeProjects,
+                    budgets: window.financeBudgets,
+                    preferences: window.financePreferences
+                }).catch(e => console.error("Failed to sync finance command center", e));
+            }
+        };
+
         function applySettings() {
             document.getElementById('pageTitle').innerText = window.settings.title;
             const root = document.documentElement;
@@ -2782,6 +2967,15 @@
             document.getElementById('setBannerPosition').value = window.settings.bannerPosition || 'center';
         }
 
+        document.getElementById('pageTitle').addEventListener('input', function(event) {
+            window.settings.title = event.currentTarget.innerText;
+        });
+        document.getElementById('pageTitle').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.currentTarget.blur();
+            }
+        });
         document.getElementById('pageTitle').addEventListener('blur', window.saveSettings);
         ['Bg','Surface','Text','CardText','Primary','Todo','Inprog','Done'].forEach(id => {
             document.getElementById('set' + id + 'Color').addEventListener('change', function() {
@@ -4300,158 +4494,340 @@
             cell.focus();
         };
 
-        // --- FINANCE TRACKER LOGIC ---
-        window.addFinanceTransaction = function() {
-            const payee = document.getElementById('financePayee').value.trim();
-            const amountFloat = parseFloat(document.getElementById('financeAmount').value);
-            const type = document.getElementById('financeType').value;
-            const category = document.getElementById('financeCategory').value.trim();
-            const spendingType = document.getElementById('financeSpendingType').value;
+        // --- FINANCIAL COMMAND CENTER LOGIC ---
+        const DAY_MS = 24 * 60 * 60 * 1000;
+        const financeMoney = (cents, digits = 2) => `₱${(Math.abs(cents || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
+        const financeEscape = (value) => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
+        const financeStartOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const financeEndOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
 
-            if (!payee || isNaN(amountFloat) || !category) {
-                window.showToast("Please enter a valid payee, amount, and category.", "error");
+        function getFinanceRange(preferences = window.financePreferences, now = new Date()) {
+            let start;
+            let end = financeEndOfDay(now);
+            const preset = preferences.rangePreset || 'month';
+            if (preset === '30d') start = financeStartOfDay(new Date(now.getTime() - (29 * DAY_MS)));
+            else if (preset === 'qtd') start = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+            else if (preset === 'ytd') start = new Date(now.getFullYear(), 0, 1);
+            else if (preset === 'custom') {
+                start = preferences.startDate ? financeStartOfDay(new Date(`${preferences.startDate}T12:00:00`)) : new Date(now.getFullYear(), now.getMonth(), 1);
+                end = preferences.endDate ? financeEndOfDay(new Date(`${preferences.endDate}T12:00:00`)) : end;
+                if (start > end) [start, end] = [financeStartOfDay(end), financeEndOfDay(start)];
+            } else start = new Date(now.getFullYear(), now.getMonth(), 1);
+            return { start, end, label: ({ month:'This Month', '30d':'Last 30 Days', qtd:'Quarter-to-Date', ytd:'Year-to-Date', custom:'Custom Range' })[preset] || 'This Month' };
+        }
+
+        function classifyFinanceTransaction(tx) {
+            const text = `${tx.payee || ''} ${tx.category || ''}`.toLowerCase();
+            const assetWords = ['asset', 'investment', 'property', 'real estate', 'vehicle purchase', 'electronics', 'pc parts', 'instrument'];
+            const savingWords = ['saving', 'investment', 'emergency', 'debt', 'asset'];
+            const needWords = ['rent', 'utility', 'utilities', 'food', 'grocery', 'transport', 'fuel', 'insurance', 'medical', 'hosting', 'cloud'];
+            const nature = tx.transactionNature || (assetWords.some(word => text.includes(word)) ? 'asset' : 'expense');
+            const frequency = tx.frequency || (tx.spendingType === 'Fixed' ? 'recurring' : 'one-time');
+            let allocationClass = tx.allocationClass;
+            if (!allocationClass) {
+                if (nature === 'asset' || savingWords.some(word => text.includes(word))) allocationClass = 'savings';
+                else if (tx.spendingType === 'Fixed' || needWords.some(word => text.includes(word))) allocationClass = 'needs';
+                else allocationClass = 'wants';
+            }
+            return { nature, frequency, allocationClass };
+        }
+
+        function deriveFinanceAnalytics() {
+            const now = new Date();
+            const range = getFinanceRange(window.financePreferences, now);
+            const elapsedEnd = range.end < now ? range.end : now;
+            const daysElapsed = Math.max(1, Math.floor((financeStartOfDay(elapsedEnd) - financeStartOfDay(range.start)) / DAY_MS) + 1);
+            const periodDays = Math.max(1, Math.floor((financeStartOfDay(range.end) - financeStartOfDay(range.start)) / DAY_MS) + 1);
+            const filtered = window.financeTransactions.filter(tx => {
+                const date = new Date(tx.date);
+                if (Number.isNaN(date.getTime()) || date < range.start || date > range.end) return false;
+                const classification = classifyFinanceTransaction(tx);
+                const natureMatch = window.financePreferences.natureFilter === 'all' || (tx.amountCents < 0 && classification.nature === window.financePreferences.natureFilter);
+                const frequencyMatch = window.financePreferences.frequencyFilter === 'all' || classification.frequency === window.financePreferences.frequencyFilter;
+                return natureMatch && frequencyMatch;
+            });
+            let inflow = 0;
+            let outflow = 0;
+            const categories = {};
+            const merchants = {};
+            const allocation = { needs: 0, wants: 0, savings: 0 };
+            filtered.forEach(tx => {
+                if (tx.amountCents > 0) inflow += tx.amountCents;
+                else {
+                    const amount = Math.abs(tx.amountCents);
+                    outflow += amount;
+                    const category = tx.category || 'Uncategorized';
+                    const merchant = tx.payee || 'Unknown';
+                    categories[category] = (categories[category] || 0) + amount;
+                    merchants[merchant] = (merchants[merchant] || 0) + amount;
+                    const classification = classifyFinanceTransaction(tx);
+                    allocation[classification.allocationClass] += amount;
+                }
+            });
+            const net = inflow - outflow;
+            const dailyBurn = outflow / daysElapsed;
+            const monthlyOutflow = dailyBurn * 30.4375;
+            const runway = monthlyOutflow > 0 ? window.financePreferences.liquidCashCents / monthlyOutflow : 0;
+            const savingsRate = inflow > 0 ? (net / inflow) * 100 : 0;
+            return { now, range, daysElapsed, periodDays, filtered, inflow, outflow, net, dailyBurn, monthlyOutflow, runway, savingsRate, categories, merchants, allocation };
+        }
+
+        function financeSparkline(current, previous) {
+            const max = Math.max(current, previous, 1);
+            const y1 = 21 - (previous / max * 17);
+            const y2 = 21 - (current / max * 17);
+            const color = current > previous * 1.03 ? '#ef4444' : current < previous * .97 ? '#10b981' : '#94a3b8';
+            return `<svg class="sparkline" viewBox="0 0 72 24" role="img" aria-label="Month-over-month trend"><path d="M3 ${y1.toFixed(1)} C24 ${y1.toFixed(1)}, 48 ${y2.toFixed(1)}, 69 ${y2.toFixed(1)}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><circle cx="69" cy="${y2.toFixed(1)}" r="3" fill="${color}"/></svg>`;
+        }
+
+        window.updateFinanceFilters = function() {
+            const read = (id) => document.getElementById(id);
+            window.financePreferences = {
+                ...window.financePreferences,
+                rangePreset: read('financeRangePreset').value,
+                startDate: read('financeStartDate').value,
+                endDate: read('financeEndDate').value,
+                natureFilter: read('financeNatureFilter').value,
+                frequencyFilter: read('financeFrequencyFilter').value,
+                liquidCashCents: Math.round((parseFloat(read('financeLiquidCash').value) || 0) * 100),
+                dailyTargetCents: Math.round((parseFloat(read('financeDailyTarget').value) || 0) * 100)
+            };
+            window.saveFinanceCommand();
+        };
+
+        window.setFinanceCommandView = function(view) {
+            document.querySelectorAll('.command-tab').forEach(button => button.classList.toggle('active', button.dataset.commandView === view));
+            document.querySelectorAll('.command-view').forEach(panel => panel.classList.toggle('active', panel.id === `finance-view-${view}`));
+        };
+
+        window.addFinanceTransaction = function() {
+            const get = (id) => document.getElementById(id);
+            const payee = get('financePayee').value.trim();
+            const amountFloat = parseFloat(get('financeAmount').value);
+            const type = get('financeType').value;
+            const category = get('financeCategory').value.trim();
+            if (!payee || !Number.isFinite(amountFloat) || amountFloat <= 0 || !category) {
+                window.showToast('Please enter a valid payee, positive amount, and category.', 'error');
                 return;
             }
-
-            const amountCents = Math.round(amountFloat * 100) * (type === 'expense' ? -1 : 1);
-
+            const dateValue = get('financeDate').value;
             window.financeTransactions.push({
-                id: Date.now().toString(),
-                payee,
-                amountCents,
+                id: Date.now().toString(), payee,
+                amountCents: Math.round(amountFloat * 100) * (type === 'expense' ? -1 : 1),
                 category,
-                spendingType: type === 'expense' ? spendingType : 'N/A',
-                date: new Date().toISOString()
+                spendingType: type === 'expense' ? get('financeSpendingType').value : 'N/A',
+                allocationClass: type === 'expense' ? get('financeAllocationClass').value : 'savings',
+                transactionNature: type === 'expense' ? get('financeTransactionNature').value : 'income',
+                frequency: get('financeFrequency').value,
+                date: dateValue ? new Date(`${dateValue}T12:00:00`).toISOString() : new Date().toISOString()
             });
-
-            document.getElementById('financePayee').value = '';
-            document.getElementById('financeAmount').value = '';
-            document.getElementById('financeCategory').value = '';
+            ['financePayee','financeAmount','financeCategory'].forEach(id => get(id).value = '');
+            get('financeDate').value = new Date().toISOString().slice(0, 10);
             window.saveFinance();
-            window.showToast("Transaction recorded!", "success");
+            window.showToast('Transaction recorded!', 'success');
         };
 
         window.deleteFinanceTransaction = function(id) {
-            window.financeTransactions = window.financeTransactions.filter(t => t.id !== id);
+            window.financeTransactions = window.financeTransactions.filter(tx => tx.id !== id);
             window.saveFinance();
         };
+
+        window.upsertFinanceBudget = function() {
+            const category = document.getElementById('budgetCategory').value.trim();
+            const amount = parseFloat(document.getElementById('budgetAmount').value);
+            if (!category || !Number.isFinite(amount) || amount <= 0) return window.showToast('Enter a category and positive budget.', 'error');
+            const existing = window.financeBudgets.find(item => item.category.toLowerCase() === category.toLowerCase());
+            if (existing) existing.allocatedCents = Math.round(amount * 100);
+            else window.financeBudgets.push({ id: Date.now().toString(), category, allocatedCents: Math.round(amount * 100) });
+            document.getElementById('budgetCategory').value = '';
+            document.getElementById('budgetAmount').value = '';
+            window.saveFinanceCommand();
+        };
+        window.deleteFinanceBudget = function(id) { window.financeBudgets = window.financeBudgets.filter(item => item.id !== id); window.saveFinanceCommand(); };
+
+        window.addFinanceAsset = function() {
+            const value = (id) => document.getElementById(id).value;
+            const name = value('assetName').trim();
+            const acquired = parseFloat(value('assetAcquiredCost'));
+            if (!name || !Number.isFinite(acquired) || acquired < 0) return window.showToast('Enter an asset name and valid acquired cost.', 'error');
+            window.financeAssets.push({
+                id: Date.now().toString(), name, category: value('assetCategory').trim() || 'Other',
+                acquiredCostCents: Math.round(acquired * 100), currentValueCents: Math.round((parseFloat(value('assetMarketValue')) || 0) * 100),
+                sunkCostCents: Math.round((parseFloat(value('assetSunkCost')) || 0) * 100), saleValueCents: Math.round((parseFloat(value('assetSaleValue')) || 0) * 100),
+                status: value('assetStatus'), date: new Date().toISOString()
+            });
+            ['assetName','assetCategory','assetAcquiredCost','assetMarketValue','assetSunkCost','assetSaleValue'].forEach(id => document.getElementById(id).value = '');
+            window.saveFinanceCommand();
+        };
+        window.deleteFinanceAsset = function(id) { window.financeAssets = window.financeAssets.filter(item => item.id !== id); window.saveFinanceCommand(); };
+        window.editFinanceAsset = function(id) {
+            const asset = window.financeAssets.find(item => item.id === id);
+            if (!asset) return;
+            const market = prompt('Current estimated market value (₱):', ((asset.currentValueCents || 0) / 100).toString());
+            if (market === null) return;
+            const sunk = prompt('Total sunk costs — mods, repairs, maintenance (₱):', ((asset.sunkCostCents || 0) / 100).toString());
+            if (sunk === null) return;
+            const sale = prompt('Realized sale/trade value (₱, use 0 if held):', ((asset.saleValueCents || 0) / 100).toString());
+            if (sale === null) return;
+            const status = prompt('Status: Held, Listed, or Sold', asset.status || 'Held');
+            if (status === null) return;
+            const parsed = [market, sunk, sale].map(Number);
+            if (parsed.some(value => !Number.isFinite(value) || value < 0) || !['Held','Listed','Sold'].includes(status)) return window.showToast('Use valid positive values and a valid status.', 'error');
+            asset.currentValueCents = Math.round(parsed[0] * 100);
+            asset.sunkCostCents = Math.round(parsed[1] * 100);
+            asset.saleValueCents = Math.round(parsed[2] * 100);
+            asset.status = status;
+            window.saveFinanceCommand();
+        };
+
+        window.addFinanceProject = function() {
+            const value = (id) => document.getElementById(id).value;
+            const name = value('projectName').trim();
+            const budget = parseFloat(value('projectBudget'));
+            if (!name || !Number.isFinite(budget) || budget <= 0) return window.showToast('Enter a project name and positive budget.', 'error');
+            window.financeProjects.push({ id: Date.now().toString(), name, milestone: value('projectMilestone').trim() || 'Not set', budgetCents: Math.round(budget * 100), spentCents: Math.round((parseFloat(value('projectSpent')) || 0) * 100), status: value('projectStatus'), date: new Date().toISOString() });
+            ['projectName','projectMilestone','projectBudget','projectSpent'].forEach(id => document.getElementById(id).value = '');
+            window.saveFinanceCommand();
+        };
+        window.deleteFinanceProject = function(id) { window.financeProjects = window.financeProjects.filter(item => item.id !== id); window.saveFinanceCommand(); };
+        window.editFinanceProject = function(id) {
+            const project = window.financeProjects.find(item => item.id === id);
+            if (!project) return;
+            const spent = prompt('Spent to date (₱):', ((project.spentCents || 0) / 100).toString());
+            if (spent === null) return;
+            const milestone = prompt('Current milestone:', project.milestone || '');
+            if (milestone === null) return;
+            const status = prompt('Status: Planning, Active, Paused, or Complete', project.status || 'Planning');
+            if (status === null) return;
+            const parsedSpent = Number(spent);
+            if (!Number.isFinite(parsedSpent) || parsedSpent < 0 || !['Planning','Active','Paused','Complete'].includes(status)) return window.showToast('Use a valid spend and project status.', 'error');
+            project.spentCents = Math.round(parsedSpent * 100);
+            project.milestone = milestone.trim() || 'Not set';
+            project.status = status;
+            window.saveFinanceCommand();
+        };
+
+        function renderFinanceBudgets(analytics) {
+            const container = document.getElementById('finance-budget-progress');
+            if (!container) return;
+            if (!window.financeBudgets.length) {
+                container.innerHTML = '<div class="empty-state">Set a category budget to activate pace forecasts and month-over-month trends.</div>';
+                return;
+            }
+            const now = analytics.now;
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            const previousStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const dayOfMonth = now.getDate();
+            container.innerHTML = window.financeBudgets.map(budget => {
+                let spent = 0;
+                let previous = 0;
+                window.financeTransactions.forEach(tx => {
+                    if (tx.amountCents >= 0 || (tx.category || '').toLowerCase() !== budget.category.toLowerCase()) return;
+                    const date = new Date(tx.date);
+                    if (date >= monthStart && date < nextMonth) spent += Math.abs(tx.amountCents);
+                    else if (date >= previousStart && date < monthStart) previous += Math.abs(tx.amountCents);
+                });
+                const pct = budget.allocatedCents ? (spent / budget.allocatedCents) * 100 : 0;
+                const projected = dayOfMonth ? (spent / dayOfMonth) * daysInMonth : spent;
+                const barClass = pct > 100 ? 'danger' : pct >= 80 ? 'warning' : '';
+                const forecast = projected > budget.allocatedCents ? `<div class="finance-alert">Projected ${financeMoney(projected - budget.allocatedCents)} over budget by month-end.</div>` : '';
+                return `<div class="budget-row"><div class="budget-row-head"><strong>${financeEscape(budget.category)}</strong><span>${financeMoney(spent)} / ${financeMoney(budget.allocatedCents)}</span></div><div class="budget-track"><div class="budget-fill ${barClass}" style="width:${Math.min(pct, 100)}%"></div></div><div class="budget-meta"><span>${pct.toFixed(0)}% used · forecast ${financeMoney(projected)}</span>${financeSparkline(spent, previous)}<button class="btn-small btn-danger" onclick="deleteFinanceBudget('${budget.id}')" aria-label="Delete ${financeEscape(budget.category)} budget">✕</button></div>${forecast}</div>`;
+            }).join('');
+        }
+
+        function renderFinanceAssets() {
+            const container = document.getElementById('finance-assets-table');
+            if (!container) return;
+            if (!window.financeAssets.length) { container.innerHTML = '<div class="empty-state">No capital assets tracked yet.</div>'; return; }
+            const rows = window.financeAssets.map(asset => {
+                const basis = (asset.acquiredCostCents || 0) + (asset.sunkCostCents || 0);
+                const exitValue = asset.status === 'Sold' ? (asset.saleValueCents || 0) : (asset.currentValueCents || 0);
+                const position = exitValue - basis;
+                const margin = basis ? (position / basis) * 100 : 0;
+                return `<tr><td><strong>${financeEscape(asset.name)}</strong><br><span style="opacity:.6">${financeEscape(asset.category)}</span></td><td>${financeEscape(asset.status)}</td><td class="numeric">${financeMoney(asset.acquiredCostCents)}</td><td class="numeric">${financeMoney(asset.sunkCostCents)}</td><td class="numeric">${financeMoney(exitValue)}</td><td class="numeric" style="color:${position >= 0 ? 'var(--success)' : 'var(--danger)'}">${position >= 0 ? '+' : '-'}${financeMoney(position)} (${margin.toFixed(1)}%)</td><td style="display:flex;gap:6px"><button class="btn-small" onclick="editFinanceAsset('${asset.id}')">Edit</button><button class="btn-small btn-danger" onclick="deleteFinanceAsset('${asset.id}')">✕</button></td></tr>`;
+            }).join('');
+            container.innerHTML = `<table class="finance-table"><thead><tr><th>Asset</th><th>Status</th><th>Acquired</th><th>Sunk cost</th><th>Value / sale</th><th>Net position</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        function renderFinanceProjects() {
+            const container = document.getElementById('finance-projects-table');
+            if (!container) return;
+            if (!window.financeProjects.length) { container.innerHTML = '<div class="empty-state">No one-off project budgets tracked yet.</div>'; return; }
+            const rows = window.financeProjects.map(project => {
+                const pct = project.budgetCents ? (project.spentCents / project.budgetCents) * 100 : 0;
+                return `<tr><td><strong>${financeEscape(project.name)}</strong></td><td>${financeEscape(project.milestone)}</td><td>${financeEscape(project.status)}</td><td class="numeric">${financeMoney(project.spentCents)} / ${financeMoney(project.budgetCents)}</td><td style="min-width:170px"><div class="budget-track"><div class="budget-fill ${pct > 100 ? 'danger' : pct >= 80 ? 'warning' : ''}" style="width:${Math.min(pct,100)}%"></div></div><small>${pct.toFixed(0)}% used</small></td><td style="display:flex;gap:6px"><button class="btn-small" onclick="editFinanceProject('${project.id}')">Edit</button><button class="btn-small btn-danger" onclick="deleteFinanceProject('${project.id}')">✕</button></td></tr>`;
+            }).join('');
+            container.innerHTML = `<table class="finance-table"><thead><tr><th>Project</th><th>Milestone</th><th>Status</th><th>Spend</th><th>Progress</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+        }
 
         window.renderFinance = function() {
             const list = document.getElementById('finance-list');
             if (!list) return;
-            
-            list.innerHTML = '';
-            let totalIncome = 0;
-            let totalExpense = 0;
-            let expenses30D = 0;
-            let ytdFixed = 0;
-            let ytdDisc = 0;
+            const preferences = window.financePreferences;
+            const controls = {
+                range: document.getElementById('financeRangePreset'), nature: document.getElementById('financeNatureFilter'), frequency: document.getElementById('financeFrequencyFilter'),
+                cash: document.getElementById('financeLiquidCash'), target: document.getElementById('financeDailyTarget'), start: document.getElementById('financeStartDate'), end: document.getElementById('financeEndDate')
+            };
+            controls.range.value = preferences.rangePreset;
+            controls.nature.value = preferences.natureFilter;
+            controls.frequency.value = preferences.frequencyFilter;
+            controls.cash.value = preferences.liquidCashCents ? preferences.liquidCashCents / 100 : '';
+            controls.target.value = preferences.dailyTargetCents ? preferences.dailyTargetCents / 100 : '';
+            controls.start.value = preferences.startDate || '';
+            controls.end.value = preferences.endDate || '';
+            document.getElementById('financeCustomDates').classList.toggle('visible', preferences.rangePreset === 'custom');
+            const dateInput = document.getElementById('financeDate');
+            if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
 
-            const now = new Date();
-            const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
-            const currentYear = now.getFullYear();
+            const analytics = deriveFinanceAnalytics();
+            document.getElementById('finance-period-label').innerText = analytics.range.label;
+            const balance = document.getElementById('finance-balance');
+            balance.innerText = `${analytics.net < 0 ? '-' : ''}${financeMoney(analytics.net)}`;
+            balance.style.color = analytics.net >= 0 ? 'var(--success)' : 'var(--danger)';
+            document.getElementById('finance-income').innerText = financeMoney(analytics.inflow);
+            document.getElementById('finance-expenses').innerText = financeMoney(analytics.outflow);
+            document.getElementById('finance-net-meta').innerText = `${financeMoney(analytics.inflow)} in · ${financeMoney(analytics.outflow)} out`;
+            const burn = document.getElementById('finance-burn-rate');
+            burn.innerText = `${financeMoney(analytics.dailyBurn)} / day`;
+            const target = preferences.dailyTargetCents || 0;
+            const burnDelta = target ? analytics.dailyBurn - target : 0;
+            burn.style.color = target && burnDelta > 0 ? 'var(--danger)' : 'var(--warning)';
+            document.getElementById('finance-burn-meta').innerText = target ? `${burnDelta > 0 ? financeMoney(burnDelta) + ' above' : financeMoney(Math.abs(burnDelta)) + ' below'} ${financeMoney(target)} target` : `${analytics.daysElapsed} elapsed day${analytics.daysElapsed === 1 ? '' : 's'} · set a daily target`;
+            document.getElementById('finance-runway').innerText = `${analytics.runway.toFixed(1)} mo`;
+            document.getElementById('finance-runway').style.color = analytics.runway >= 6 ? 'var(--success)' : analytics.runway >= 3 ? 'var(--warning)' : 'var(--danger)';
+            document.getElementById('finance-runway-meta').innerText = `${financeMoney(preferences.liquidCashCents)} liquid · ${financeMoney(analytics.monthlyOutflow)}/mo avg`;
+            document.getElementById('finance-savings-rate').innerText = `${analytics.savingsRate.toFixed(1)}%`;
+            document.getElementById('finance-savings-rate').style.color = analytics.savingsRate >= 20 ? 'var(--success)' : analytics.savingsRate >= 0 ? 'var(--warning)' : 'var(--danger)';
+            document.getElementById('finance-savings-meta').innerText = analytics.inflow ? `${financeMoney(analytics.net)} retained in period` : 'Add inflow to calculate rate';
 
-            const sorted = [...window.financeTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const categoryEntries = Object.entries(analytics.categories).sort((a,b) => b[1] - a[1]);
+            document.getElementById('finance-category-bars').innerHTML = categoryEntries.length ? categoryEntries.map(([category, amount]) => {
+                const pct = analytics.outflow ? amount / analytics.outflow * 100 : 0;
+                return `<div class="finance-bar-row"><strong>${financeEscape(category)}</strong><div class="finance-bar-track"><div class="finance-bar-fill" style="width:${pct}%"></div></div><span>${financeMoney(amount)} · ${pct.toFixed(1)}%</span></div>`;
+            }).join('') : '<div class="empty-state">No outflow in this filtered period.</div>';
 
-            const countBadge = document.getElementById('finance-tx-count');
-            if (countBadge) {
-                countBadge.innerText = `${sorted.length} Record${sorted.length === 1 ? '' : 's'}`;
-            }
+            const merchantEntries = Object.entries(analytics.merchants).sort((a,b) => b[1] - a[1]).slice(0,5);
+            document.getElementById('finance-merchant-rank').innerHTML = merchantEntries.length ? merchantEntries.map(([merchant, amount], index) => `<div class="rank-row"><span class="rank-number">${index + 1}</span><span class="rank-name">${financeEscape(merchant)}</span><span class="rank-amount">${financeMoney(amount)}</span></div>`).join('') : '<div class="empty-state">Merchant ranking appears after expenses are recorded.</div>';
 
-            if (sorted.length === 0) {
-                list.innerHTML = `<div style="opacity: 0.6; font-size: 13px; text-align: center; padding: 20px;">No transactions recorded yet.</div>`;
-            }
+            const ruleConfig = [{ key:'needs', label:'Needs', target:50 }, { key:'wants', label:'Wants', target:30 }, { key:'savings', label:'Savings & Assets', target:20 }];
+            document.getElementById('finance-rule-health').innerHTML = ruleConfig.map(rule => {
+                const pct = analytics.outflow ? analytics.allocation[rule.key] / analytics.outflow * 100 : 0;
+                return `<div class="rule-row"><strong>${rule.label} <small>(${rule.target}%)</small></strong><div class="rule-track"><div class="rule-fill ${rule.key}" style="width:${Math.min(pct,100)}%"></div></div><span>${pct.toFixed(1)}% · ${financeMoney(analytics.allocation[rule.key])}</span></div>`;
+            }).join('');
 
-            sorted.forEach(tx => {
-                const txDate = new Date(tx.date);
+            const sorted = [...analytics.filtered].sort((a,b) => new Date(b.date) - new Date(a.date));
+            document.getElementById('finance-tx-count').innerText = `${sorted.length} Record${sorted.length === 1 ? '' : 's'}`;
+            list.innerHTML = sorted.length ? sorted.map(tx => {
+                const classification = classifyFinanceTransaction(tx);
+                const income = tx.amountCents > 0;
+                return `<div class="task-card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:default;margin-bottom:0"><div style="min-width:0"><div style="font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis">${financeEscape(tx.payee)}</div><div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:6px;font-size:10px;opacity:.74"><span class="badge">${financeEscape(tx.category)}</span><span>${financeEscape(classification.allocationClass)}</span><span>· ${financeEscape(classification.nature)}</span><span>· ${financeEscape(classification.frequency)}</span><span>· ${new Date(tx.date).toLocaleDateString()}</span></div></div><div style="display:flex;align-items:center;gap:10px"><strong style="font-family:var(--font-metric);color:${income ? 'var(--success)' : 'var(--danger)'}">${income ? '+' : '-'}${financeMoney(tx.amountCents)}</strong><button class="btn-small btn-danger" onclick="deleteFinanceTransaction('${tx.id}')" aria-label="Delete transaction">✕</button></div></div>`;
+            }).join('') : '<div class="empty-state">No transactions match the selected filters.</div>';
 
-                if (tx.amountCents > 0) {
-                    totalIncome += tx.amountCents;
-                } else {
-                    const absExpense = Math.abs(tx.amountCents);
-                    totalExpense += absExpense;
-
-                    if (txDate >= thirtyDaysAgo) {
-                        expenses30D += absExpense;
-                    }
-
-                    if (txDate.getFullYear() === currentYear) {
-                        let sType = tx.spendingType;
-                        
-                        if (!sType || sType === 'N/A') {
-                            const textInfo = (tx.payee + ' ' + tx.category).toLowerCase();
-                            if (textInfo.includes('spotify') || textInfo.includes('server') || textInfo.includes('cloud') || textInfo.includes('hosting') || textInfo.includes('shockbyte') || textInfo.includes('google ai')) {
-                                sType = 'Fixed';
-                            } else if (textInfo.includes('steam') || textInfo.includes('car') || textInfo.includes('mod') || textInfo.includes('byd')) {
-                                sType = 'Discretionary';
-                            } else {
-                                sType = 'Discretionary';
-                            }
-                        }
-
-                        if (sType === 'Fixed') ytdFixed += absExpense;
-                        else ytdDisc += absExpense;
-                    }
-                }
-
-                const amountDisplay = (Math.abs(tx.amountCents) / 100).toLocaleString(undefined, {minimumFractionDigits: 2});
-                const isIncome = tx.amountCents > 0;
-                const color = isIncome ? 'var(--success)' : 'var(--danger)';
-                const sign = isIncome ? '+' : '-';
-
-                let typeBadge = '';
-                if (!isIncome && tx.spendingType && tx.spendingType !== 'N/A') {
-                    const badgeColor = tx.spendingType === 'Fixed' ? 'var(--purple)' : 'var(--warning)';
-                    typeBadge = `<span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid ${badgeColor}; color: ${badgeColor}; margin-left: 6px;">${tx.spendingType}</span>`;
-                }
-
-                list.innerHTML += `
-                    <div class="task-card" style="display: flex; justify-content: space-between; align-items: center; cursor: default; margin-bottom: 0;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 15px;">${tx.payee}</div>
-                            <div style="font-size: 12px; opacity: 0.7; margin-top: 4px; display: flex; align-items: center;">
-                                <span class="badge">${tx.category}</span> ${typeBadge} <span style="margin-left: 6px;">• ${txDate.toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 16px; color: ${color};">
-                                ${sign}₱${amountDisplay}
-                            </div>
-                            <button class="btn-small btn-danger" onclick="deleteFinanceTransaction('${tx.id}')">✕</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            const balance = totalIncome - totalExpense;
-            const balEl = document.getElementById('finance-balance');
-            const incEl = document.getElementById('finance-income');
-            const expEl = document.getElementById('finance-expenses');
-            const burnEl = document.getElementById('finance-burn-rate');
-
-            if (balEl) {
-                balEl.innerText = `₱${(balance / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-                balEl.style.color = balance >= 0 ? 'var(--success)' : 'var(--danger)';
-            }
-            if (incEl) incEl.innerText = `₱${(totalIncome / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            if (expEl) expEl.innerText = `₱${(totalExpense / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            if (burnEl) {
-                const dailyBurn = (expenses30D / 30) / 100;
-                burnEl.innerText = `₱${dailyBurn.toLocaleString(undefined, {minimumFractionDigits: 2})} / day`;
-            }
-
-            const ytdTotal = ytdFixed + ytdDisc;
-            const fixedPct = ytdTotal === 0 ? 0 : (ytdFixed / ytdTotal) * 100;
-            
-            const pieEl = document.getElementById('finance-ytd-pie');
-            const fixedText = document.getElementById('ytd-fixed-text');
-            const discText = document.getElementById('ytd-disc-text');
-
-            if (pieEl) {
-                pieEl.style.background = `conic-gradient(var(--purple) 0% ${fixedPct}%, var(--warning) ${fixedPct}% 100%)`;
-            }
-            if (fixedText) fixedText.innerText = `₱${(ytdFixed / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} (${Math.round(fixedPct)}%)`;
-            if (discText) discText.innerText = `₱${(ytdDisc / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} (${Math.round(100 - fixedPct)}%)`;
+            renderFinanceBudgets(analytics);
+            renderFinanceAssets();
+            renderFinanceProjects();
         };
 
         // Initialize UI
