@@ -1866,6 +1866,93 @@
         @media (max-width: 1100px) { .finance-toolbar { grid-template-columns: repeat(3, 1fr); } .finance-kpi-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 820px) { .finance-panel-grid { grid-template-columns: 1fr; } .finance-form-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 560px) { .finance-toolbar, .finance-kpi-grid, .finance-form-grid { grid-template-columns: 1fr; } .finance-form-grid .wide { grid-column: auto; } .finance-custom-dates { grid-template-columns: 1fr; } .finance-bar-row { grid-template-columns: 90px 1fr; } .finance-bar-row > :last-child { grid-column: 2; } .rule-row { grid-template-columns: 95px 1fr; } .rule-row > :last-child { grid-column: 2; } }
+
+        /* CROSS-THEME INTERACTION CONTRAST */
+        .btn-alt, .btn-small, .view-tab,
+        .calendar-header .btn-alt, .calendar-header .btn-small,
+        .format-toolbar button {
+            background: var(--surface) !important;
+            color: var(--card-text) !important;
+            border: 1px solid var(--surface-border-strong) !important;
+            opacity: 1;
+            -webkit-text-fill-color: currentColor;
+            text-shadow: none;
+        }
+        .btn-alt:hover, .btn-small:hover, .view-tab:hover, .format-toolbar button:hover {
+            background: rgba(var(--primary-rgb), .1) !important;
+            color: var(--card-text) !important;
+            border-color: var(--primary) !important;
+        }
+        .view-tab.active, .command-tab.active {
+            background: var(--primary) !important;
+            color: var(--primary-contrast-text) !important;
+            border-color: var(--primary) !important;
+            -webkit-text-fill-color: var(--primary-contrast-text);
+        }
+        .btn-danger, .btn-small.btn-danger { color: var(--danger) !important; border-color: var(--danger) !important; background: var(--surface) !important; }
+        .btn-danger:hover, .btn-small.btn-danger:hover { color: #fff !important; background: var(--danger) !important; }
+        .calendar-header { color: var(--card-text); }
+        .schedule-grid { gap: 1px; background: var(--surface-border-strong); border-color: var(--surface-border-strong); }
+        .schedule-header, .schedule-time, .schedule-cell {
+            color: var(--card-text) !important;
+            background: var(--surface) !important;
+            border-color: var(--surface-border-strong);
+            opacity: 1;
+            -webkit-text-fill-color: currentColor;
+        }
+        .schedule-time { opacity: .9; font-weight: 700; box-shadow: inset -1px 0 var(--surface-border-strong); }
+        .schedule-cell { box-shadow: inset 0 0 0 1px rgba(var(--primary-rgb), .025); }
+        .calendar-day-header, .calendar-date { color: var(--card-text) !important; opacity: .9; }
+        .calendar-day { background: var(--surface); color: var(--card-text); border-color: var(--surface-border-strong); }
+        .calendar-task { border: 1px solid rgba(255,255,255,.38); box-shadow: 0 2px 7px rgba(0,0,0,.12); }
+        .calendar-task.gcal-event { width: 100%; min-height: 0; display: block; text-align: left; background: #2563eb; color: #fff; border-radius: 7px; padding: 5px 7px; font-size: 10px; }
+        .calendar-task.gcal-event:hover { background: #1d4ed8; transform: translateY(-1px); opacity: 1; }
+
+        /* GOOGLE CALENDAR EVENT INSPECTOR */
+        .gcal-modal-backdrop { position: fixed; inset: 0; z-index: 12000; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(2,6,23,.72); backdrop-filter: blur(10px); }
+        .gcal-modal-backdrop.open { display: flex; }
+        .gcal-modal {
+            width: min(680px, 100%); max-height: min(86vh, 820px); overflow-y: auto; position: relative;
+            padding: clamp(20px, 4vw, 34px); border: 1px solid var(--surface-border-strong); border-radius: 22px;
+            background: var(--surface); color: var(--card-text); box-shadow: 0 36px 100px -30px rgba(0,0,0,.8);
+        }
+        .gcal-modal-close { position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; padding: 0; border-radius: 50%; }
+        .gcal-modal-kicker { color: var(--primary); font-size: 10px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+        .gcal-modal h2 { margin: 8px 48px 18px 0; font: 800 clamp(22px, 4vw, 30px)/1.15 var(--font-display); letter-spacing: -.035em; }
+        .gcal-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+        .gcal-detail { padding: 13px; border: 1px solid var(--surface-border); border-radius: 13px; background: rgba(var(--primary-rgb), .045); }
+        .gcal-detail-label { display: block; margin-bottom: 5px; font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .58; }
+        .gcal-detail-value { font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+        .gcal-description { margin: 16px 0; padding: 15px; white-space: pre-wrap; font-size: 13px; line-height: 1.65; border-left: 3px solid var(--primary); background: rgba(var(--primary-rgb), .06); border-radius: 0 12px 12px 0; }
+        .gcal-attendees { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+        .gcal-attendee { padding: 5px 9px; border: 1px solid var(--surface-border-strong); border-radius: 999px; font-size: 10px; background: rgba(var(--primary-rgb), .06); }
+        .gcal-modal-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--surface-border); }
+        .gcal-modal-actions a { text-decoration: none; }
+
+        /* PRODUCTIVITY PERFORMANCE HUB */
+        .performance-hero { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; }
+        .performance-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+        .performance-kpi { min-height: 130px; padding: 17px; border: 1px solid rgba(var(--primary-rgb), .15); border-radius: 17px; background: linear-gradient(145deg, rgba(var(--primary-rgb), .08), transparent 60%), rgba(var(--surface-rgb), .78); }
+        .performance-kpi-value { margin: 14px 0 5px; font: 750 clamp(21px, 2vw, 28px)/1 var(--font-metric); letter-spacing: -.04em; }
+        .performance-kpi-meta { font-size: 10px; opacity: .65; line-height: 1.4; }
+        .performance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .performance-panel { padding: 20px; border: 1px solid rgba(var(--primary-rgb), .14); border-radius: 18px; background: rgba(var(--surface-rgb), .78); }
+        .performance-panel h3 { margin: 5px 0 17px; font: 750 16px/1.25 var(--font-display); }
+        .focus-quota-value { font: 800 clamp(27px, 4vw, 42px)/1 var(--font-metric); letter-spacing: -.06em; }
+        .focus-quota-copy { margin: 8px 0 14px; font-size: 12px; opacity: .72; }
+        .allocation-list, .diagnostic-list { display: flex; flex-direction: column; gap: 10px; }
+        .allocation-row { display: grid; grid-template-columns: minmax(90px,.8fr) minmax(120px,2fr) auto; gap: 9px; align-items: center; font-size: 11px; }
+        .allocation-track { height: 8px; overflow: hidden; border-radius: 999px; background: rgba(var(--primary-rgb), .1); }
+        .allocation-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--primary), #22d3ee); }
+        .diagnostic-item { padding: 12px; display: grid; grid-template-columns: 10px 1fr auto; gap: 10px; align-items: start; border: 1px solid var(--surface-border); border-radius: 13px; background: rgba(var(--surface-rgb), .45); }
+        .diagnostic-dot { width: 8px; height: 8px; margin-top: 4px; border-radius: 50%; background: var(--warning); box-shadow: 0 0 10px currentColor; }
+        .diagnostic-dot.overdue { background: var(--danger); }
+        .diagnostic-title { font-size: 12px; font-weight: 700; }
+        .diagnostic-meta { margin-top: 3px; font-size: 10px; opacity: .65; }
+        .quota-settings { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+        @media(max-width: 1050px) { .performance-kpis { grid-template-columns: 1fr 1fr; } .performance-hero { grid-template-columns: 1fr; } }
+        @media(max-width: 760px) { .performance-grid { grid-template-columns: 1fr; } .gcal-detail-grid { grid-template-columns: 1fr; } }
+        @media(max-width: 520px) { .performance-kpis { grid-template-columns: 1fr; } .allocation-row { grid-template-columns: 90px 1fr; } .allocation-row > :last-child { grid-column: 2; } .gcal-modal-actions > * { width: 100%; } }
     </style>
 </head>
 <body>
@@ -2155,6 +2242,21 @@
                         </div>
                         <div id="stat-time" class="metric-value-display" style="color: var(--purple);">0h 0m</div>
                     </div>
+                    <div class="metric-card-elevated card-finished">
+                        <div class="metric-header"><span class="metric-label">Daily Focus Quota</span><span class="status-dot dot-primary"></span></div>
+                        <div id="stat-focus-quota" class="metric-value-display" style="color: var(--primary);">0%</div>
+                    </div>
+                    <div class="metric-card-elevated card-velocity">
+                        <div class="metric-header"><span class="metric-label">Active-Day Streak</span><span class="status-dot dot-warning"></span></div>
+                        <div id="stat-focus-streak" class="metric-value-display" style="color: var(--warning);">0 days</div>
+                    </div>
+                </div>
+                <div class="quota-settings" style="margin-top:16px;">
+                    <div class="setting-item" style="min-width:220px;">
+                        <label for="productivityDailyGoalHours">Daily focus target (hours)</label>
+                        <input id="productivityDailyGoalHours" type="number" min="0.25" max="24" step="0.25" value="4" onchange="updateProductivityGoal()">
+                    </div>
+                    <span style="font-size:12px;opacity:.68;padding-bottom:10px;">Used by the live quota, streak, and focus-performance calculations.</span>
                 </div>
             </div>
 
@@ -2197,6 +2299,13 @@
                 <button class="btn-alt" onclick="changeMonth(1)">Next ▶</button>
             </div>
             <div id="calendar-grid" class="calendar-grid"></div>
+        </div>
+
+        <div id="gcal-event-modal" class="gcal-modal-backdrop" role="presentation" onclick="handleGCalModalBackdrop(event)">
+            <section class="gcal-modal" role="dialog" aria-modal="true" aria-labelledby="gcal-modal-title" tabindex="-1">
+                <button class="btn-small gcal-modal-close" onclick="closeGoogleCalendarEvent()" aria-label="Close event inspector">✕</button>
+                <div id="gcal-modal-content"></div>
+            </section>
         </div>
 
         <!-- GMAIL INBOX CONTAINER -->
@@ -2733,6 +2842,10 @@
             liquidCashCents: 0, dailyTargetCents: 0,
             ...(JSON.parse(localStorage.getItem('soloflow_finance_preferences')) || {})
         };
+        window.productivitySettings = {
+            dailyFocusTargetSeconds: 4 * 60 * 60,
+            ...(JSON.parse(localStorage.getItem('soloflow_productivity_settings')) || {})
+        };
 
         function setupFirestoreListeners() {
             if (!userId) return;
@@ -3106,6 +3219,112 @@
             }
         };
 
+        const calendarEscape = (value) => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
+        const localISODate = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+        function getGoogleCalendarMeetingLink(event) {
+            if (event.hangoutLink) return event.hangoutLink;
+            const entryPoints = event.conferenceData && Array.isArray(event.conferenceData.entryPoints) ? event.conferenceData.entryPoints : [];
+            const videoEntry = entryPoints.find(point => point.entryPointType === 'video' && point.uri);
+            if (videoEntry) return videoEntry.uri;
+            const searchable = `${event.location || ''} ${event.description || ''}`;
+            const match = searchable.match(/https?:\/\/[^\s<>"]+(?:zoom\.us|meet\.google\.com|teams\.microsoft\.com)[^\s<>"]*/i) || searchable.match(/https?:\/\/[^\s<>"]+/i);
+            return match ? match[0].replace(/[),.;]+$/, '') : '';
+        }
+
+        function formatGoogleEventRange(event) {
+            const startValue = event.start && (event.start.dateTime || event.start.date);
+            const endValue = event.end && (event.end.dateTime || event.end.date);
+            if (!startValue) return { range: 'Time not supplied', timezone: 'Timezone not supplied' };
+            const allDay = Boolean(event.start.date && !event.start.dateTime);
+            const timezone = (event.start && event.start.timeZone) || (event.end && event.end.timeZone) || Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (allDay) {
+                const startDate = new Date(`${event.start.date}T12:00:00`);
+                const inclusiveEnd = endValue ? new Date(new Date(`${event.end.date}T12:00:00`).getTime() - DAY_MS) : startDate;
+                const sameDay = localISODate(startDate) === localISODate(inclusiveEnd);
+                return { range: sameDay ? startDate.toLocaleDateString([], { dateStyle:'full' }) : `${startDate.toLocaleDateString([], { dateStyle:'medium' })} – ${inclusiveEnd.toLocaleDateString([], { dateStyle:'medium' })}`, timezone: `${timezone} · All day` };
+            }
+            const startDate = new Date(startValue);
+            const endDate = endValue ? new Date(endValue) : null;
+            const formatInZone = (date, options) => {
+                try { return new Intl.DateTimeFormat(undefined, { ...options, timeZone: timezone }).format(date); }
+                catch (error) { return new Intl.DateTimeFormat(undefined, options).format(date); }
+            };
+            const dateKey = (date) => formatInZone(date, { year:'numeric', month:'2-digit', day:'2-digit' });
+            const sameDay = endDate && dateKey(startDate) === dateKey(endDate);
+            const range = sameDay
+                ? `${formatInZone(startDate, { dateStyle:'full' })} · ${formatInZone(startDate, { hour:'2-digit', minute:'2-digit' })} – ${formatInZone(endDate, { hour:'2-digit', minute:'2-digit' })}`
+                : `${formatInZone(startDate, { dateStyle:'medium', timeStyle:'short' })}${endDate ? ` – ${formatInZone(endDate, { dateStyle:'medium', timeStyle:'short' })}` : ''}`;
+            return { range, timezone };
+        }
+
+        window.openGoogleCalendarEvent = function(encodedId) {
+            const eventId = decodeURIComponent(encodedId);
+            const event = window.gcalEvents.find(item => item.id === eventId);
+            if (!event) return window.showToast('Google Calendar event details are unavailable. Refresh the calendar and try again.', 'error');
+            window.activeGCalEventId = event.id;
+            window.gcalLastFocusedElement = document.activeElement;
+            const modal = document.getElementById('gcal-event-modal');
+            const content = document.getElementById('gcal-modal-content');
+            const timing = formatGoogleEventRange(event);
+            const meetingLink = getGoogleCalendarMeetingLink(event);
+            const attendees = Array.isArray(event.attendees) ? event.attendees : [];
+            const eventLink = event.htmlLink || '';
+            content.innerHTML = `
+                <span class="gcal-modal-kicker">Google Calendar Event</span>
+                <h2 id="gcal-modal-title">${calendarEscape(event.summary || 'Untitled event')}</h2>
+                <div class="gcal-detail-grid">
+                    <div class="gcal-detail"><span class="gcal-detail-label">Date &amp; time</span><div class="gcal-detail-value">${calendarEscape(timing.range)}</div></div>
+                    <div class="gcal-detail"><span class="gcal-detail-label">Timezone</span><div class="gcal-detail-value">${calendarEscape(timing.timezone)}</div></div>
+                    <div class="gcal-detail"><span class="gcal-detail-label">Location</span><div class="gcal-detail-value">${calendarEscape(event.location || 'No location supplied')}</div></div>
+                    <div class="gcal-detail"><span class="gcal-detail-label">Organizer</span><div class="gcal-detail-value">${calendarEscape((event.organizer && (event.organizer.displayName || event.organizer.email)) || 'Not supplied')}</div></div>
+                </div>
+                ${event.description ? `<div class="gcal-description">${calendarEscape(event.description)}</div>` : ''}
+                <div><span class="gcal-detail-label">Attendees (${attendees.length})</span><div class="gcal-attendees">${attendees.length ? attendees.map(person => `<span class="gcal-attendee">${calendarEscape(person.displayName || person.email || 'Guest')} · ${calendarEscape(person.responseStatus || 'pending')}</span>`).join('') : '<span style="font-size:12px;opacity:.62">No attendee list supplied.</span>'}</div></div>
+                <div class="gcal-modal-actions">
+                    ${meetingLink ? `<a class="btn-google" href="${calendarEscape(meetingLink)}" target="_blank" rel="noopener noreferrer">🎥 Join Meeting</a>` : ''}
+                    ${eventLink ? `<a class="btn-alt" href="${calendarEscape(eventLink)}" target="_blank" rel="noopener noreferrer">↗ Open in Google Calendar</a>` : ''}
+                    <button onclick="importGoogleCalendarEventAsTask()">＋ Import as SoloFlow Task</button>
+                </div>`;
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            modal.querySelector('.gcal-modal').focus();
+        };
+
+        window.closeGoogleCalendarEvent = function() {
+            document.getElementById('gcal-event-modal').classList.remove('open');
+            document.body.style.overflow = '';
+            window.activeGCalEventId = null;
+            if (window.gcalLastFocusedElement && typeof window.gcalLastFocusedElement.focus === 'function') window.gcalLastFocusedElement.focus();
+            window.gcalLastFocusedElement = null;
+        };
+        window.handleGCalModalBackdrop = function(event) { if (event.target.id === 'gcal-event-modal') window.closeGoogleCalendarEvent(); };
+
+        window.importGoogleCalendarEventAsTask = function() {
+            const event = window.gcalEvents.find(item => item.id === window.activeGCalEventId);
+            if (!event) return;
+            if (window.tasks.some(task => task.sourceGCalEventId === event.id)) return window.showToast('This Google Calendar event is already a SoloFlow task.', 'error');
+            const startValue = event.start && (event.start.dateTime || event.start.date);
+            const dueDate = startValue ? startValue.split('T')[0] : '';
+            const dueTime = event.start && event.start.dateTime ? event.start.dateTime.split('T')[1].slice(0, 5) : '';
+            const meetingLink = getGoogleCalendarMeetingLink(event);
+            const notes = [event.description || '', event.location ? `Location: ${event.location}` : ''].filter(Boolean).join('\n\n');
+            window.tasks.push({
+                id: Date.now().toString(), title: event.summary || 'Google Calendar event', category: 'Google Calendar', priority: 'Medium',
+                financeType: 'Profit', budget: '', description: notes, subtasks: [], photoUrl: '', linkUrl: event.htmlLink || meetingLink || '',
+                workspaceUrl: meetingLink || '', assignee: '', dateAssigned: localISODate(), dueDate, dueTime, blockedBy: '', status: 'todo',
+                syncedToCalendar: true, syncedToGCal: true, financeSynced: false, sourceGCalEventId: event.id
+            });
+            window.saveTasks();
+            window.closeGoogleCalendarEvent();
+            window.setView('all');
+            window.showToast('Google Calendar event imported as a SoloFlow task!', 'success');
+        };
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && document.getElementById('gcal-event-modal').classList.contains('open')) window.closeGoogleCalendarEvent();
+        });
+
         // --- GMAIL REST API INBOX LOGIC ---
         window.connectGmailInbox = async function() {
             const provider = new GoogleAuthProvider();
@@ -3238,6 +3457,23 @@
                 }
                 window.showToast("Email parsed into task fields!", "success");
             }
+        };
+
+        window.convertEmailToTask = function(encodedSubject, encodedSnippet, encodedSender, encodedPermalink) {
+            const subject = decodeURIComponent(encodedSubject || '');
+            const snippet = decodeURIComponent(encodedSnippet || '');
+            const sender = decodeURIComponent(encodedSender || '');
+            const permalink = decodeURIComponent(encodedPermalink || '');
+            window.setView('all');
+            document.getElementById('taskTitle').value = subject || 'Email follow-up';
+            document.getElementById('taskDescription').value = snippet;
+            document.getElementById('taskWorkspaceUrl').value = permalink;
+            const emailMatch = sender.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+            document.getElementById('taskAssignee').value = emailMatch ? emailMatch[0] : sender;
+            document.getElementById('taskCategory').value = 'Email Follow-up';
+            document.getElementById('kanban-task-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('taskTitle').focus();
+            window.showToast('Email details loaded into the task form.', 'success');
         };
 
         window.emailTaskUpdate = function(taskId) {
@@ -3463,6 +3699,8 @@
             if (task) { 
                 const previousStatus = task.status;
                 task.status = newStatus; 
+                if (newStatus === 'done' && previousStatus !== 'done') task.completedAt = new Date().toISOString();
+                if (newStatus !== 'done' && previousStatus === 'done') task.completedAt = null;
 
                 if (newStatus === 'done' && previousStatus !== 'done' && task.budget && !task.financeSynced) {
                     const amountFloat = parseFloat(task.budget);
@@ -3734,126 +3972,114 @@
         };
 
         // --- PRODUCTIVITY DASHBOARD MODULE ---
+        const productivityEscape = (value) => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
+        const formatFocusDuration = (seconds) => `${Math.floor((seconds || 0) / 3600)}h ${Math.floor(((seconds || 0) % 3600) / 60)}m`;
+
+        function getTaskCompletionDate(task) {
+            const value = task.completedAt || task.doneAt || task.dateCompleted || (task.status === 'done' ? (task.dueDate || task.dateAssigned) : '');
+            if (!value) return null;
+            const date = value.includes && value.includes('T') ? new Date(value) : new Date(`${value}T12:00:00`);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function deriveProductivityAnalytics() {
+            const tasks = window.tasks || [];
+            const now = new Date();
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const sevenDayStart = new Date(todayStart.getTime() - (6 * DAY_MS));
+            const completedTasks = tasks.filter(task => task.status === 'done');
+            const recentCompleted = completedTasks.filter(task => { const date = getTaskCompletionDate(task); return date && date >= sevenDayStart && date <= now; });
+            const recentlyAssigned = tasks.filter(task => { if (!task.dateAssigned) return false; const date = new Date(`${task.dateAssigned}T12:00:00`); return date >= sevenDayStart && date <= now; });
+            const cycleSamples = completedTasks.map(task => {
+                const completed = getTaskCompletionDate(task);
+                if (!completed || !task.dateAssigned) return null;
+                const assigned = new Date(`${task.dateAssigned}T12:00:00`);
+                return completed >= assigned ? (completed - assigned) / DAY_MS : null;
+            }).filter(value => value !== null);
+            const averageCycleDays = cycleSamples.length ? cycleSamples.reduce((sum, value) => sum + value, 0) / cycleSamples.length : 0;
+            const completedFocusSeconds = completedTasks.reduce((sum, task) => sum + (Number(task.timeSpent) || 0), 0);
+            const focusOutputHours = completedTasks.length ? (completedFocusSeconds / 3600) / completedTasks.length : 0;
+            const totalFocusSeconds = tasks.reduce((sum, task) => sum + (Number(task.timeSpent) || 0), 0);
+            const todayKey = localISODate(now);
+            const dailyFocusSeconds = tasks.reduce((sum, task) => sum + (task.focusLog && Number(task.focusLog[todayKey]) || 0), 0);
+            const targetSeconds = Math.max(900, Number(window.productivitySettings.dailyFocusTargetSeconds) || 14400);
+            const quotaPercent = Math.min(100, dailyFocusSeconds / targetSeconds * 100);
+            const categorySeconds = {};
+            tasks.forEach(task => { const seconds = Number(task.timeSpent) || 0; if (seconds) categorySeconds[task.category || 'General'] = (categorySeconds[task.category || 'General'] || 0) + seconds; });
+            const activeDates = new Set();
+            tasks.forEach(task => {
+                if (task.focusLog) Object.entries(task.focusLog).forEach(([date, seconds]) => { if (Number(seconds) > 0) activeDates.add(date); });
+                const completed = getTaskCompletionDate(task);
+                if (completed) activeDates.add(localISODate(completed));
+            });
+            let streakCursor = new Date(todayStart);
+            if (!activeDates.has(localISODate(streakCursor))) streakCursor = new Date(streakCursor.getTime() - DAY_MS);
+            let streak = 0;
+            while (activeDates.has(localISODate(streakCursor))) { streak++; streakCursor = new Date(streakCursor.getTime() - DAY_MS); }
+            const blocked = tasks.filter(task => {
+                if (task.status === 'done' || !task.blockedBy) return false;
+                const blocker = tasks.find(candidate => candidate.id === task.blockedBy);
+                return !blocker || blocker.status !== 'done';
+            });
+            const overdue = tasks.filter(task => task.status !== 'done' && task.dueDate && new Date(`${task.dueDate}T00:00:00`) < todayStart);
+            const inProgress = tasks.filter(task => task.status === 'inprogress');
+            const highPriority = tasks.filter(task => task.priority === 'High' && task.status !== 'done' && task.status !== 'inprogress');
+            const activeTask = inProgress[0] || highPriority[0] || tasks.find(task => task.status === 'todo');
+            const throughputRate = Math.min(100, recentCompleted.length / Math.max(1, recentlyAssigned.length || recentCompleted.length) * 100);
+            return { tasks, completedTasks, recentCompleted, recentlyAssigned, averageCycleDays, focusOutputHours, totalFocusSeconds, dailyFocusSeconds, targetSeconds, quotaPercent, categorySeconds, streak, blocked, overdue, inProgress, highPriority, activeTask, throughputRate, velocity: recentCompleted.length / 7 };
+        }
+
+        window.updateProductivityGoal = function() {
+            const input = document.getElementById('productivityDailyGoalHours');
+            const hours = Math.min(24, Math.max(.25, parseFloat(input.value) || 4));
+            window.productivitySettings.dailyFocusTargetSeconds = Math.round(hours * 3600);
+            localStorage.setItem('soloflow_productivity_settings', JSON.stringify(window.productivitySettings));
+            input.value = hours;
+            window.renderProductivityDashboard();
+            window.calculateAnalytics();
+        };
+
         window.renderProductivityDashboard = function() {
             const container = document.getElementById('productivity-container');
             if (!container) return;
-
-            const tasks = window.tasks || [];
-            const totalTasks = tasks.length;
-            const completedTasks = tasks.filter(t => t.status === 'done');
-            const inProgressTasks = tasks.filter(t => t.status === 'inprogress');
-            const highPriorityTasks = tasks.filter(t => t.priority === 'High' && t.status !== 'done');
-            
-            const completionRate = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
-            
-            let totalSecondsTracked = 0;
-            let totalProfitEarned = 0;
-            
-            tasks.forEach(t => {
-                if (t.timeSpent) totalSecondsTracked += t.timeSpent;
-                if (t.status === 'done' && t.budget) {
-                    const val = parseFloat(t.budget) || 0;
-                    if ((t.financeType || 'Profit') === 'Profit') totalProfitEarned += val;
-                }
-            });
-
-            const focusHours = Math.floor(totalSecondsTracked / 3600);
-            const focusMins = Math.floor((totalSecondsTracked % 3600) / 60);
-
-            const activeTask = inProgressTasks[0] || highPriorityTasks[0] || tasks.find(t => t.status === 'todo');
-
+            const metrics = deriveProductivityAnalytics();
+            const categoryEntries = Object.entries(metrics.categorySeconds).sort((a,b) => b[1] - a[1]);
+            const diagnostics = [
+                ...metrics.overdue.map(task => ({ task, type:'overdue', label:`Overdue since ${task.dueDate}` })),
+                ...metrics.blocked.map(task => { const blocker = metrics.tasks.find(item => item.id === task.blockedBy); return { task, type:'blocked', label:`Blocked by ${blocker ? blocker.title : 'missing dependency'}` }; })
+            ];
+            const goalHours = metrics.targetSeconds / 3600;
+            const activeTask = metrics.activeTask;
             container.innerHTML = `
                 <div class="productivity-dashboard">
-                    <div class="prod-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div class="prod-card-title">Daily Focus Snapshot</div>
-                                <div style="font-size: 18px; font-weight: 700;">
-                                    ${completedTasks.length} of ${totalTasks} Tasks Completed (${completionRate}%)
-                                </div>
-                            </div>
-                            <span style="font-size: 28px;">🎯</span>
-                        </div>
-                        <div class="prod-progress-bar-bg">
-                            <div class="prod-progress-bar-fill" style="width: ${completionRate}%;"></div>
-                        </div>
+                    <div class="performance-hero">
+                        <section class="performance-panel">
+                            <span class="finance-section-kicker">Daily focus quota</span>
+                            <div class="focus-quota-value" style="color:${metrics.quotaPercent >= 100 ? 'var(--success)' : 'var(--primary)'}">${formatFocusDuration(metrics.dailyFocusSeconds)}</div>
+                            <div class="focus-quota-copy">Goal ${goalHours.toFixed(goalHours % 1 ? 1 : 0)}h · ${metrics.quotaPercent.toFixed(0)}% complete · ${metrics.streak} active-day streak</div>
+                            <div class="prod-progress-bar-bg"><div class="prod-progress-bar-fill" style="width:${metrics.quotaPercent}%"></div></div>
+                            <div class="quota-settings" style="margin-top:14px"><label style="font-size:10px;font-weight:700">Daily goal <input id="productivityHubGoal" type="number" min=".25" max="24" step=".25" value="${goalHours}" style="width:90px;margin-left:6px" onchange="document.getElementById('productivityDailyGoalHours').value=this.value;updateProductivityGoal()"></label></div>
+                        </section>
+                        <section class="active-task-hero">
+                            <div><div class="active-task-badge">⚡ Priority Focus Target</div><h3 style="margin:12px 0 6px;font:750 20px var(--font-display)">${activeTask ? productivityEscape(activeTask.title) : 'Queue clear — protect your recovery time.'}</h3><p style="margin:0;opacity:.75;font-size:12px">${activeTask ? productivityEscape(activeTask.description || `${activeTask.category || 'General'} · ${activeTask.priority || 'Normal'} priority`) : 'No pending task requires immediate action.'}</p></div>
+                            ${activeTask ? `<div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn-timer ${window.activeTaskId === activeTask.id ? 'active' : ''}" onclick="toggleTimer('${activeTask.id}');renderProductivityDashboard()">${window.activeTaskId === activeTask.id ? '⏹ Stop Focus' : '▶ Start Focus'}</button><button class="btn-alt" onclick="moveTask('${activeTask.id}','done');renderProductivityDashboard()">✓ Complete</button></div>` : ''}
+                        </section>
                     </div>
 
-                    <div class="prod-grid-summary">
-                        <div class="prod-card">
-                            <div class="prod-card-title">Total Focus Time</div>
-                            <div class="prod-card-value" style="color: #8b5cf6;">${focusHours}h ${focusMins}m</div>
-                        </div>
-                        <div class="prod-card">
-                            <div class="prod-card-title">Completion Rate</div>
-                            <div class="prod-card-value" style="color: var(--primary);">${completionRate}%</div>
-                        </div>
-                        <div class="prod-card">
-                            <div class="prod-card-title">Completed Output</div>
-                            <div class="prod-card-value" style="color: var(--success);">₱${totalProfitEarned.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
-                        </div>
-                        <div class="prod-card">
-                            <div class="prod-card-title">7-Day Velocity</div>
-                            <div class="prod-card-value" style="color: var(--warning);">${(completedTasks.length / 7).toFixed(1)} / day</div>
-                        </div>
+                    <div class="performance-kpis">
+                        <article class="performance-kpi"><span class="finance-section-kicker">7-day throughput</span><div class="performance-kpi-value" style="color:var(--success)">${metrics.recentCompleted.length}</div><div class="performance-kpi-meta">${metrics.throughputRate.toFixed(0)}% of the comparable 7-day intake</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Sprint velocity</span><div class="performance-kpi-value" style="color:var(--primary)">${metrics.velocity.toFixed(2)}/day</div><div class="performance-kpi-meta">Rolling daily completion average</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Average cycle time</span><div class="performance-kpi-value" style="color:var(--warning)">${metrics.averageCycleDays.toFixed(1)}d</div><div class="performance-kpi-meta">Assigned date to completed date</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Focus → output</span><div class="performance-kpi-value" style="color:#8b5cf6">${metrics.focusOutputHours.toFixed(1)}h</div><div class="performance-kpi-meta">Tracked focus per completed deliverable</div></article>
                     </div>
 
-                    <div class="workspace-layout">
-                        <div class="active-task-hero">
-                            <div>
-                                <div class="active-task-badge">⚡ Priority Focus Target</div>
-                                <h3 style="margin: 12px 0 6px 0; font-family: 'Poppins', sans-serif; font-size: 20px;">
-                                    ${activeTask ? activeTask.title : 'All tasks completed! Take a break.'}
-                                </h3>
-                                <p style="margin: 0; opacity: 0.8; font-size: 14px;">
-                                    ${activeTask ? (activeTask.description || 'No description added.') : 'No pending tasks in queue.'}
-                                </p>
-                            </div>
-
-                            ${activeTask ? `
-                                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px;">
-                                    <button class="btn-timer ${window.activeTaskId === activeTask.id ? 'active' : ''}" 
-                                        onclick="window.toggleTimer('${activeTask.id}'); window.renderProductivityDashboard();">
-                                        ${window.activeTaskId === activeTask.id ? '⏹ Stop Pomodoro' : '▶ Start Pomodoro Focus'}
-                                    </button>
-                                    ${activeTask.status !== 'done' ? `
-                                        <button class="btn-alt" onclick="window.moveTask('${activeTask.id}', 'done'); window.renderProductivityDashboard();">
-                                            ✓ Mark Complete
-                                        </button>
-                                    ` : ''}
-                                </div>
-                            ` : ''}
-                        </div>
-
-                        <div class="prod-card" style="display: flex; flex-direction: column; gap: 12px;">
-                            <div class="prod-card-title">Active Queue (${inProgressTasks.length + highPriorityTasks.length})</div>
-                            <div style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
-                                ${[...inProgressTasks, ...highPriorityTasks].slice(0, 5).map(t => `
-                                    <div style="padding: 8px 12px; background: rgba(30, 30, 30, 0.03); border-radius: var(--radius-sm); border: 1px solid var(--surface-border); display: flex; justify-content: space-between; align-items: center;">
-                                        <span style="font-size: 13px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 170px;">${t.title}</span>
-                                        <button class="btn-small" onclick="window.moveTask('${t.id}', 'done'); window.renderProductivityDashboard();" style="padding: 2px 8px; min-height: 26px;">✓</button>
-                                    </div>
-                                `).join('') || '<div style="font-size: 13px; opacity: 0.6;">Queue is clear!</div>'}
-                            </div>
-                        </div>
+                    <div class="performance-grid">
+                        <section class="performance-panel"><span class="finance-section-kicker">Category allocation</span><h3>Where focus time goes</h3><div class="allocation-list">${categoryEntries.length ? categoryEntries.map(([category, seconds]) => { const pct = metrics.totalFocusSeconds ? seconds / metrics.totalFocusSeconds * 100 : 0; return `<div class="allocation-row"><strong>${productivityEscape(category)}</strong><div class="allocation-track"><div class="allocation-fill" style="width:${pct}%"></div></div><span>${formatFocusDuration(seconds)} · ${pct.toFixed(1)}%</span></div>`; }).join('') : '<div class="empty-state">Start a task timer to build your focus allocation.</div>'}</div></section>
+                        <section class="performance-panel"><span class="finance-section-kicker">Bottleneck diagnostics</span><h3>${diagnostics.length} item${diagnostics.length === 1 ? '' : 's'} need attention</h3><div class="diagnostic-list">${diagnostics.length ? diagnostics.slice(0,8).map(item => `<div class="diagnostic-item"><span class="diagnostic-dot ${item.type === 'overdue' ? 'overdue' : ''}"></span><div><div class="diagnostic-title">${productivityEscape(item.task.title)}</div><div class="diagnostic-meta">${productivityEscape(item.label)}</div></div><button class="btn-small" onclick="setView('all')">Open</button></div>`).join('') : '<div class="empty-state">No blocked or overdue tasks. Flow is clear.</div>'}</div></section>
                     </div>
 
-                    <div class="deep-dive-portal deep-dive-cta">
-                        <div>
-                            <strong style="font-size: 16px; font-weight: 700; color: var(--card-text); display: block;">
-                                Detailed Financial &amp; Time Analytics
-                            </strong>
-                            <div style="font-size: 13px; opacity: 0.85; margin-top: 4px; color: var(--card-text);">
-                                Inspect deep revenue breakdown, allocated budgets, and complete time logs.
-                            </div>
-                        </div>
-                        <button class="btn-alt" onclick="window.navigateToCustomizeAnalytics()" 
-                            style="background: var(--primary); color: var(--primary-contrast-text, #ffffff); border: none; font-weight: 600; padding: 10px 18px; box-shadow: var(--shadow-sm);">
-                            📊 Open Analytics Settings →
-                        </button>
-                    </div>
-                </div>
-            `;
+                    <div class="deep-dive-portal deep-dive-cta"><div><strong style="display:block;font-size:16px">Operational analytics controls</strong><div style="font-size:12px;opacity:.72;margin-top:4px">Adjust the daily focus quota and inspect workspace-wide productivity totals.</div></div><button class="btn-alt" onclick="navigateToCustomizeAnalytics()">📊 Open Analytics Settings →</button></div>
+                </div>`;
         };
 
         window.navigateToCustomizeAnalytics = function() {
@@ -3976,7 +4202,7 @@
                                 const dateObj = new Date(ev.start.dateTime);
                                 evTime = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ' ';
                             }
-                            dayHtml += `<div class="calendar-task" style="background: #4285F4; color: #ffffff;" title="${ev.summary}">${evTime}🔵 ${ev.summary}</div>`;
+                            dayHtml += `<button type="button" class="calendar-task gcal-event" title="Inspect ${calendarEscape(ev.summary || 'Google Calendar event')}" onclick="openGoogleCalendarEvent('${encodeURIComponent(ev.id)}')">${calendarEscape(evTime)}🔵 ${calendarEscape(ev.summary || 'Untitled event')}</button>`;
                         }
                     }
                 });
@@ -4058,8 +4284,15 @@
             document.getElementById('stat-budget').innerText = `₱${totalBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             document.getElementById('stat-finished').innerText = finishedCount;
             document.getElementById('stat-overdue').innerText = overdueCount;
-            document.getElementById('stat-velocity').innerText = `${(finishedCount / 7).toFixed(1)} / day`;
+            const performance = deriveProductivityAnalytics();
+            document.getElementById('stat-velocity').innerText = `${performance.velocity.toFixed(2)} / day`;
             document.getElementById('stat-time').innerText = `${hrs}h ${mins}m`;
+            const quotaEl = document.getElementById('stat-focus-quota');
+            const streakEl = document.getElementById('stat-focus-streak');
+            if (quotaEl) quotaEl.innerText = `${performance.quotaPercent.toFixed(0)}%`;
+            if (streakEl) streakEl.innerText = `${performance.streak} day${performance.streak === 1 ? '' : 's'}`;
+            const goalInput = document.getElementById('productivityDailyGoalHours');
+            if (goalInput && document.activeElement !== goalInput) goalInput.value = performance.targetSeconds / 3600;
         };
 
         window.renderTasks = function() {
@@ -4321,6 +4554,7 @@
             window.activeTaskId = taskId;
             const task = window.tasks.find(t => t.id === taskId);
             if (!task.timeSpent) task.timeSpent = 0;
+            if (!task.focusLog || typeof task.focusLog !== 'object') task.focusLog = {};
 
             const newBtn = document.getElementById(`btn-timer-${taskId}`);
             if (newBtn) {
@@ -4330,6 +4564,8 @@
 
             window.timerInterval = setInterval(() => {
                 task.timeSpent += 1;
+                const focusDateKey = localISODate();
+                task.focusLog[focusDateKey] = (task.focusLog[focusDateKey] || 0) + 1;
                 
                 const display = document.getElementById(`display-timer-${taskId}`);
                 if (display) {
@@ -4342,6 +4578,7 @@
                 if (task.timeSpent % 10 === 0) {
                      window.saveTasks(true);
                 }
+                if (task.timeSpent % 30 === 0 && currentView === 'productivity') window.renderProductivityDashboard();
             }, 1000);
         };
 
