@@ -1,0 +1,61 @@
+.batch-action-bar {
+  position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); z-index: 1000;
+  transform: translateX(-50%); display: flex; align-items: end; gap: 10px; flex-wrap: wrap;
+  width: min(920px, calc(100vw - 28px)); padding: 12px; color: var(--card-text);
+  background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--surface-border-strong);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); backdrop-filter: blur(18px);
+}
+.batch-action-bar[hidden] { display: none; }
+.batch-field { display: grid; gap: 3px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.batch-field select { min-width: 120px; padding: 8px 10px; }
+.task-card.batch-selected { outline: 3px solid var(--primary); outline-offset: 2px; box-shadow: 0 0 0 6px var(--focus-ring), var(--shadow-md); }
+.project-epic-badge { display: inline-flex; margin: 4px 0 7px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.report-launcher { display: block; margin: -12px 0 18px auto; }
+.command-visual-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .8fr); gap: 16px; margin-top: 16px; }
+.cash-flow-chart svg { display: block; width: 100%; min-height: 230px; overflow: visible; }
+.cash-gridline { stroke: var(--surface-border); stroke-width: 1; }
+.cash-line { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.cash-line.income { stroke: var(--success); }
+.cash-line.expense { stroke: var(--danger); }
+.cash-area.expense { fill: rgba(var(--danger-rgb), .08); }
+.cash-chart-legend { display: flex; gap: 16px; font-size: 12px; font-weight: 700; }
+.cash-chart-legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--success); }
+.cash-chart-legend span + span::before { background: var(--danger); }
+.project-delivery-row { display: grid; gap: 5px; padding: 10px 0; border-bottom: 1px solid var(--surface-border); }
+.project-delivery-row span { color: var(--text-muted); font-size: 11px; }
+.project-dual-track { position: relative; height: 9px; background: rgba(var(--surface-rgb), .5); border: 1px solid var(--surface-border); border-radius: 999px; overflow: hidden; }
+.project-dual-track i { position: absolute; inset: 0 auto 0 0; display: block; border-radius: inherit; }
+.project-dual-track .delivery { background: var(--primary); height: 4px; top: 0; }
+.project-dual-track .spend { background: var(--warning); height: 4px; top: auto; bottom: 0; }
+.summary-report-modal { width: min(880px, calc(100vw - 24px)); max-height: calc(100vh - 24px); padding: 0; color: var(--card-text); background: var(--surface); border: 1px solid var(--surface-border-strong); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); }
+.summary-report-modal::backdrop { background: rgba(4, 8, 18, .72); backdrop-filter: blur(8px); }
+.report-shell { padding: 24px; }
+.report-actions { display: flex; justify-content: flex-end; gap: 8px; position: sticky; top: 0; padding-bottom: 16px; background: var(--surface); z-index: 2; }
+.report-body { max-width: 720px; margin: auto; }
+.report-body h1 { font-family: var(--font-display); font-size: clamp(28px, 5vw, 46px); }
+.report-meta { color: var(--text-muted); }
+.report-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+.report-metrics div { padding: 16px; background: var(--bg); border: 1px solid var(--surface-border); border-radius: var(--radius-md); }
+.report-metrics strong, .report-metrics span { display: block; }
+.report-metrics strong { font: 800 24px/1 var(--font-metric); }
+.report-metrics span { margin-top: 6px; color: var(--text-muted); font-size: 11px; }
+.offline-banner { position: fixed; right: 16px; bottom: 16px; z-index: 1200; padding: 9px 12px; color: #fff; background: #27272a; border-radius: 999px; box-shadow: var(--shadow-lg); font-size: 12px; font-weight: 700; }
+@media (max-width: 760px) {
+  .command-visual-grid { grid-template-columns: 1fr; }
+  .batch-action-bar { align-items: stretch; }
+  .batch-action-bar > * { flex: 1 1 120px; }
+  .batch-action-bar > strong { flex-basis: 100%; }
+  .report-metrics { grid-template-columns: 1fr; }
+  .report-launcher { margin: 0 0 16px; width: 100%; }
+}
+@media (max-width: 380px) {
+  .batch-field select { min-width: 0; width: 100%; }
+  .report-shell { padding: 15px; }
+}
+@media print {
+  body.printing-report > *:not(#summary-report-modal) { display: none !important; }
+  body.printing-report #summary-report-modal { position: static; display: block; width: 100%; max-height: none; border: 0; box-shadow: none; }
+  body.printing-report .report-actions { display: none; }
+  body.printing-report .report-body { max-width: none; color: #111; }
+}
+

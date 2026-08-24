@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoloFlow — Task and Events Tracker</title>
+    <title>SoloFlow — Task and Events Workspace</title>
+    <meta name="theme-color" content="#0F172A">
+    <meta name="description" content="An offline-ready command center for tasks, focus, calendar, finance, and project delivery.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="stylesheet" href="./styles/architecture.css">
     
     <!-- reCAPTCHA Enterprise Script -->
     <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lcvq4otAAAAAGNDRtcejDcv3A5IKBTFEMBc7jz4"></script>
@@ -2584,6 +2590,7 @@
                         <span class="input-label">Assigned:</span><input type="date" id="taskDateAssigned">
                         <span class="input-label">Due time:</span><input type="time" id="taskDueTime">
                         <select id="taskBlockedBy" style="flex-grow:1;min-width:150px"><option value="">No Dependencies</option></select>
+                        <select id="taskProjectId" style="flex-grow:1;min-width:150px" aria-label="Parent project or epic"><option value="">No Project / Epic</option></select>
                     </div>
                 </div></div>
             </details>
@@ -3021,7 +3028,9 @@
             applySettings();
             
             if (userId) {
-                setDoc(getDocPath('trackerData', 'settings'), window.settings).catch(e => console.error("Failed to sync settings", e));
+                const write = () => setDoc(getDocPath('trackerData', 'settings'), window.settings);
+                if (window.SoloFlowCloudQueue) window.SoloFlowCloudQueue.enqueue('settings', write);
+                else write().catch(e => console.error("Failed to sync settings", e));
             }
         };
 
@@ -3034,7 +3043,10 @@
                 window.renderProductivityDashboard();
             }
             if (userId) {
-                setDoc(getDocPath('trackerData', 'tasks'), { data: window.tasks }).catch(e => console.error("Failed to sync tasks", e));
+                const payload = { data: structuredClone(window.tasks) };
+                const write = () => setDoc(getDocPath('trackerData', 'tasks'), payload);
+                if (window.SoloFlowCloudQueue) window.SoloFlowCloudQueue.enqueue('tasks', write);
+                else write().catch(e => console.error("Failed to sync tasks", e));
             }
         };
 
@@ -3042,14 +3054,20 @@
             localStorage.setItem('trackerEvents', JSON.stringify(window.events));
             window.renderEvents();
             if (userId) {
-                setDoc(getDocPath('trackerData', 'events'), { data: window.events }).catch(e => console.error("Failed to sync events", e));
+                const payload = { data: structuredClone(window.events) };
+                const write = () => setDoc(getDocPath('trackerData', 'events'), payload);
+                if (window.SoloFlowCloudQueue) window.SoloFlowCloudQueue.enqueue('events', write);
+                else write().catch(e => console.error("Failed to sync events", e));
             }
         };
 
         window.saveSchedule = function() {
             localStorage.setItem('weeklySchedule', JSON.stringify(window.scheduleData));
             if (userId) {
-                setDoc(getDocPath('trackerData', 'schedule'), { data: window.scheduleData }).catch(e => console.error("Failed to sync schedule", e));
+                const payload = { data: structuredClone(window.scheduleData) };
+                const write = () => setDoc(getDocPath('trackerData', 'schedule'), payload);
+                if (window.SoloFlowCloudQueue) window.SoloFlowCloudQueue.enqueue('schedule', write);
+                else write().catch(e => console.error("Failed to sync schedule", e));
             }
         };
 
@@ -3057,7 +3075,10 @@
             localStorage.setItem('soloflow_finance', JSON.stringify(window.financeTransactions));
             window.renderFinance();
             if (userId) {
-                setDoc(getDocPath('trackerData', 'finance'), { data: window.financeTransactions }).catch(e => console.error("Failed to sync finance", e));
+                const payload = { data: structuredClone(window.financeTransactions) };
+                const write = () => setDoc(getDocPath('trackerData', 'finance'), payload);
+                if (window.SoloFlowCloudQueue) window.SoloFlowCloudQueue.enqueue('finance', write);
+                else write().catch(e => console.error("Failed to sync finance", e));
             }
         };
 
@@ -3068,12 +3089,15 @@
             localStorage.setItem('soloflow_finance_preferences', JSON.stringify(window.financePreferences));
             window.renderFinance();
             if (userId) {
-                setDoc(getDocPath('trackerData', 'financeCommand'), {
+                const payload = {
                     assets: window.financeAssets,
                     projects: window.financeProjects,
                     budgets: window.financeBudgets,
                     preferences: window.financePreferences
-                }).catch(e => console.error("Failed to sync finance command center", e));
+                };
+                const write = () => setDoc(getDocPath('trackerData', 'financeCommand'), structuredClone(payload));
+                if (window.SoloFlowCloudQueue) window.SoloFlowCloudQueue.enqueue('financeCommand', write);
+                else write().catch(e => console.error("Failed to sync finance command center", e));
             }
         };
 
@@ -3465,18 +3489,39 @@
 
                     const card = document.createElement('div');
                     card.className = 'inbox-card';
-                    card.innerHTML = `
-                        <div class="inbox-card-header">
-                            <div class="inbox-subject">${subject}</div>
-                            <div class="inbox-date">${dateStr}</div>
-                        </div>
-                        <div class="inbox-sender">${sender}</div>
-                        <div class="inbox-snippet">${snippet}</div>
-                        <div class="inbox-actions">
-                            <button class="btn-inbox-convert" onclick="convertEmailToTask('${encodeURIComponent(subject)}', '${encodeURIComponent(snippet)}', '${encodeURIComponent(sender)}', '${encodeURIComponent(permalink)}')">✨ Convert to SoloFlow Task</button>
-                            <a href="${permalink}" target="_blank" class="task-link" style="margin: 0;">🔗 Open in Gmail</a>
-                        </div>
-                    `;
+                    const header = document.createElement('div');
+                    header.className = 'inbox-card-header';
+                    const subjectNode = document.createElement('div');
+                    subjectNode.className = 'inbox-subject';
+                    subjectNode.textContent = subject;
+                    const dateNode = document.createElement('div');
+                    dateNode.className = 'inbox-date';
+                    dateNode.textContent = dateStr;
+                    header.append(subjectNode, dateNode);
+                    const senderNode = document.createElement('div');
+                    senderNode.className = 'inbox-sender';
+                    senderNode.textContent = sender;
+                    const snippetNode = document.createElement('div');
+                    snippetNode.className = 'inbox-snippet';
+                    snippetNode.textContent = snippet;
+                    const actions = document.createElement('div');
+                    actions.className = 'inbox-actions';
+                    const convertButton = document.createElement('button');
+                    convertButton.type = 'button';
+                    convertButton.className = 'btn-inbox-convert';
+                    convertButton.textContent = '✨ Convert to SoloFlow Task';
+                    convertButton.addEventListener('click', () => window.convertEmailToTask(
+                        encodeURIComponent(subject), encodeURIComponent(snippet), encodeURIComponent(sender), encodeURIComponent(permalink)
+                    ));
+                    const gmailLink = document.createElement('a');
+                    gmailLink.href = permalink;
+                    gmailLink.target = '_blank';
+                    gmailLink.rel = 'noopener noreferrer';
+                    gmailLink.className = 'task-link';
+                    gmailLink.style.margin = '0';
+                    gmailLink.textContent = '🔗 Open in Gmail';
+                    actions.append(convertButton, gmailLink);
+                    card.append(header, senderNode, snippetNode, actions);
                     container.appendChild(card);
                 }
             } catch (err) {
@@ -3486,6 +3531,33 @@
         };
 
         // --- TASK TRACKER LOGIC ---
+        const taskEscape = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[char]);
+        const taskSafeUrl = (value, allowImageData = false) => {
+            try {
+                const input = String(value || '').trim();
+                if (allowImageData && /^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(input)) return input;
+                const parsed = new URL(input, location.href);
+                return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
+            } catch { return ''; }
+        };
+        const taskSanitizeRichText = (value) => {
+            const template = document.createElement('template');
+            template.innerHTML = String(value ?? '');
+            const allowed = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'MARK', 'BR']);
+            const clean = (parent) => Array.from(parent.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) return;
+                if (node.nodeType !== Node.ELEMENT_NODE || !allowed.has(node.tagName)) {
+                    node.replaceWith(document.createTextNode(node.textContent || ''));
+                    return;
+                }
+                Array.from(node.attributes).forEach(attribute => node.removeAttribute(attribute.name));
+                clean(node);
+            });
+            clean(template.content);
+            return template.innerHTML;
+        };
         window.parseEmailToTask = function() {
             const emailText = prompt("Paste copied text from your email (Subject, Sender, Body, or URL):");
             if (!emailText || !emailText.trim()) return;
@@ -3729,6 +3801,7 @@
                 dueDate: document.getElementById('taskDueDate').value,
                 dueTime: document.getElementById('taskDueTime').value,
                 blockedBy: document.getElementById('taskBlockedBy').value,
+                projectId: document.getElementById('taskProjectId')?.value || '',
                 status: 'todo',
                 syncedToCalendar: false,
                 syncedToGCal: false,
@@ -3737,7 +3810,7 @@
 
             window.tasks.push(newTask);
             
-            ['taskTitle','taskCategory','taskBudget','taskDescription','taskSubtasks','taskPhotoUrl','taskLinkUrl','taskWorkspaceUrl','taskAssignee','taskDateAssigned','taskDueDate','taskDueTime','taskBlockedBy'].forEach(id => {
+            ['taskTitle','taskCategory','taskBudget','taskDescription','taskSubtasks','taskPhotoUrl','taskLinkUrl','taskWorkspaceUrl','taskAssignee','taskDateAssigned','taskDueDate','taskDueTime','taskBlockedBy','taskProjectId'].forEach(id => {
                 document.getElementById(id).value = '';
             });
             window.clearSubtaskChips();
@@ -3775,7 +3848,8 @@
             const task = window.tasks.find(t => t.id === taskId);
             if (task) {
                 task[field] = value;
-                window.saveTasks();
+                window.saveTasks(true);
+                window.calculateAnalytics();
             }
         };
 
@@ -3828,7 +3902,9 @@
         window.deleteTask = function(id) {
             window.tasks = window.tasks.filter(t => t.id !== id);
             window.expandedCards.delete(id);
-            window.saveTasks();
+            document.querySelector(`.task-card[data-task-id="${CSS.escape(id)}"]`)?.remove();
+            window.saveTasks(true);
+            window.calculateAnalytics();
         };
 
         window.emptyStateHTML = function(title, description, ctaLabel = '', action = '') {
@@ -3849,6 +3925,7 @@
             if (!completedIds.length) return window.showToast('There are no completed tasks to clear.', 'info');
             if (!confirm('Are you sure you want to delete all completed tasks?')) return;
             const completedSet = new Set(completedIds);
+            if (window.activeTaskId && completedSet.has(window.activeTaskId)) window.SoloFlowTimer?.stop(true);
             window.tasks = window.tasks.filter(task => task.status !== 'done');
             completedIds.forEach(id => window.expandedCards.delete(id));
             if (window.activeTaskId && completedSet.has(window.activeTaskId)) {
@@ -3905,7 +3982,9 @@
             const task = window.tasks.find(t => t.id === taskId);
             if(task && task.subtasks[subIdx]) {
                 task.subtasks[subIdx].completed = !task.subtasks[subIdx].completed;
-                window.saveTasks();
+                const row = document.querySelector(`.task-card[data-task-id="${CSS.escape(taskId)}"]`)?.querySelectorAll('.subtask-item')[subIdx];
+                row?.classList.toggle('completed', task.subtasks[subIdx].completed);
+                window.saveTasks(true);
             }
         };
 
@@ -4036,18 +4115,20 @@
             const task = window.tasks.find(t => t.id === taskId);
             if (!task) return;
 
-            const newValue = element.innerHTML.trim();
+            const newValue = field === 'title' ? taskEscape(element.innerText.trim()) : taskSanitizeRichText(element.innerHTML.trim());
             if (subtaskIdx !== null) {
                  if(newValue === '') task.subtasks.splice(subtaskIdx, 1);
                  else task.subtasks[subtaskIdx].text = newValue;
             } else {
                 if (field === 'title' && element.innerText.trim() === '') {
-                    element.innerHTML = task.title;
+                    element.textContent = task.title;
                     return;
                 }
-                task[field] = newValue;
+                task[field] = field === 'title' ? element.innerText.trim() : newValue;
             }
-            window.saveTasks();
+            element.innerHTML = field === 'title' ? taskEscape(task[field]) : newValue;
+            window.saveTasks(true);
+            window.calculateAnalytics();
         };
 
         window.preventEnter = function(e) {
@@ -4352,8 +4433,18 @@
                 if(t.assignee) assignees.add(t.assignee);
             });
 
-            catSelect.innerHTML = Array.from(categories).map(c => `<option value="${c}">${c === 'All' ? 'All Categories' : c}</option>`).join('');
-            assignSelect.innerHTML = Array.from(assignees).map(a => `<option value="${a}">${a === 'All' ? 'All Assignees' : a}</option>`).join('');
+            catSelect.replaceChildren(...Array.from(categories).map(c => {
+                const option = document.createElement('option');
+                option.value = c;
+                option.textContent = c === 'All' ? 'All Categories' : c;
+                return option;
+            }));
+            assignSelect.replaceChildren(...Array.from(assignees).map(a => {
+                const option = document.createElement('option');
+                option.value = a;
+                option.textContent = a === 'All' ? 'All Assignees' : a;
+                return option;
+            }));
             
             if(categories.has(currentCat)) catSelect.value = currentCat;
             if(assignees.has(currentAssign)) assignSelect.value = currentAssign;
@@ -4361,14 +4452,34 @@
             const blockedSelect = document.getElementById('taskBlockedBy');
             if (blockedSelect) {
                 const currentBlocked = blockedSelect.value;
-                let blockedOptions = '<option value="">No Dependencies</option>';
+                const blockedOptions = [];
+                const none = document.createElement('option');
+                none.value = '';
+                none.textContent = 'No Dependencies';
+                blockedOptions.push(none);
                 window.tasks.forEach(t => {
                     if (t.status !== 'done') {
-                        blockedOptions += `<option value="${t.id}">Block with: ${t.title}</option>`;
+                        const option = document.createElement('option');
+                        option.value = t.id;
+                        option.textContent = `Block with: ${t.title}`;
+                        blockedOptions.push(option);
                     }
                 });
-                blockedSelect.innerHTML = blockedOptions;
+                blockedSelect.replaceChildren(...blockedOptions);
                 blockedSelect.value = currentBlocked;
+            }
+            const projectSelect = document.getElementById('taskProjectId');
+            if (projectSelect) {
+                const currentProject = projectSelect.value;
+                const options = [Object.assign(document.createElement('option'), { value: '', textContent: 'No Project / Epic' })];
+                (window.financeProjects || []).forEach(project => {
+                    const option = document.createElement('option');
+                    option.value = project.id;
+                    option.textContent = project.name;
+                    options.push(option);
+                });
+                projectSelect.replaceChildren(...options);
+                projectSelect.value = currentProject;
             }
         };
 
@@ -4456,6 +4567,9 @@
 
                 const card = document.createElement('div');
                 card.className = `task-card card-${task.status}`;
+                card.dataset.taskId = task.id;
+                card.setAttribute('role', 'option');
+                card.setAttribute('aria-selected', 'false');
                 
                 let isBlocked = false;
                 let blockedBadgeHtml = '';
@@ -4463,7 +4577,7 @@
                     const blockingTask = window.tasks.find(t => t.id === task.blockedBy);
                     if (blockingTask && blockingTask.status !== 'done') {
                         isBlocked = true;
-                        blockedBadgeHtml = `<div style="background: rgba(231, 76, 60, 0.1); color: var(--danger); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px dashed var(--danger);">🔒 Blocked by: ${blockingTask.title}</div>`;
+                        blockedBadgeHtml = `<div style="background: rgba(231, 76, 60, 0.1); color: var(--danger); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px dashed var(--danger);">🔒 Blocked by: ${taskEscape(blockingTask.title)}</div>`;
                     }
                 }
 
@@ -4487,17 +4601,18 @@
                     }
                 }
 
-                const photoHtml = task.photoUrl ? `<img src="${task.photoUrl}" class="task-photo" alt="Attached photo" onerror="this.style.display='none'">` : '';
-                const photoThumbHtml = task.photoUrl ? `<img src="${task.photoUrl}" class="task-photo-thumb" alt="Task attachment thumbnail" onerror="this.style.display='none'">` : '';
+                const safePhotoUrl = taskSafeUrl(task.photoUrl, true);
+                const photoHtml = safePhotoUrl ? `<img src="${taskEscape(safePhotoUrl)}" class="task-photo" alt="Attached photo" onerror="this.style.display='none'">` : '';
+                const photoThumbHtml = safePhotoUrl ? `<img src="${taskEscape(safePhotoUrl)}" class="task-photo-thumb" alt="Task attachment thumbnail" onerror="this.style.display='none'">` : '';
                 
                 let linksContainerHtml = '';
                 if (task.linkUrl || task.workspaceUrl) {
                     linksContainerHtml = `<div class="task-links-container">`;
-                    if (task.linkUrl) {
-                        linksContainerHtml += `<a href="${task.linkUrl}" target="_blank" class="task-link">🔗 Reference Link</a>`;
+                    if (taskSafeUrl(task.linkUrl)) {
+                        linksContainerHtml += `<a href="${taskEscape(taskSafeUrl(task.linkUrl))}" target="_blank" rel="noopener noreferrer" class="task-link">🔗 Reference Link</a>`;
                     }
-                    if (task.workspaceUrl) {
-                        linksContainerHtml += `<a href="${task.workspaceUrl}" target="_blank" class="task-link doc-link">📄 Workspace / Doc</a>`;
+                    if (taskSafeUrl(task.workspaceUrl)) {
+                        linksContainerHtml += `<a href="${taskEscape(taskSafeUrl(task.workspaceUrl))}" target="_blank" rel="noopener noreferrer" class="task-link doc-link">📄 Workspace / Doc</a>`;
                     }
                     linksContainerHtml += `</div>`;
                 }
@@ -4507,7 +4622,7 @@
                 const budgetHtml = task.budget ? `<div class="task-metric ${financeClass}">${financeTypeLabel}: ₱${parseFloat(task.budget).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>` : '';
                 
                 const descText = task.description || '';
-                const descHtml = `<div class="task-desc editable" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${descText}</div>`;
+                const descHtml = `<div class="task-desc editable" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${taskSanitizeRichText(descText)}</div>`;
                 
                 let subtasksHtml = '<div class="subtasks-list">';
                 if(task.subtasks && task.subtasks.length > 0) {
@@ -4519,7 +4634,7 @@
                                 <input type="checkbox" ${checked} onchange="toggleSubtask('${task.id}', ${idx})">
                                 <div class="subtask-text-container editable" contenteditable="true" spellcheck="false" 
                                     onkeydown="preventEnter(event)" 
-                                    onblur="updateTaskField('${task.id}', 'subtasks', this, ${idx})">${st.text}</div>
+                                    onblur="updateTaskField('${task.id}', 'subtasks', this, ${idx})">${taskSanitizeRichText(st.text)}</div>
                             </div>
                         `;
                     });
@@ -4545,7 +4660,7 @@
                 }
 
                 let metaHtml = `<div class="task-meta">`;
-                if (task.assignee) metaHtml += `<p><strong>Assigned to:</strong> ${task.assignee}</p>`;
+                if (task.assignee) metaHtml += `<p><strong>Assigned to:</strong> ${taskEscape(task.assignee)}</p>`;
                 
                 metaHtml += `
                     <p>
@@ -4595,12 +4710,12 @@
                     ${photoThumbHtml}
                     <div class="task-title editable" contenteditable="true" spellcheck="false" 
                         onkeydown="preventEnter(event)" 
-                        onblur="updateTaskField('${task.id}', 'title', this)">${task.title}</div>
+                        onblur="updateTaskField('${task.id}', 'title', this)">${taskEscape(task.title)}</div>
                     ${budgetHtml}
                     ${dueBadgeHtml && !isExpanded ? `<div style="font-size: 11px; margin-bottom: 8px;">${dueBadgeHtml}</div>` : ''}
                     <div class="badges">
-                        <span class="badge ${task.priority.toLowerCase()}">${task.priority}</span>
-                        <span class="badge">${task.category}</span>
+                        <span class="badge ${taskEscape(task.priority.toLowerCase())}">${taskEscape(task.priority)}</span>
+                        <span class="badge">${taskEscape(task.category)}</span>
                         ${task.financeSynced ? `<span class="badge" style="border-color: var(--success); color: var(--success);">✓ Finance Logged</span>` : ''}
                     </div>
                     ${descHtml}
@@ -5242,5 +5357,6 @@
         window.renderEvents();
         window.renderFinance();
     </script>
+    <script type="module" src="./bootstrap.js"></script>
 </body>
 </html>
