@@ -130,6 +130,5 @@ export function installReportModule() {
   button.className = 'btn-alt report-launcher';
   button.textContent = 'Generate summary';
   button.addEventListener('click', window.openSummaryReport);
-  document.querySelector('.view-tabs')?.after(button);
+  document.querySelector('.control-panel')?.append(button);
 }
-

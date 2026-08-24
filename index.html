@@ -2011,6 +2011,41 @@
     </style>
 </head>
 <body>
+    <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
+        <div class="sidebar-brand">
+            <span class="sidebar-mark" aria-hidden="true">S</span>
+            <span class="sidebar-brand-copy"><strong>SoloFlow</strong><small>Command Center</small></span>
+            <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Collapse navigation" aria-expanded="true">‹</button>
+        </div>
+        <button id="commandPaletteTrigger" class="sidebar-command" type="button" aria-haspopup="dialog" aria-controls="commandPalette">
+            <span aria-hidden="true">⌕</span><span class="nav-label">Search &amp; commands</span><kbd>⌘K</kbd>
+        </button>
+        <nav class="view-tabs" aria-label="Workspace views">
+            <button class="view-tab active" id="tab-all" data-view="all" onclick="setView('all')"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Kanban Board</span><span class="nav-badge" id="nav-count-all">0</span></button>
+            <button class="view-tab" id="tab-today" data-view="today" onclick="setView('today')"><span class="nav-icon" aria-hidden="true">◎</span><span class="nav-label">Today’s Focus</span><span class="nav-badge" id="nav-count-today">0</span></button>
+            <button class="view-tab" id="tab-backlog" data-view="backlog" onclick="setView('backlog')"><span class="nav-icon" aria-hidden="true">☷</span><span class="nav-label">Backlog</span><span class="nav-badge" id="nav-count-backlog">0</span></button>
+            <button class="view-tab" id="tab-schedule" data-view="schedule" onclick="setView('schedule')"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Weekly Schedule</span></button>
+            <button class="view-tab" id="tab-calendar" data-view="calendar" onclick="setView('calendar')"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Calendar</span><span class="nav-badge" id="nav-count-calendar">0</span></button>
+            <button class="view-tab" id="tab-inbox" data-view="inbox" onclick="setView('inbox')"><span class="nav-icon" aria-hidden="true">✉</span><span class="nav-label">Email Inbox</span></button>
+            <button class="view-tab" id="tab-productivity" data-view="productivity" onclick="setView('productivity')"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Productivity Hub</span></button>
+            <button class="view-tab" id="tab-finance" data-view="finance" onclick="setView('finance')"><span class="nav-icon" aria-hidden="true">₱</span><span class="nav-label">Finance Tracker</span><span class="nav-badge" id="nav-count-finance">0</span></button>
+        </nav>
+        <div class="sidebar-footer"><span class="sync-orbit" aria-hidden="true"></span><span class="nav-label">Local-first sync</span></div>
+    </aside>
+
+    <dialog id="commandPalette" class="command-palette" aria-labelledby="commandPaletteTitle">
+        <div class="command-palette-shell">
+            <div class="command-palette-head">
+                <span aria-hidden="true">⌕</span>
+                <label id="commandPaletteTitle" class="sr-only" for="commandPaletteInput">Search tasks, events, finance, and commands</label>
+                <input id="commandPaletteInput" type="search" autocomplete="off" placeholder="Search tasks, events, finance, or type a command…">
+                <kbd>Esc</kbd>
+            </div>
+            <div id="commandPaletteResults" class="command-palette-results" role="listbox" aria-label="Command results"></div>
+            <div class="command-palette-footer"><span>↑↓ Navigate</span><span>↵ Run</span><span><strong>&gt;</strong> Commands</span></div>
+        </div>
+    </dialog>
+    <section id="toastDeck" class="toast-deck" aria-live="polite" aria-atomic="false"></section>
     <div class="container">
         
         <!-- SOLOFLOW TOP BRAND HEADER -->
@@ -2041,17 +2076,17 @@
         <h2 id="pageTitle" contenteditable="true" role="textbox" aria-label="Editable dashboard title" aria-multiline="false" spellcheck="false" title="Click to edit workspace name">Rob's Globe and ADMU Task and Events Tracker</h2>
 
         <!-- Floating Rich Text Toolbar -->
-        <div id="formatToolbar" class="format-toolbar" style="display: none;">
-            <button onmousedown="event.preventDefault(); formatText('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
-            <button onmousedown="event.preventDefault(); formatText('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
-            <button onmousedown="event.preventDefault(); formatText('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+        <div id="formatToolbar" class="format-toolbar" role="toolbar" aria-label="Inline text formatting" style="display: none;">
+            <button type="button" onmousedown="event.preventDefault(); formatText('bold')" title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button>
+            <button type="button" onmousedown="event.preventDefault(); formatText('italic')" title="Italic (Ctrl+I)" aria-label="Italic"><i>I</i></button>
+            <button type="button" onmousedown="event.preventDefault(); formatText('underline')" title="Underline (Ctrl+U)" aria-label="Underline"><u>U</u></button>
             
             <div style="display: flex; align-items: center; gap: 4px; border-left: 1px solid var(--surface-border); padding-left: 4px; margin-left: 2px;">
                 <input type="color" id="highlightColor" value="#ffff00" style="width: 20px; height: 20px; padding: 0; border: none; cursor: pointer; background: transparent;" title="Pick Text Highlight Color">
-                <button onmousedown="event.preventDefault(); applyHighlight()" title="Highlight Text (Ctrl+Shift+H)">🖌️</button>
+                <button type="button" onmousedown="event.preventDefault(); applyHighlight()" title="Highlight Text (Ctrl+Shift+H)" aria-label="Apply highlight">🖌️</button>
             </div>
             
-            <button onmousedown="event.preventDefault(); formatText('removeFormat')" title="Clear Format">✕</button>
+            <button type="button" onmousedown="event.preventDefault(); formatText('removeFormat')" title="Clear Format" aria-label="Clear formatting">✕</button>
 
             <!-- SCHEDULE TOOLS -->
             <div id="scheduleTools" style="display: none; align-items: center; gap: 4px; border-left: 1px solid var(--surface-border); padding-left: 4px; margin-left: 2px;">
@@ -2098,41 +2133,10 @@
                 <div class="theme-live-layout">
                     <div class="theme-controls-col">
                         <label class="micro-label">Preset Themes</label>
-                        <div class="theme-preset-row">
-                            <button type="button" class="theme-preset-swatch active" data-preset="midnightSlate" onclick="window.applyThemePreset('midnightSlate')" title="Midnight Slate">
-                                <span class="preset-dots" style="background: linear-gradient(135deg, #0f172a 0 58%, #6366f1 58%);"></span>
-                                Midnight Slate
-                            </button>
-                            <button type="button" class="theme-preset-swatch" data-preset="emeraldFocus" onclick="window.applyThemePreset('emeraldFocus')" title="Emerald Focus">
-                                <span class="preset-dots" style="background: linear-gradient(135deg, #071a15 0 58%, #10b981 58%);"></span>
-                                Emerald Focus
-                            </button>
-                            <button type="button" class="theme-preset-swatch" data-preset="cyberSunset" onclick="window.applyThemePreset('cyberSunset')" title="Cyber Sunset">
-                                <span class="preset-dots" style="background: linear-gradient(135deg, #180d2b 0 58%, #f97316 58%);"></span>
-                                Cyber Sunset
-                            </button>
-                            <button type="button" class="theme-preset-swatch" data-preset="minimalistStudio" onclick="window.applyThemePreset('minimalistStudio')" title="Minimalist Studio">
-                                <span class="preset-dots" style="background: linear-gradient(135deg, #fafafa 0 58%, #18181b 58%);"></span>
-                                Minimalist Studio
-                            </button>
-                            <button type="button" class="theme-preset-swatch" data-preset="nordicFrost" onclick="window.applyThemePreset('nordicFrost')" title="Nordic Frost">
-                                <span class="preset-dots" style="background: linear-gradient(135deg, #eef7fb 0 58%, #0ea5e9 58%);"></span>
-                                Nordic Frost
-                            </button>
-                        </div>
+                        <div id="themePresetCatalog" class="theme-preset-row" role="group" aria-label="Color theme presets"></div>
 
                         <label class="micro-label" style="margin-top: 18px;">Typography Pairing</label>
-                        <div class="font-preset-row" role="group" aria-label="Typography pairing">
-                            <button type="button" class="font-preset-button active" data-font="modern" onclick="window.applyFontPreset('modern')">
-                                <strong>Modern Clean</strong><span>Inter · Geist-style UI</span>
-                            </button>
-                            <button type="button" class="font-preset-button" data-font="tech" onclick="window.applyFontPreset('tech')">
-                                <strong>Tech / Productivity</strong><span>Space Grotesk · JetBrains Mono</span>
-                            </button>
-                            <button type="button" class="font-preset-button" data-font="editorial" onclick="window.applyFontPreset('editorial')">
-                                <strong>Editorial / Focus</strong><span>Plus Jakarta Sans</span>
-                            </button>
-                        </div>
+                        <div id="fontPresetCatalog" class="font-preset-row" role="group" aria-label="Typography pairing"></div>
 
                         <label class="micro-label" style="margin-top: 18px;">Primary Accent</label>
                         <div class="accent-picker-row">
@@ -2325,18 +2329,6 @@
                 </div>
             </div>
         </details>
-
-        <!-- View Switcher Tabs -->
-        <div class="view-tabs">
-            <button class="view-tab active" id="tab-all" onclick="setView('all')">Kanban Board</button>
-            <button class="view-tab" id="tab-today" onclick="setView('today')">Today's Focus</button>
-            <button class="view-tab" id="tab-backlog" onclick="setView('backlog')">Backlog</button>
-            <button class="view-tab" id="tab-schedule" onclick="setView('schedule')">📅 Weekly Schedule</button>
-            <button class="view-tab" id="tab-calendar" onclick="setView('calendar')">📆 Calendar</button>
-            <button class="view-tab" id="tab-inbox" onclick="setView('inbox')">📧 Email Inbox</button>
-            <button class="view-tab" id="tab-productivity" onclick="setView('productivity')">🚀 Productivity Hub</button>
-            <button class="view-tab" id="tab-finance" onclick="setView('finance')">💰 Finance Tracker</button>
-        </div>
 
         <!-- Weekly Schedule Container -->
         <div id="schedule-container" class="schedule-container" style="display: none;">
@@ -2542,6 +2534,10 @@
             <select id="assigneeFilter" onchange="renderTasks()">
                 <option value="All">All Assignees</option>
             </select>
+            <div id="densitySwitcher" class="density-switcher" role="group" aria-label="Task card density">
+                <button type="button" class="density-button active" data-density="comfortable" aria-pressed="true">Comfortable</button>
+                <button type="button" class="density-button" data-density="compact" aria-pressed="false">Compact</button>
+            </div>
         </div>
 
         <!-- Add Task Form -->
@@ -4028,13 +4024,14 @@
                 else timeStr = `In ${diffDays} days`;
                 
                 const displayTime = ev.time ? ` at ${formatTime(ev.time)}` : '';
-                const linkHtml = ev.link ? `<a href="${ev.link}" target="_blank" class="task-link" style="margin: 0;">🔗 Open Link</a>` : '';
+                const safeEventLink = taskSafeUrl(ev.link);
+                const linkHtml = safeEventLink ? `<a href="${taskEscape(safeEventLink)}" target="_blank" rel="noopener noreferrer" class="task-link" style="margin: 0;">🔗 Open Link</a>` : '';
                 
                 container.innerHTML += `
                     <div class="event-card">
                         <div>
-                            <div style="font-weight: bold; font-size: 16px; color: var(--card-text);">${ev.title}</div>
-                            <div style="font-size: 13px; color: var(--card-text); opacity: 0.8; margin-top: 3px;">📅 ${ev.date}${displayTime} &nbsp;|&nbsp; ${timeStr}</div>
+                            <div style="font-weight: bold; font-size: 16px; color: var(--card-text);">${taskEscape(ev.title)}</div>
+                            <div style="font-size: 13px; color: var(--card-text); opacity: 0.8; margin-top: 3px;">📅 ${taskEscape(ev.date)}${taskEscape(displayTime)} &nbsp;|&nbsp; ${timeStr}</div>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
                             ${linkHtml}
@@ -4389,14 +4386,14 @@
                 
                 window.events.forEach(ev => {
                     if (ev.date === dateStr) {
-                        dayHtml += `<div class="calendar-task" style="background: var(--warning); color: #000;" title="${ev.title}">${ev.time ? formatTime(ev.time) + ' ' : ''}⭐ ${ev.title}</div>`;
+                        dayHtml += `<div class="calendar-task" style="background: var(--warning); color: #000;" title="${calendarEscape(ev.title)}">${ev.time ? calendarEscape(formatTime(ev.time)) + ' ' : ''}⭐ ${calendarEscape(ev.title)}</div>`;
                     }
                 });
 
                 window.tasks.forEach(task => {
                     if (task.syncedToCalendar && task.dueDate === dateStr) {
                         const statusClass = task.status === 'done' ? 'done' : '';
-                        dayHtml += `<div class="calendar-task ${statusClass}" title="${task.title}" onclick="setView('all')">${task.dueTime ? formatTime(task.dueTime) + ' ' : ''}📋 ${task.title}</div>`;
+                        dayHtml += `<div class="calendar-task ${statusClass}" title="${calendarEscape(task.title)}" onclick="setView('all')">${task.dueTime ? calendarEscape(formatTime(task.dueTime)) + ' ' : ''}📋 ${calendarEscape(task.title)}</div>`;
                     }
                 });
 
