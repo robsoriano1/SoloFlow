@@ -162,6 +162,7 @@ function start() {
   registerServiceWorker();
   window.renderTasks?.();
   window.renderFinance?.();
+  window.applyFinanceLedgerState?.();
   window.setView?.('all');
   store.bus.emit('app:ready', { at: Date.now() });
 }

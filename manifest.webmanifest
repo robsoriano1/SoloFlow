@@ -13,8 +13,9 @@
     <!-- reCAPTCHA Enterprise Script -->
     <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lcvq4otAAAAAGNDRtcejDcv3A5IKBTFEMBc7jz4"></script>
     
-    <!-- SoloFlow Favicon for Browser Tab & URL Address Bar -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M15 65 C 15 35, 45 30, 80 35' stroke='%23ff2e2e' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M22 75 C 22 45, 48 40, 75 43' stroke='%23ff2e2e' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M75 20 Q 80 35 95 40 Q 80 45 75 60 Q 70 45 55 40 Q 70 35 75 20 Z' fill='%23ff2e2e'/%3E%3Cpath d='M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z' fill='%23ffb82e'/%3E%3C/svg%3E">
+    <!-- SoloFlow brand artwork -->
+    <link rel="icon" type="image/png" href="./assets/soloflow-logo.png">
+    <link rel="apple-touch-icon" href="./assets/soloflow-logo.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
@@ -2013,7 +2014,7 @@
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
         <div class="sidebar-brand">
-            <span class="sidebar-mark" aria-hidden="true">S</span>
+            <span class="sidebar-mark" aria-hidden="true"><img src="./assets/soloflow-logo.png" alt=""></span>
             <span class="sidebar-brand-copy"><strong>SoloFlow</strong><small>Command Center</small></span>
             <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Collapse navigation" aria-expanded="true">‹</button>
         </div>
@@ -2055,12 +2056,7 @@
         <header class="soloflow-header">
             <div class="soloflow-brand">
                 <div class="soloflow-logo-badge">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28">
-                        <path d="M15 65 C 15 35, 45 30, 80 35" stroke="#ff2e2e" stroke-width="8" fill="none" stroke-linecap="round"/>
-                        <path d="M22 75 C 22 45, 48 40, 75 43" stroke="#ff2e2e" stroke-width="5" fill="none" stroke-linecap="round"/>
-                        <path d="M75 20 Q 80 35 95 40 Q 80 45 75 60 Q 70 45 55 40 Q 70 35 75 20 Z" fill="#ff2e2e"/>
-                        <path d="M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z" fill="#ffb82e"/>
-                    </svg>
+                    <img src="./assets/soloflow-logo.png" alt="SoloFlow logo">
                 </div>
                 <div class="soloflow-title-group">
                     <h1>SoloFlow</h1>
@@ -2482,10 +2478,12 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="finance-panel-header"><div><span class="finance-section-kicker">Filtered ledger</span><h3>Transactions</h3></div><span id="finance-tx-count" class="badge">0 Records</span></div>
-                                <div class="finance-ledger-shell">
-                                    <div class="finance-ledger-head" aria-hidden="true"><span>Transaction</span><span>Classification</span><span>Amount</span><span></span></div>
-                                    <div id="finance-list" class="finance-ledger-list"></div>
+                                <div class="finance-panel-header finance-ledger-titlebar"><div><span class="finance-section-kicker">Filtered ledger</span><h3>Transactions</h3></div><div class="finance-ledger-title-actions"><span id="finance-tx-count" class="badge">0 Records</span><button id="financeLedgerToggle" type="button" class="finance-ledger-toggle" aria-controls="financeLedgerCollapsible" aria-expanded="true" onclick="toggleFinanceLedger()"><span id="financeLedgerToggleIcon" aria-hidden="true">⌃</span><span class="sr-only">Collapse transaction ledger</span></button></div></div>
+                                <div id="financeLedgerCollapsible" class="finance-ledger-collapsible">
+                                    <div class="finance-ledger-shell">
+                                        <div class="finance-ledger-head" aria-hidden="true"><span>Transaction</span><span>Classification</span><span>Amount</span><span></span></div>
+                                        <div id="finance-list" class="finance-ledger-list"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -5204,6 +5202,29 @@
                 option.setAttribute('aria-pressed', String(active));
             });
             select.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        window.applyFinanceLedgerState = function() {
+            const collapsed = localStorage.getItem('soloflow_finance_ledger_collapsed') === 'true';
+            const region = document.getElementById('financeLedgerCollapsible');
+            const toggle = document.getElementById('financeLedgerToggle');
+            const icon = document.getElementById('financeLedgerToggleIcon');
+            if (!region || !toggle || !icon) return;
+            region.classList.toggle('is-collapsed', collapsed);
+            region.setAttribute('aria-hidden', String(collapsed));
+            region.inert = collapsed;
+            toggle.setAttribute('aria-expanded', String(!collapsed));
+            toggle.setAttribute('aria-label', collapsed ? 'Expand transaction ledger' : 'Collapse transaction ledger');
+            toggle.querySelector('.sr-only').textContent = collapsed ? 'Expand transaction ledger' : 'Collapse transaction ledger';
+            icon.textContent = collapsed ? '⌄' : '⌃';
+        };
+
+        window.toggleFinanceLedger = function() {
+            const region = document.getElementById('financeLedgerCollapsible');
+            if (!region) return;
+            const collapsed = !region.classList.contains('is-collapsed');
+            localStorage.setItem('soloflow_finance_ledger_collapsed', String(collapsed));
+            window.applyFinanceLedgerState();
         };
 
         window.addFinanceTransaction = function() {
