@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="./manifest.webmanifest">
-    <link rel="stylesheet" href="./styles/architecture.css">
     
     <!-- reCAPTCHA Enterprise Script -->
     <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lcvq4otAAAAAGNDRtcejDcv3A5IKBTFEMBc7jz4"></script>
@@ -61,7 +60,7 @@
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: var(--font-body);
             background-color: var(--bg);
             background-image: radial-gradient(rgba(30, 30, 30, 0.05) 1px, transparent 1px);
             background-size: 24px 24px;
@@ -109,7 +108,7 @@
             box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8);
         }
         .soloflow-title-group h1 {
-            font-family: 'Poppins', sans-serif;
+            font-family: var(--font-display);
             margin: 0;
             font-size: 22px;
             font-weight: 800;
@@ -153,7 +152,7 @@
             transition: height 0.3s ease, width 0.3s ease;
         }
         #pageTitle {
-            font-family: 'Poppins', sans-serif;
+            font-family: var(--font-display);
             display: inline-block; 
             padding: 6px 12px; 
             margin: -6px 0 18px -12px;
@@ -227,7 +226,7 @@
         }
         details.collapsible-ledger summary {
             cursor: pointer;
-            font-family: 'Poppins', sans-serif;
+            font-family: var(--font-display);
             font-size: 16px;
             font-weight: 700;
             color: var(--card-text);
@@ -461,7 +460,7 @@
             top: 16px;
         }
         .live-preview-card-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: var(--font-display);
             font-weight: 700;
             font-size: 15px;
             margin-bottom: 6px;
@@ -627,7 +626,7 @@
         .dot-purple { background: var(--purple); box-shadow: 0 0 8px rgba(139, 92, 246, 0.6); }
 
         .metric-value-display {
-            font-family: 'Poppins', sans-serif;
+            font-family: var(--font-metric);
             font-size: 26px;
             font-weight: 800;
             letter-spacing: -0.02em;
@@ -823,7 +822,7 @@
             min-height: 260px; 
         }
         .column h3 { 
-            font-family: 'Poppins', sans-serif; 
+            font-family: var(--font-display); 
             font-size: 16px; 
             font-weight: 700; 
             margin: 0 0 16px 0; 
@@ -1209,7 +1208,7 @@
             color: var(--card-text); 
         }
         .calendar-header h3 { 
-            font-family: 'Poppins', sans-serif; 
+            font-family: var(--font-display); 
             margin: 0; 
             font-size: 18px; 
             font-weight: 700; 
@@ -1294,7 +1293,7 @@
             gap: 12px;
         }
         .inbox-header h3 { 
-            font-family: 'Poppins', sans-serif; 
+            font-family: var(--font-display); 
             margin: 0; 
             font-size: 18px; 
             font-weight: 700; 
@@ -1360,7 +1359,7 @@
         }
         .prod-card-value {
             font-size: 24px;
-            font-family: 'Poppins', sans-serif;
+            font-family: var(--font-metric);
             font-weight: 700;
         }
         .prod-progress-bar-bg {
@@ -2009,6 +2008,7 @@
         @media(max-width: 620px) { .task-quick-row { grid-template-columns: 1fr; } .task-quick-row > *, .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; } details.task-advanced-fields > summary { width: 100%; } .column h3 { top: 122px; } }
         @media(max-width: 390px) { .task-card.has-photo:not(.is-expanded) { padding-right: 70px; } .task-photo-thumb { right: 11px; top: 12px; } }
     </style>
+    <link rel="stylesheet" href="./styles/architecture.css">
 </head>
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
@@ -2892,7 +2892,42 @@
         window.settings = { ...defaultSettings, ...(JSON.parse(localStorage.getItem('trackerSettings')) || {}) };
         window.activeThemePreset = window.settings.themePreset || 'midnightSlate';
         window.activeFontPreset = window.settings.fontPair || 'modern';
-        window.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        window.normalizeTaskSchema = function(task, source = 'legacy') {
+            const normalized = task && typeof task === 'object' ? task : {};
+            const createdAt = normalized.metadata?.createdAt || normalized.createdAt || new Date().toISOString();
+            normalized.id = String(normalized.id || (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`));
+            normalized.title = String(normalized.title || 'Untitled task');
+            normalized.subtasks = Array.isArray(normalized.subtasks) ? normalized.subtasks : [];
+            normalized.category = String(normalized.category || 'General');
+            normalized.priority = ['Low', 'Medium', 'High'].includes(normalized.priority) ? normalized.priority : 'Medium';
+            normalized.status = ['todo', 'inprogress', 'done'].includes(normalized.status) ? normalized.status : 'todo';
+            normalized.syncedToCalendar = Boolean(normalized.syncedToCalendar);
+            normalized.syncedToGCal = Boolean(normalized.syncedToGCal || normalized.googleEventId);
+            normalized.financeSynced = Boolean(normalized.financeSynced);
+            normalized.integrations = {
+                internalCalendar: {
+                    status: normalized.syncedToCalendar ? 'synced' : 'idle',
+                    eventId: normalized.integrations?.internalCalendar?.eventId || null,
+                    ...(normalized.integrations?.internalCalendar || {})
+                },
+                googleCalendar: {
+                    status: normalized.syncedToGCal ? 'synced' : 'idle',
+                    eventId: normalized.googleEventId || normalized.integrations?.googleCalendar?.eventId || null,
+                    ...(normalized.integrations?.googleCalendar || {})
+                },
+                ics: { lastExportedAt: null, ...(normalized.integrations?.ics || {}) },
+                email: { lastSentAt: null, ...(normalized.integrations?.email || {}) }
+            };
+            normalized.syncStatus = normalized.syncStatus || (normalized.syncedToGCal || normalized.syncedToCalendar ? 'synced' : 'idle');
+            normalized.metadata = {
+                createdAt,
+                updatedAt: normalized.metadata?.updatedAt || createdAt,
+                source: normalized.metadata?.source || source,
+                ...(normalized.metadata || {})
+            };
+            return normalized;
+        };
+        window.tasks = (JSON.parse(localStorage.getItem('tasks')) || []).map(task => window.normalizeTaskSchema(task));
         window.events = JSON.parse(localStorage.getItem('trackerEvents')) || [];
         window.scheduleData = JSON.parse(localStorage.getItem('weeklySchedule')) || {};
         window.financeTransactions = JSON.parse(localStorage.getItem('soloflow_finance')) || [];
@@ -2929,7 +2964,7 @@
                 if (doc.metadata && doc.metadata.hasPendingWrites) return;
 
                 if (doc.exists()) {
-                    const cloudTasks = doc.data().data || [];
+                    const cloudTasks = (doc.data().data || []).map(task => window.normalizeTaskSchema(task, 'cloud'));
                     if (JSON.stringify(cloudTasks) !== JSON.stringify(window.tasks)) {
                         window.tasks = cloudTasks;
                         localStorage.setItem('tasks', JSON.stringify(window.tasks));
@@ -3031,6 +3066,7 @@
         };
 
         window.saveTasks = function(skipRender = false) {
+            window.tasks = window.tasks.map(task => window.normalizeTaskSchema(task));
             localStorage.setItem('tasks', JSON.stringify(window.tasks));
             if(!skipRender) {
                 window.renderTasks();
@@ -3247,6 +3283,14 @@
                     const data = await res.json();
                     task.googleEventId = data.id;
                     task.syncedToGCal = true;
+                    task.integrations = task.integrations || {};
+                    task.integrations.googleCalendar = {
+                        ...(task.integrations.googleCalendar || {}),
+                        status: 'synced',
+                        eventId: data.id
+                    };
+                    task.syncStatus = 'synced';
+                    task.metadata = { ...(task.metadata || {}), updatedAt: new Date().toISOString() };
                     window.saveTasks();
                     window.showToast("Event added to Google Calendar!", "success");
                 } else if (res.status === 401 || res.status === 403) {
@@ -3388,12 +3432,12 @@
             const dueTime = event.start && event.start.dateTime ? event.start.dateTime.split('T')[1].slice(0, 5) : '';
             const meetingLink = getGoogleCalendarMeetingLink(event);
             const notes = [event.description || '', event.location ? `Location: ${event.location}` : ''].filter(Boolean).join('\n\n');
-            window.tasks.push({
+            window.tasks.push(window.normalizeTaskSchema({
                 id: Date.now().toString(), title: event.summary || 'Google Calendar event', category: 'Google Calendar', priority: 'Medium',
                 financeType: 'Profit', budget: '', description: notes, subtasks: [], photoUrl: '', linkUrl: event.htmlLink || meetingLink || '',
                 workspaceUrl: meetingLink || '', assignee: '', dateAssigned: localISODate(), dueDate, dueTime, blockedBy: '', status: 'todo',
                 syncedToCalendar: true, syncedToGCal: true, financeSynced: false, sourceGCalEventId: event.id
-            });
+            }, 'google-calendar'));
             window.saveTasks();
             window.closeGoogleCalendarEvent();
             window.setView('all');
@@ -3801,10 +3845,22 @@
                 status: 'todo',
                 syncedToCalendar: false,
                 syncedToGCal: false,
-                financeSynced: false
+                financeSynced: false,
+                integrations: {
+                    internalCalendar: { status: 'idle', eventId: null },
+                    googleCalendar: { status: 'idle', eventId: null },
+                    ics: { lastExportedAt: null },
+                    email: { lastSentAt: null }
+                },
+                syncStatus: 'idle',
+                metadata: {
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    source: 'manual'
+                }
             };
 
-            window.tasks.push(newTask);
+            window.tasks.push(window.normalizeTaskSchema(newTask, 'manual'));
             
             ['taskTitle','taskCategory','taskBudget','taskDescription','taskSubtasks','taskPhotoUrl','taskLinkUrl','taskWorkspaceUrl','taskAssignee','taskDateAssigned','taskDueDate','taskDueTime','taskBlockedBy','taskProjectId'].forEach(id => {
                 document.getElementById(id).value = '';
@@ -3965,12 +4021,27 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            task.integrations = task.integrations || {};
+            task.integrations.ics = { ...(task.integrations.ics || {}), lastExportedAt: new Date().toISOString() };
+            task.metadata = { ...(task.metadata || {}), updatedAt: new Date().toISOString() };
+            window.saveTasks(true);
         };
 
         window.syncTaskToCalendarApp = function(taskId) {
             const task = window.tasks.find(t => t.id === taskId);
             if (!task) return;
-            task.syncedToCalendar = !task.syncedToCalendar; 
+            if (!task.dueDate) {
+                window.showToast("Add a due date before syncing this task to the SoloFlow calendar.", "error");
+                return;
+            }
+            task.syncedToCalendar = !task.syncedToCalendar;
+            task.integrations = task.integrations || {};
+            task.integrations.internalCalendar = {
+                ...(task.integrations.internalCalendar || {}),
+                status: task.syncedToCalendar ? 'synced' : 'idle'
+            };
+            task.syncStatus = task.syncedToCalendar || task.syncedToGCal ? 'synced' : 'idle';
+            task.metadata = { ...(task.metadata || {}), updatedAt: new Date().toISOString() };
             window.saveTasks();
         };
 
@@ -4165,7 +4236,7 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if(Array.isArray(imported)) {
-                        window.tasks = imported; 
+                        window.tasks = imported.map(task => window.normalizeTaskSchema(task, 'import'));
                         window.saveTasks();
                         window.showToast('Tasks imported successfully!', 'success');
                     } else { window.showToast('Invalid file format. Must be a JSON array.', 'error'); }
@@ -4694,9 +4765,6 @@
                     `;
                 }
 
-                const syncText = task.syncedToCalendar ? "🗓️ Synced" : "📅 Sync App";
-                const syncColor = task.syncedToCalendar ? "var(--success)" : "var(--primary)";
-
                 const isExpanded = window.expandedCards.has(task.id);
                 const expandBtnText = isExpanded ? "⌃ See Less" : "⌄ See More";
                 const expandClass = isExpanded ? "task-expand-area expanded" : "task-expand-area";
@@ -4731,14 +4799,14 @@
                         ${subtasksHtml}
                         ${metaHtml}
                         ${timerHtml}
-                        <div class="actions" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px;">
-                           <button class="btn-small" title="Upload or link a photo" onclick="editTaskPhoto('${task.id}')">📷 Photo</button>
-                           <button class="btn-small" title="Edit Reference or Workspace/Doc Links" onclick="editTaskLinks('${task.id}')">✏️ Links</button>
-                           <button class="btn-small" style="color: #8e44ad; border-color: rgba(142,68,173,0.3); font-weight: bold;" title="Send progress report mailto to Assignee or target email" onclick="emailTaskUpdate('${task.id}')">✉️ Email Update</button>
-                           ${task.dueDate ? `<button class="btn-small" style="color: ${syncColor}; border-color: ${syncColor}; font-weight: bold;" title="Sync to internal Calendar tab" onclick="syncTaskToCalendarApp('${task.id}')">${syncText}</button>` : ''}
-                           ${task.dueDate ? `<button class="btn-small" style="color: var(--primary); font-weight: bold; border-color: rgba(var(--primary-rgb, 217,119,6),0.4);" title="Push to Google Calendar" onclick="createGoogleCalendarEvent('${task.id}')">${task.syncedToGCal ? '✅ GCal Synced' : '📅 Sync to GCal'}</button>` : ''}
-                           ${task.dueDate ? `<button class="btn-small" title="Export .ics file for Google Calendar/Apple" onclick="syncTaskToCalendarFile('${task.id}')">💾 .ics</button>` : ''}
-                           <button class="btn-small btn-danger" onclick="deleteTask('${task.id}')">Delete</button>
+                        <div class="actions task-card-action-strip">
+                           <button class="btn-small task-card-action" title="Upload or link a photo" onclick="editTaskPhoto('${task.id}')"><span aria-hidden="true">▧</span> Photo</button>
+                           <button class="btn-small task-card-action" title="Edit reference or workspace links" onclick="editTaskLinks('${task.id}')"><span aria-hidden="true">↗</span> Links</button>
+                           <button class="btn-small task-card-action task-action-email" title="Send a progress update to the assignee or target email" onclick="emailTaskUpdate('${task.id}')"><span aria-hidden="true">✉</span> Email Update</button>
+                           <button class="btn-small task-card-action task-action-sync ${task.syncedToCalendar ? 'is-synced' : ''}" title="${task.dueDate ? 'Sync to the SoloFlow Calendar view' : 'Add a due date to sync this task'}" onclick="syncTaskToCalendarApp('${task.id}')"><span aria-hidden="true">◫</span> ${task.syncedToCalendar ? 'App Synced' : 'Sync App'}</button>
+                           <button class="btn-small task-card-action task-action-sync ${task.syncedToGCal ? 'is-synced' : ''}" title="${task.dueDate ? 'Push to Google Calendar' : 'Add a due date to sync this task'}" onclick="createGoogleCalendarEvent('${task.id}')"><span aria-hidden="true">▦</span> ${task.syncedToGCal ? 'GCal Synced' : 'Sync to GCal'}</button>
+                           <button class="btn-small task-card-action" title="${task.dueDate ? 'Export an iCalendar file' : 'Add a due date to export an iCalendar file'}" onclick="syncTaskToCalendarFile('${task.id}')"><span aria-hidden="true">⇩</span> .ics</button>
+                           <button class="btn-small btn-danger task-card-action task-action-delete" onclick="deleteTask('${task.id}')"><span aria-hidden="true">×</span> Delete</button>
                         </div>
                     </div>
                 `;
