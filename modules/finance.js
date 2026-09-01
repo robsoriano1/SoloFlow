@@ -1,30 +1,89 @@
-# SoloFlow Command Center PWA
+/**
+ * SoloFlow's compatibility-first reactive store.
+ * The legacy window collections remain the persistence contract; this store
+ * publishes granular mutations so new modules can patch only affected nodes.
+ */
+export class EventBus {
+  #listeners = new Map();
 
-This package keeps the original SoloFlow DOM IDs, Firebase listeners, Google Calendar and Gmail REST integrations, local-storage schema, finance ledgers, and import/export behavior. Its modular enhancement layer adds reactive state events, debounced cloud writes, an accurate worker timer, batch operations, charts, reporting, an accessible command shell, inline editing, and offline support.
+  on(topic, listener) {
+    if (!this.#listeners.has(topic)) this.#listeners.set(topic, new Set());
+    this.#listeners.get(topic).add(listener);
+    return () => this.#listeners.get(topic)?.delete(listener);
+  }
 
-## Run locally
+  emit(topic, detail) {
+    this.#listeners.get(topic)?.forEach((listener) => listener(detail));
+    this.#listeners.get('*')?.forEach((listener) => listener({ topic, detail }));
+  }
+}
 
-Service workers and ES modules require HTTP(S); they do not install from `file://` URLs.
+export class ReactiveStore {
+  #state;
+  #bus = new EventBus();
 
-```bash
-python3 -m http.server 8080 --directory .
-```
+  constructor(initialState = {}) {
+    this.#state = structuredClone(initialState);
+  }
 
-Open `http://localhost:8080/index.html`.
+  get bus() { return this.#bus; }
+  get state() { return this.#state; }
+  snapshot() { return structuredClone(this.#state); }
 
-## Keyboard shortcuts
+  subscribe(topic, listener) { return this.#bus.on(topic, listener); }
 
-- `N`: new task capture
-- `Cmd/Ctrl + K` or `/`: open the global command palette
-- `F`: focus the Kanban search field
-- `Space` or `P`: toggle focus timer
-- `1`–`6`: Kanban, Focus, Backlog, Schedule, Calendar, Finance
-- `Escape`: close overlays and clear batch selection
+  set(path, value, meta = {}) {
+    const keys = path.split('.');
+    let cursor = this.#state;
+    for (const key of keys.slice(0, -1)) cursor = cursor[key] ??= {};
+    const key = keys.at(-1);
+    const previous = cursor[key];
+    cursor[key] = value;
+    this.#bus.emit(path, { path, value, previous, meta });
+    this.#bus.emit('state:change', { path, value, previous, meta });
+  }
 
-Multi-select Kanban cards with `Shift+Click` for a range or `Ctrl/Cmd+Click` for individual cards.
+  patchCollection(name, id, patch, meta = {}) {
+    const collection = this.#state[name] ?? [];
+    const index = collection.findIndex((item) => item.id === id);
+    if (index < 0) return false;
+    const previous = collection[index];
+    const value = { ...previous, ...patch };
+    collection[index] = value;
+    this.#bus.emit(`${name}:patch`, { id, index, value, previous, meta });
+    this.#bus.emit('state:change', { path: name, value, previous, meta });
+    return true;
+  }
 
-Right-click a task for completion, focus, duplicate, link, and delete actions. Task deletions and status changes provide a five-second Undo notification. Use the control-bar switcher to alternate between Comfortable cards and Compact spreadsheet-style rows.
+  syncFromWindow(meta = { source: 'legacy' }) {
+    const mappings = {
+      tasks: 'tasks', events: 'events', schedule: 'scheduleData',
+      transactions: 'financeTransactions', assets: 'financeAssets',
+      projects: 'financeProjects', budgets: 'financeBudgets', settings: 'settings'
+    };
+    Object.entries(mappings).forEach(([key, globalName]) => {
+      const next = window[globalName];
+      if (next !== undefined) this.set(key, structuredClone(next), meta);
+    });
+  }
+}
 
-## PDF reports
+export function createSoloFlowStore() {
+  const store = new ReactiveStore({
+    tasks: window.tasks ?? [],
+    events: window.events ?? [],
+    schedule: window.scheduleData ?? {},
+    transactions: window.financeTransactions ?? [],
+    assets: window.financeAssets ?? [],
+    projects: window.financeProjects ?? [],
+    budgets: window.financeBudgets ?? [],
+    settings: window.settings ?? {},
+    selection: [],
+    online: navigator.onLine
+  });
+  window.SoloFlowStore = store;
+  addEventListener('online', () => store.set('online', true, { source: 'network' }));
+  addEventListener('offline', () => store.set('online', false, { source: 'network' }));
+  return store;
+}
 
-Use **Generate summary**, then **Print / Save PDF**. The browser print dialog provides the platform-native PDF export while keeping the app dependency-free.

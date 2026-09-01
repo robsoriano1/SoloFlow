@@ -1,122 +1,108 @@
-const localDateKey = (timestamp = Date.now()) => {
-  const date = new Date(timestamp);
-  const offset = date.getTimezoneOffset() * 60_000;
-  return new Date(timestamp - offset).toISOString().slice(0, 10);
-};
+export function installScheduleModule(store) {
+  let selection = null;
 
-function allocateFocusSeconds(task, from, to) {
-  task.focusLog = task.focusLog && typeof task.focusLog === 'object' ? task.focusLog : {};
-  let cursor = from;
-  while (cursor < to) {
-    const date = new Date(cursor);
-    const boundary = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).getTime();
-    const segmentEnd = Math.min(to, boundary);
-    const seconds = Math.max(0, Math.floor((segmentEnd - cursor) / 1000));
-    const key = localDateKey(cursor);
-    task.focusLog[key] = (task.focusLog[key] || 0) + seconds;
-    cursor = segmentEnd;
+  function cellsInRange(day, start, end) {
+    const [from, to] = [start, end].sort((a, b) => a - b);
+    return Array.from({ length: to - from + 1 }, (_, index) => document.getElementById(`cell-${day}-${from + index}`)).filter(Boolean);
   }
-}
 
-function formatDuration(seconds) {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainder = seconds % 60;
-  return `⏱ ${hours ? `${hours}h ` : ''}${minutes}m${remainder}s`;
-}
+  function paintSelection() {
+    document.querySelectorAll('.schedule-cell.is-range-selecting').forEach((cell) => cell.classList.remove('is-range-selecting'));
+    if (!selection) return;
+    cellsInRange(selection.day, selection.start, selection.end).forEach((cell) => cell.classList.add('is-range-selecting'));
+  }
 
-export function installTimerModule(store) {
-  const workerSource = `
-    let heartbeat = null;
-    self.onmessage = ({ data }) => {
-      if (data.type === 'start') {
-        clearInterval(heartbeat);
-        const tick = () => self.postMessage({ type: 'tick', now: Date.now() });
-        tick();
-        heartbeat = setInterval(tick, 250);
+  function mergeSelection() {
+    if (!selection || selection.start === selection.end) return;
+    const cells = cellsInRange(selection.day, selection.start, selection.end);
+    if (cells.length < 2) return;
+    const before = cells.map((cell) => ({
+      time: cell.dataset.time,
+      text: cell.textContent,
+      display: cell.style.display,
+      gridRow: cell.style.gridRow,
+      data: structuredClone(window.scheduleData[`${selection.day}-${cell.dataset.time}`] ?? null)
+    }));
+    const first = cells[0];
+    const combinedText = cells.map((cell) => cell.textContent.trim()).filter(Boolean).join('\n');
+    first.textContent = combinedText;
+    first.style.display = '';
+    first.style.gridRow = `${first.dataset.row} / span ${cells.length}`;
+    const firstKey = `${selection.day}-${first.dataset.time}`;
+    const prior = typeof window.scheduleData[firstKey] === 'object' ? window.scheduleData[firstKey] : {};
+    window.scheduleData[firstKey] = { text: combinedText, bg: prior.bg || first.style.backgroundColor || '', span: cells.length, hidden: false };
+    cells.slice(1).forEach((cell) => {
+      cell.style.display = 'none';
+      cell.textContent = '';
+      window.scheduleData[`${selection.day}-${cell.dataset.time}`] = { text: '', bg: '', span: 1, hidden: true };
+    });
+    window.saveSchedule?.();
+    store.bus.emit('schedule:block-created', { day: selection.day, start: first.dataset.time, slots: cells.length });
+    window.showToast?.(`Created a ${cells.length * 30}-minute schedule block`, 'success', {
+      label: 'Undo', action: () => {
+        cells.forEach((cell, index) => {
+          const snapshot = before[index];
+          const key = `${selection?.day || cell.dataset.day}-${snapshot.time}`;
+          cell.textContent = snapshot.text;
+          cell.style.display = snapshot.display;
+          cell.style.gridRow = snapshot.gridRow;
+          if (snapshot.data === null) delete window.scheduleData[key]; else window.scheduleData[key] = snapshot.data;
+        });
+        window.saveSchedule?.();
       }
-      if (data.type === 'stop') { clearInterval(heartbeat); heartbeat = null; }
+    });
+  }
+
+  function bindDragBlocking() {
+    const grid = document.getElementById('schedule-grid');
+    if (!grid || grid.dataset.dragBlockingBound === 'true') return;
+    grid.dataset.dragBlockingBound = 'true';
+    grid.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0) return;
+      const cell = event.target.closest('.schedule-cell');
+      if (!cell || cell.style.display === 'none') return;
+      selection = { day: cell.dataset.day, start: Number(cell.dataset.tidx), end: Number(cell.dataset.tidx), pointerId: event.pointerId, moved: false };
+      grid.classList.add('is-drag-blocking');
+      paintSelection();
+    });
+    grid.addEventListener('pointermove', (event) => {
+      if (!selection || selection.pointerId !== event.pointerId) return;
+      const cell = document.elementFromPoint(event.clientX, event.clientY)?.closest?.('.schedule-cell');
+      if (!cell || cell.dataset.day !== selection.day) return;
+      const next = Number(cell.dataset.tidx);
+      if (next !== selection.end) {
+        selection.end = next;
+        selection.moved = selection.moved || next !== selection.start;
+        paintSelection();
+      }
+      if (selection.moved) event.preventDefault();
+    });
+    const finish = (event) => {
+      if (!selection || (event.pointerId !== undefined && selection.pointerId !== event.pointerId)) return;
+      if (selection.moved) mergeSelection();
+      selection = null;
+      grid.classList.remove('is-drag-blocking');
+      paintSelection();
     };
-  `;
-  const url = URL.createObjectURL(new Blob([workerSource], { type: 'text/javascript' }));
-  const worker = new Worker(url);
-  let session = null;
-  let lastPersistedSecond = -1;
-
-  function paint(taskId, seconds, active) {
-    const display = document.getElementById(`display-timer-${taskId}`);
-    if (display) display.textContent = formatDuration(seconds);
-    const button = document.getElementById(`btn-timer-${taskId}`);
-    if (button) {
-      button.className = active ? 'btn-timer active' : 'btn-timer';
-      button.textContent = active ? '⏹ Stop' : '▶ Pomodoro';
-      button.setAttribute('aria-pressed', String(active));
-    }
+    grid.addEventListener('pointerup', finish);
+    grid.addEventListener('pointercancel', finish);
   }
 
-  function commit(now = Date.now(), persist = false) {
-    if (!session) return;
-    const task = window.tasks.find((item) => item.id === session.taskId);
-    if (!task) {
-      worker.postMessage({ type: 'stop' });
-      session = null;
-      window.activeTaskId = null;
-      window.timerInterval = null;
-      store.set('activeTimer', null, { source: 'timer-missing-task' });
-      return;
-    }
-    const totalSeconds = session.baseSeconds + Math.max(0, Math.floor((now - session.startedAt) / 1000));
-    const delta = totalSeconds - task.timeSpent;
-    if (delta > 0) {
-      allocateFocusSeconds(task, session.lastAllocatedAt, session.lastAllocatedAt + delta * 1000);
-      session.lastAllocatedAt += delta * 1000;
-      task.timeSpent = totalSeconds;
-      store.patchCollection('tasks', task.id, { timeSpent: task.timeSpent, focusLog: task.focusLog }, { source: 'timer' });
-    }
-    paint(task.id, task.timeSpent, true);
-    if (persist || (totalSeconds > 0 && totalSeconds % 10 === 0 && totalSeconds !== lastPersistedSecond)) {
-      lastPersistedSecond = totalSeconds;
-      window.saveTasks(true);
-    }
+  const render = window.renderSchedule;
+  if (typeof render === 'function') {
+    window.renderSchedule = function renderScheduleModule(...args) {
+      const result = render.apply(this, args);
+      bindDragBlocking();
+      store.bus.emit('schedule:rendered', { at: Date.now() });
+      return result;
+    };
   }
-
-  function stop(persist = true) {
-    if (!session) return;
-    const priorId = session.taskId;
-    commit(Date.now(), persist);
-    worker.postMessage({ type: 'stop' });
-    paint(priorId, window.tasks.find((item) => item.id === priorId)?.timeSpent || 0, false);
-    session = null;
-    window.activeTaskId = null;
-    window.timerInterval = null;
-    store.set('activeTimer', null, { source: 'timer' });
-  }
-
-  function start(taskId) {
-    const task = window.tasks.find((item) => item.id === taskId);
-    if (!task) return;
-    const now = Date.now();
-    task.timeSpent = Number(task.timeSpent) || 0;
-    session = { taskId, startedAt: now, lastAllocatedAt: now, baseSeconds: task.timeSpent };
-    window.activeTaskId = taskId;
-    window.timerInterval = null;
-    lastPersistedSecond = -1;
-    worker.postMessage({ type: 'start' });
-    paint(taskId, task.timeSpent, true);
-    store.set('activeTimer', { taskId, startedAt: now }, { source: 'timer' });
-  }
-
-  worker.addEventListener('message', ({ data }) => {
-    if (data.type === 'tick') commit(data.now);
-  });
-
-  window.toggleTimer = (taskId) => {
-    if (session?.taskId === taskId) return stop();
-    if (session) stop();
-    start(taskId);
+  const refresh = () => {
+    const grid = document.getElementById('schedule-grid');
+    if (grid && grid.offsetParent && typeof window.updateScheduleTimeMarker === 'function') window.updateScheduleTimeMarker();
   };
-  window.SoloFlowTimer = { start, stop, commit, get activeTaskId() { return session?.taskId || null; } };
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) commit(Date.now()); });
-  addEventListener('pagehide', () => commit(Date.now(), true));
-  return window.SoloFlowTimer;
+  const interval = setInterval(refresh, 60_000);
+  bindDragBlocking();
+  refresh();
+  return () => clearInterval(interval);
 }
