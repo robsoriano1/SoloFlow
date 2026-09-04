@@ -53,7 +53,10 @@ export const ThemeAccessibilityEngine = {
 };
 
 export const FONT_PRESETS = {
-  neo: { name: 'Minimalist Neo-Grotesque', sample: 'Quiet clarity', detail: 'Outfit · DM Mono', display: "'Outfit', 'Inter', sans-serif", body: "'Outfit', 'Inter', sans-serif", metric: "'DM Mono', monospace" },
+  signal: { name: 'Signal Grotesque', sample: 'Deliberate work', detail: 'Bricolage Grotesque · Schibsted Grotesk', display: "'Bricolage Grotesque', 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif", body: "'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif", metric: "'Martian Mono', ui-monospace, SFMono-Regular, monospace" },
+  broadsheet: { name: 'Broadsheet Editorial', sample: 'The daily ledger', detail: 'Literata · Instrument Sans', display: "'Literata', ui-serif, Georgia, serif", body: "'Instrument Sans', ui-sans-serif, system-ui, sans-serif", metric: "'Geist Mono', ui-monospace, SFMono-Regular, monospace" },
+  apparatus: { name: 'Apparatus Technical', sample: 'BUILT TO SHIP', detail: 'Syne · Schibsted Grotesk', display: "'Syne', ui-sans-serif, system-ui, sans-serif", body: "'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif", metric: "'Azeret Mono', ui-monospace, SFMono-Regular, monospace" },
+  neo: { name: 'Minimalist Neo-Grotesque', sample: 'Quiet clarity', detail: 'Outfit · DM Mono', display: "'Outfit', sans-serif", body: "'Outfit', sans-serif", metric: "'DM Mono', monospace" },
   cyber: { name: 'Cyber / Industrial Mono', sample: 'SYSTEM READY', detail: 'Chakra Petch · Fira Code', display: "'Chakra Petch', sans-serif", body: "'Fira Code', monospace", metric: "'Fira Code', monospace" },
   executive: { name: 'Executive Editorial', sample: 'Decisive focus', detail: 'Fraunces · Manrope', display: "'Fraunces', serif", body: "'Manrope', sans-serif", metric: "'JetBrains Mono', monospace" },
   geometric: { name: 'Geometric Studio', sample: 'Shape the work', detail: 'Sora · DM Sans', display: "'Sora', sans-serif", body: "'DM Sans', sans-serif", metric: "'Space Mono', monospace" },
@@ -62,6 +65,10 @@ export const FONT_PRESETS = {
 };
 
 export const THEME_PRESETS = {
+  graphiteEmber: { name: 'Graphite & Ember', bgColor: '#14110E', surfaceColor: '#1E1A16', textColor: '#F4EEE5', cardTextColor: '#F4EEE5', primaryColor: '#E2622F', secondaryAccent: '#EFB255', todoBg: '#2A231C', inprogBg: '#3A2718', doneBg: '#1F2C22' },
+  parchmentInk: { name: 'Parchment & Ink', bgColor: '#F3EEE4', surfaceColor: '#FBF8F2', textColor: '#221F1A', cardTextColor: '#221F1A', primaryColor: '#9C3D2E', secondaryAccent: '#2F6B5E', todoBg: '#F1E6DC', inprogBg: '#F3E9D2', doneBg: '#E3EBE0' },
+  blueprintNight: { name: 'Blueprint Night', bgColor: '#0A151E', surfaceColor: '#11212D', textColor: '#E4F0F5', cardTextColor: '#E4F0F5', primaryColor: '#BFD84A', secondaryAccent: '#5FA9C6', todoBg: '#182B38', inprogBg: '#1D3542', doneBg: '#16332C' },
+  limestoneMoss: { name: 'Limestone & Moss', bgColor: '#ECEAE2', surfaceColor: '#F7F6F1', textColor: '#1E231F', cardTextColor: '#1E231F', primaryColor: '#3F6B3A', secondaryAccent: '#B4762B', todoBg: '#E6E8DF', inprogBg: '#F0E7D6', doneBg: '#DFE9DD' },
   midnightSlate: { name: 'Midnight Slate', bgColor: '#0F172A', surfaceColor: '#151E32', textColor: '#F8FAFC', cardTextColor: '#F8FAFC', primaryColor: '#6366F1', secondaryAccent: '#38BDF8', todoBg: '#202A44', inprogBg: '#292A52', doneBg: '#123A37' },
   emeraldFocus: { name: 'Emerald Focus', bgColor: '#071A15', surfaceColor: '#0E2820', textColor: '#ECFDF5', cardTextColor: '#ECFDF5', primaryColor: '#10B981', secondaryAccent: '#6EE7B7', todoBg: '#15342B', inprogBg: '#17483A', doneBg: '#0B5B43' },
   cyberSunset: { name: 'Cyber Sunset', bgColor: '#180D2B', surfaceColor: '#25133D', textColor: '#FFF7ED', cardTextColor: '#FFF7ED', primaryColor: '#F97316', secondaryAccent: '#FB7185', todoBg: '#352047', inprogBg: '#4A2438', doneBg: '#3D2B2B' },
@@ -75,6 +82,11 @@ export const THEME_PRESETS = {
   solarizedLight: { name: 'Solarized Light', bgColor: '#FDF6E3', surfaceColor: '#EEE8D5', textColor: '#657B83', cardTextColor: '#657B83', primaryColor: '#268BD2', secondaryAccent: '#2AA198' }
 };
 
+/* Registry defaults. Kept as named constants so the shipped look can evolve
+   without scattering literal preset keys through the module. */
+export const DEFAULT_FONT_KEY = 'signal';
+export const DEFAULT_THEME_KEY = 'graphiteEmber';
+
 function setInput(id, value) {
   const input = document.getElementById(id);
   if (input) input.value = value;
@@ -84,9 +96,16 @@ function applyDerivedTokens(preset) {
   const root = document.documentElement;
   const primary = parseHex(preset.primaryColor);
   const surface = parseHex(preset.surfaceColor);
+  const canvas = parseHex(preset.bgColor);
+  const secondary = parseHex(preset.secondaryAccent || preset.primaryColor);
   const setToken = (name, value) => { if (root.style.getPropertyValue(name).trim() !== String(value)) root.style.setProperty(name, value); };
   setToken('--primary-rgb', `${primary.r}, ${primary.g}, ${primary.b}`);
   setToken('--surface-rgb', `${surface.r}, ${surface.g}, ${surface.b}`);
+  /* Canvas and secondary channels power the atmospheric gradient/grain layer
+     without any component needing a literal color of its own. */
+  setToken('--bg-rgb', `${canvas.r}, ${canvas.g}, ${canvas.b}`);
+  setToken('--secondary-accent-rgb', `${secondary.r}, ${secondary.g}, ${secondary.b}`);
+  root.dataset.themeMode = luminance(canvas) > .38 ? 'light' : 'dark';
   setToken('--surface-border', preset.surfaceBorder);
   setToken('--surface-border-strong', preset.surfaceBorderStrong);
   setToken('--secondary-accent', preset.secondaryAccent || preset.primaryColor);
@@ -151,7 +170,7 @@ export function installThemeModule(store) {
   const root = document.documentElement;
 
   window.applyFontPreset = (key) => {
-    const normalizedKey = FONT_PRESETS[key] ? key : 'neo';
+    const normalizedKey = FONT_PRESETS[key] ? key : DEFAULT_FONT_KEY;
     const preset = FONT_PRESETS[normalizedKey];
     window.activeFontPreset = normalizedKey;
     window.settings = { ...(window.settings || {}), fontPair: normalizedKey };
@@ -166,7 +185,7 @@ export function installThemeModule(store) {
   };
 
   window.applyThemePreset = (key) => {
-    const normalizedKey = THEME_PRESETS[key] ? key : 'midnightSlate';
+    const normalizedKey = THEME_PRESETS[key] ? key : DEFAULT_THEME_KEY;
     const preset = ThemeAccessibilityEngine.normalize(THEME_PRESETS[normalizedKey]);
     window.activeThemePreset = normalizedKey;
     setInput('setBgColor', preset.bgColor);
@@ -190,8 +209,8 @@ export function installThemeModule(store) {
     window.applyThemePreset(keys[(index + 1) % keys.length]);
   };
 
-  const activeFont = FONT_PRESETS[window.settings?.fontPair] ? window.settings.fontPair : 'neo';
-  const activeTheme = THEME_PRESETS[window.settings?.themePreset] ? window.settings.themePreset : 'midnightSlate';
+  const activeFont = FONT_PRESETS[window.settings?.fontPair] ? window.settings.fontPair : DEFAULT_FONT_KEY;
+  const activeTheme = THEME_PRESETS[window.settings?.themePreset] ? window.settings.themePreset : DEFAULT_THEME_KEY;
   window.activeFontPreset = activeFont;
   window.activeThemePreset = activeTheme;
   window.settings = { ...(window.settings || {}), fontPair: activeFont, themePreset: activeTheme };
@@ -207,8 +226,8 @@ export function installThemeModule(store) {
   const persistedSaveSettings = window.saveSettings;
   window.saveSettings = function saveSettingsWithThemeEngine(...args) {
     const result = persistedSaveSettings?.apply(this, args);
-    const activeFontPreset = FONT_PRESETS[window.activeFontPreset] || FONT_PRESETS.neo;
-    const activeThemePreset = ThemeAccessibilityEngine.normalize(THEME_PRESETS[window.activeThemePreset] || THEME_PRESETS.midnightSlate);
+    const activeFontPreset = FONT_PRESETS[window.activeFontPreset] || FONT_PRESETS[DEFAULT_FONT_KEY];
+    const activeThemePreset = ThemeAccessibilityEngine.normalize(THEME_PRESETS[window.activeThemePreset] || THEME_PRESETS[DEFAULT_THEME_KEY]);
     root.style.setProperty('--font-body', activeFontPreset.body);
     root.style.setProperty('--font-display', activeFontPreset.display);
     root.style.setProperty('--font-metric', activeFontPreset.metric);
@@ -233,14 +252,14 @@ export function installThemeModule(store) {
       enforcementScheduled = false;
       const fontKey = FONT_PRESETS[window.settings?.fontPair] ? window.settings.fontPair : window.activeFontPreset;
       const themeKey = THEME_PRESETS[window.settings?.themePreset] ? window.settings.themePreset : window.activeThemePreset;
-      const expectedFont = FONT_PRESETS[fontKey] || FONT_PRESETS.neo;
+      const expectedFont = FONT_PRESETS[fontKey] || FONT_PRESETS[DEFAULT_FONT_KEY];
       window.activeFontPreset = fontKey;
       window.activeThemePreset = themeKey;
       if (root.style.getPropertyValue('--font-body').trim() !== expectedFont.body) root.style.setProperty('--font-body', expectedFont.body);
       if (root.style.getPropertyValue('--font-display').trim() !== expectedFont.display) root.style.setProperty('--font-display', expectedFont.display);
       if (root.style.getPropertyValue('--font-metric').trim() !== expectedFont.metric) root.style.setProperty('--font-metric', expectedFont.metric);
       document.body.style.fontFamily = expectedFont.body;
-      applyDerivedTokens(ThemeAccessibilityEngine.normalize(THEME_PRESETS[themeKey] || THEME_PRESETS.midnightSlate));
+      applyDerivedTokens(ThemeAccessibilityEngine.normalize(THEME_PRESETS[themeKey] || THEME_PRESETS[DEFAULT_THEME_KEY]));
       renderFontCatalog(fontKey);
       renderThemeCatalog(themeKey);
     });
