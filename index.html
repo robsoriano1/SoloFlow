@@ -66,6 +66,12 @@
             --secondary-accent: #EFB255;
             --secondary-accent-rgb: 239, 178, 85;
 
+            /* Disclosure-marker icons. Mask images ignore the SVG's own fill
+               and pick up background-color instead, so a single data URI can
+               be tinted with currentColor everywhere it's used. */
+            --icon-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            --icon-chevron-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 6 15 12 9 18'/%3E%3C/svg%3E");
+
             /* Atmosphere: every layer is expressed through the channels above so
                a user-selected palette drives the depth instead of fixed colors. */
             --atmosphere-primary: rgba(var(--primary-rgb), .17);
@@ -97,11 +103,39 @@
             --grain-opacity: .035;
             color-scheme: light;
         }
-        
+
+        /* Several controls below are styled with a literal translucent white
+           lift (tuned for the light-leaning shipped palette) instead of a
+           theme token. On a dark preset that reads as a stray white chip
+           rather than a lift, so replace the lift with one relative to the
+           surface color whenever a dark palette is active. */
+        :root[data-theme-mode="dark"] .task-link,
+        :root[data-theme-mode="dark"] .task-metric,
+        :root[data-theme-mode="dark"] .badge,
+        :root[data-theme-mode="dark"] .meta-input-date,
+        :root[data-theme-mode="dark"] .meta-input-time {
+            background: color-mix(in srgb, var(--card-text) 8%, var(--surface));
+        }
+        :root[data-theme-mode="dark"] .task-meta {
+            background: color-mix(in srgb, var(--card-text) 5%, var(--surface));
+        }
+        :root[data-theme-mode="dark"] .btn-expand {
+            background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+        }
+        :root[data-theme-mode="dark"] .editable:focus,
+        :root[data-theme-mode="dark"] .schedule-cell:focus {
+            background-color: color-mix(in srgb, var(--card-text) 12%, var(--surface));
+        }
+
         * {
             box-sizing: border-box;
         }
-        
+        .btn-icon {
+            display: inline-block;
+            flex-shrink: 0;
+            vertical-align: -2px;
+        }
+
         body {
             font-family: var(--font-body);
             background-color: var(--bg);
@@ -249,8 +283,16 @@
             display: none;
         }
         details.customize-menu summary::after {
-            content: "▼";
-            font-size: 10px;
+            content: "";
+            width: 10px;
+            height: 10px;
+            background-color: currentColor;
+            -webkit-mask-image: var(--icon-chevron-down);
+            mask-image: var(--icon-chevron-down);
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
             opacity: 0.5;
             transition: transform var(--transition);
         }
@@ -284,8 +326,16 @@
             display: none;
         }
         details.collapsible-ledger summary::after {
-            content: "▼";
-            font-size: 11px;
+            content: "";
+            width: 11px;
+            height: 11px;
+            background-color: currentColor;
+            -webkit-mask-image: var(--icon-chevron-down);
+            mask-image: var(--icon-chevron-down);
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
             opacity: 0.6;
             transition: transform var(--transition);
         }
@@ -487,10 +537,23 @@
         }
         details.advanced-colors summary::-webkit-details-marker { display: none; }
         details.advanced-colors summary::before {
-            content: "▸ ";
+            content: "";
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            margin-right: 5px;
+            background-color: currentColor;
+            -webkit-mask-image: var(--icon-chevron-right);
+            mask-image: var(--icon-chevron-right);
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            vertical-align: -1px;
+            transition: transform var(--transition);
         }
         details.advanced-colors[open] summary::before {
-            content: "▾ ";
+            transform: rotate(90deg);
         }
         .live-preview-card {
             background: var(--surface);
@@ -2378,12 +2441,12 @@
         <!-- Monthly Calendar Container -->
         <div id="calendar-container" class="calendar-container" style="display: none;">
             <div class="calendar-header">
-                <button class="btn-alt" onclick="changeMonth(-1)">◀ Prev</button>
+                <button class="btn-alt" onclick="changeMonth(-1)"><svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 6 9 12 15 18"/></svg> Prev</button>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <h3 id="calendar-month-year" style="margin: 0;"></h3>
                     <button class="btn-small" style="color: var(--primary); border-color: rgba(var(--primary-rgb), 0.4);" onclick="fetchGoogleCalendarEvents()">🔄 Fetch GCal</button>
                 </div>
-                <button class="btn-alt" onclick="changeMonth(1)">Next ▶</button>
+                <button class="btn-alt" onclick="changeMonth(1)">Next <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 6 15 12 9 18"/></svg></button>
             </div>
             <div id="calendar-grid" class="calendar-grid"></div>
         </div>
@@ -2670,6 +2733,7 @@
     </div>
 
     <script type="module">
+        import { ICONS } from './modules/icons.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -3451,7 +3515,7 @@
                 <div><span class="gcal-detail-label">Attendees (${attendees.length})</span><div class="gcal-attendees">${attendees.length ? attendees.map(person => `<span class="gcal-attendee">${calendarEscape(person.displayName || person.email || 'Guest')} · ${calendarEscape(person.responseStatus || 'pending')}</span>`).join('') : '<span style="font-size:12px;opacity:.62">No attendee list supplied.</span>'}</div></div>
                 <div class="gcal-modal-actions">
                     ${meetingLink ? `<a class="btn-google" href="${calendarEscape(meetingLink)}" target="_blank" rel="noopener noreferrer">🎥 Join Meeting</a>` : ''}
-                    ${eventLink ? `<a class="btn-alt" href="${calendarEscape(eventLink)}" target="_blank" rel="noopener noreferrer">↗ Open in Google Calendar</a>` : ''}
+                    ${eventLink ? `<a class="btn-alt" href="${calendarEscape(eventLink)}" target="_blank" rel="noopener noreferrer">${ICONS.arrowUpRight} Open in Google Calendar</a>` : ''}
                     <button onclick="importGoogleCalendarEventAsTask()">＋ Import as SoloFlow Task</button>
                 </div>`;
             modal.classList.add('open');
@@ -3932,12 +3996,12 @@
                 window.expandedCards.delete(taskId);
                 expandArea.classList.remove('expanded');
                 if (card) card.classList.remove('is-expanded');
-                if (btn) btn.innerText = '⌄ See More';
+                if (btn) btn.innerHTML = `${ICONS.chevronDown} See More`;
             } else {
                 window.expandedCards.add(taskId);
                 expandArea.classList.add('expanded');
                 if (card) card.classList.add('is-expanded');
-                if (btn) btn.innerText = '⌃ See Less';
+                if (btn) btn.innerHTML = `${ICONS.chevronUp} See Less`;
             }
         };
 
@@ -4382,7 +4446,7 @@
                         </section>
                         <section class="active-task-hero">
                             <div><div class="active-task-badge">⚡ Priority Focus Target</div><h3 style="margin:12px 0 6px;font:750 20px var(--font-display)">${activeTask ? productivityEscape(activeTask.title) : 'Queue clear — protect your recovery time.'}</h3><p style="margin:0;opacity:.75;font-size:12px">${activeTask ? productivityEscape(activeTask.description || `${activeTask.category || 'General'} · ${activeTask.priority || 'Normal'} priority`) : 'No pending task requires immediate action.'}</p></div>
-                            ${activeTask ? `<div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn-timer ${window.activeTaskId === activeTask.id ? 'active' : ''}" onclick="toggleTimer('${activeTask.id}');renderProductivityDashboard()">${window.activeTaskId === activeTask.id ? '⏹ Stop Focus' : '▶ Start Focus'}</button><button class="btn-alt" onclick="moveTask('${activeTask.id}','done');renderProductivityDashboard()">✓ Complete</button></div>` : ''}
+                            ${activeTask ? `<div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn-timer ${window.activeTaskId === activeTask.id ? 'active' : ''}" onclick="toggleTimer('${activeTask.id}');renderProductivityDashboard()">${window.activeTaskId === activeTask.id ? `${ICONS.stop} Stop Focus` : `${ICONS.play} Start Focus`}</button><button class="btn-alt" onclick="moveTask('${activeTask.id}','done');renderProductivityDashboard()">✓ Complete</button></div>` : ''}
                         </section>
                     </div>
 
@@ -4398,7 +4462,7 @@
                         <section class="performance-panel"><span class="finance-section-kicker">Bottleneck diagnostics</span><h3>${diagnostics.length} item${diagnostics.length === 1 ? '' : 's'} need attention</h3><div class="diagnostic-list">${diagnostics.length ? diagnostics.slice(0,8).map(item => `<div class="diagnostic-item"><span class="diagnostic-dot ${item.type === 'overdue' ? 'overdue' : ''}"></span><div><div class="diagnostic-title">${productivityEscape(item.task.title)}</div><div class="diagnostic-meta">${productivityEscape(item.label)}</div></div><button class="btn-small" onclick="setView('all')">Open</button></div>`).join('') : '<div class="empty-state">No blocked or overdue tasks. Flow is clear.</div>'}</div></section>
                     </div>
 
-                    <div class="deep-dive-portal deep-dive-cta"><div><strong style="display:block;font-size:16px">Operational analytics controls</strong><div style="font-size:12px;opacity:.72;margin-top:4px">Adjust the daily focus quota and inspect workspace-wide productivity totals.</div></div><button class="btn-alt" onclick="navigateToCustomizeAnalytics()">📊 Open Analytics Settings →</button></div>
+                    <div class="deep-dive-portal deep-dive-cta"><div><strong style="display:block;font-size:16px">Operational analytics controls</strong><div style="font-size:12px;opacity:.72;margin-top:4px">Adjust the daily focus quota and inspect workspace-wide productivity totals.</div></div><button class="btn-alt" onclick="navigateToCustomizeAnalytics()">📊 Open Analytics Settings ${ICONS.arrowRight}</button></div>
                 </div>`;
         };
 
@@ -4703,14 +4767,14 @@
                     actionBtns = `<span style="font-size: 12px; color: var(--danger); font-weight: bold; padding: 5px 0;">🔒 Locked</span>`;
                 } else {
                     if (task.status === 'todo') {
-                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">Start →</button>`;
+                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">Start ${ICONS.arrowRight}</button>`;
                     } else if (task.status === 'inprogress') {
                         actionBtns = `
-                            <button class="btn-small" onclick="moveTask('${task.id}', 'todo')">← Back</button>
-                            <button class="btn-small" onclick="moveTask('${task.id}', 'done')">Complete →</button>
+                            <button class="btn-small" onclick="moveTask('${task.id}', 'todo')">${ICONS.arrowLeft} Back</button>
+                            <button class="btn-small" onclick="moveTask('${task.id}', 'done')">Complete ${ICONS.arrowRight}</button>
                         `;
                     } else {
-                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">← Reopen</button>`;
+                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">${ICONS.arrowLeft} Reopen</button>`;
                     }
                 }
 
@@ -4798,7 +4862,7 @@
                 
                 const isTimerActive = (window.activeTaskId === task.id);
                 const timerBtnClass = isTimerActive ? 'btn-timer active' : 'btn-timer';
-                const timerBtnText = isTimerActive ? '⏹ Stop' : '▶ Pomodoro';
+                const timerBtnText = isTimerActive ? `${ICONS.stop} Stop` : `${ICONS.play} Pomodoro`;
 
                 let timerHtml = '';
                 if (!isBlocked) {
@@ -4811,7 +4875,7 @@
                 }
 
                 const isExpanded = window.expandedCards.has(task.id);
-                const expandBtnText = isExpanded ? "⌃ See Less" : "⌄ See More";
+                const expandBtnText = isExpanded ? `${ICONS.chevronUp} See Less` : `${ICONS.chevronDown} See More`;
                 const expandClass = isExpanded ? "task-expand-area expanded" : "task-expand-area";
                 if (isExpanded) card.classList.add('is-expanded');
                 if (task.photoUrl) card.classList.add('has-photo');
@@ -4846,7 +4910,7 @@
                         ${timerHtml}
                         <div class="actions task-card-action-strip">
                            <button class="btn-small task-card-action" title="Upload or link a photo" onclick="editTaskPhoto('${task.id}')"><span aria-hidden="true">▧</span> Photo</button>
-                           <button class="btn-small task-card-action" title="Edit reference or workspace links" onclick="editTaskLinks('${task.id}')"><span aria-hidden="true">↗</span> Links</button>
+                           <button class="btn-small task-card-action" title="Edit reference or workspace links" onclick="editTaskLinks('${task.id}')">${ICONS.arrowUpRight} Links</button>
                            <button class="btn-small task-card-action task-action-email" title="Send a progress update to the assignee or target email" onclick="emailTaskUpdate('${task.id}')"><span aria-hidden="true">✉</span> Email Update</button>
                            <button class="btn-small task-card-action task-action-sync ${task.syncedToCalendar ? 'is-synced' : ''}" title="${task.dueDate ? 'Sync to the SoloFlow Calendar view' : 'Add a due date to sync this task'}" onclick="syncTaskToCalendarApp('${task.id}')"><span aria-hidden="true">◫</span> ${task.syncedToCalendar ? 'App Synced' : 'Sync App'}</button>
                            <button class="btn-small task-card-action task-action-sync ${task.syncedToGCal ? 'is-synced' : ''}" title="${task.dueDate ? 'Push to Google Calendar' : 'Add a due date to sync this task'}" onclick="createGoogleCalendarEvent('${task.id}')"><span aria-hidden="true">▦</span> ${task.syncedToGCal ? 'GCal Synced' : 'Sync to GCal'}</button>
@@ -4909,7 +4973,7 @@
                 const oldBtn = document.getElementById(`btn-timer-${oldTaskId}`);
                 if (oldBtn) {
                     oldBtn.className = 'btn-timer';
-                    oldBtn.innerText = '▶ Pomodoro';
+                    oldBtn.innerHTML = `${ICONS.play} Pomodoro`;
                 }
                 
                 window.saveTasks(true); 
@@ -5259,7 +5323,7 @@
             toggle.setAttribute('aria-expanded', String(!collapsed));
             toggle.setAttribute('aria-label', collapsed ? 'Expand transaction ledger' : 'Collapse transaction ledger');
             toggle.querySelector('.sr-only').textContent = collapsed ? 'Expand transaction ledger' : 'Collapse transaction ledger';
-            icon.textContent = collapsed ? '⌄' : '⌃';
+            icon.innerHTML = collapsed ? ICONS.chevronDown : ICONS.chevronUp;
         };
 
         window.toggleFinanceLedger = function() {

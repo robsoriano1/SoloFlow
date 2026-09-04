@@ -1,3 +1,5 @@
+import { ICONS } from './icons.js';
+
 const localDateKey = (timestamp = Date.now()) => {
   const date = new Date(timestamp);
   const offset = date.getTimezoneOffset() * 60_000;
@@ -49,7 +51,7 @@ export function installTimerModule(store) {
     const button = document.getElementById(`btn-timer-${taskId}`);
     if (button) {
       button.className = active ? 'btn-timer active' : 'btn-timer';
-      button.textContent = active ? '⏹ Stop' : '▶ Pomodoro';
+      button.innerHTML = active ? `${ICONS.stop} Stop` : `${ICONS.play} Pomodoro`;
       button.setAttribute('aria-pressed', String(active));
     }
   }

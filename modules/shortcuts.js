@@ -1,3 +1,5 @@
+import { ICONS } from './icons.js';
+
 const isTyping = (target) => target instanceof HTMLElement && (
   target.matches('input, textarea, select, [contenteditable="true"]') || target.closest('[contenteditable="true"]')
 );
@@ -40,7 +42,7 @@ export function installShortcutManager(taskModule) {
 
   const commands = [
     { icon: '+', title: '> New Task', detail: 'Open quick capture', kind: 'Command', keywords: 'create add capture n', run: () => { window.setView('all'); requestAnimationFrame(() => document.getElementById('taskTitle')?.focus()); } },
-    { icon: '▶', title: '> Start Focus Timer', detail: 'Start the selected or next active task', kind: 'Command', keywords: 'pomodoro timer focus p', run: () => {
+    { icon: ICONS.play, title: '> Start Focus Timer', detail: 'Start the selected or next active task', kind: 'Command', keywords: 'pomodoro timer focus p', run: () => {
       const taskId = window.SoloFlowTimer?.activeTaskId || window.SoloFlowStore?.state.selection?.[0] || window.tasks?.find((task) => task.status === 'inprogress')?.id || window.tasks?.find((task) => task.status !== 'done')?.id;
       if (taskId) window.toggleTimer?.(taskId); else window.showToast?.('No active task is available.', 'info');
     } },
@@ -97,7 +99,7 @@ export function installShortcutManager(taskModule) {
       button.setAttribute('aria-selected', String(index === activeIndex));
       const icon = document.createElement('span');
       icon.className = 'command-result-icon';
-      icon.textContent = item.icon;
+      icon.innerHTML = item.icon;
       const copy = document.createElement('span');
       copy.className = 'command-result-copy';
       const title = document.createElement('strong');

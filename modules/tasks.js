@@ -1,3 +1,5 @@
+import { ICONS } from './icons.js';
+
 const STATUS_LABELS = { todo: 'To-Do', inprogress: 'In Progress', done: 'Done' };
 const PRIORITIES = ['Low', 'Medium', 'High'];
 
@@ -116,7 +118,7 @@ export function installTaskModule(store) {
     button.setAttribute('role', 'menuitem');
     button.classList.toggle('danger', danger);
     const glyph = document.createElement('span');
-    glyph.textContent = icon;
+    glyph.innerHTML = icon;
     const text = document.createElement('span');
     text.textContent = label;
     button.append(glyph, text);
@@ -129,7 +131,7 @@ export function installTaskModule(store) {
     if (!task) return;
     contextMenu.replaceChildren();
     addContextAction('✓', 'Move to Done', () => window.moveTask(taskId, 'done'));
-    addContextAction('▶', 'Start Focus Timer', () => window.toggleTimer?.(taskId));
+    addContextAction(ICONS.play, 'Start Focus Timer', () => window.toggleTimer?.(taskId));
     addContextAction('⧉', 'Duplicate Task', () => {
       const copy = clone(task);
       copy.id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -156,7 +158,7 @@ export function installTaskModule(store) {
       window.saveTasks();
       window.showToast?.('Task duplicated', 'success');
     });
-    addContextAction('↗', 'Copy Task Link', async () => {
+    addContextAction(ICONS.arrowUpRight, 'Copy Task Link', async () => {
       const url = new URL(location.href);
       url.hash = `task-${encodeURIComponent(taskId)}`;
       try { await navigator.clipboard.writeText(url.href); window.showToast?.('Task link copied', 'success'); }
