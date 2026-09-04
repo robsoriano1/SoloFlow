@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Epilogue:wght@500;600;700&family=Fira+Code:wght@400;500;600&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,600;6..72,700&family=Outfit:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Epilogue:wght@500;600;700&family=Fira+Code:wght@400;500;600&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,600;6..72,700&family=Outfit:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Azeret+Mono:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Geist+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Martian+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap');
 
 .batch-action-bar {
   position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); z-index: 1000;
@@ -958,4 +958,640 @@ body.app-shell.sidebar-collapsed {
 .app-shell .task-card.card-inprogress:hover,
 .app-shell .task-card.card-done:hover {
   border-color: color-mix(in srgb, var(--primary) 38%, var(--surface-border-strong));
+}
+
+/* ============================================================================
+   v9 — Editorial atmosphere
+   ----------------------------------------------------------------------------
+   Presentation-only layer. No IDs, data attributes, handlers or module APIs are
+   touched here. Every colour resolves through the existing custom-property
+   contract (--bg / --surface / --primary / --secondary-accent / --card-text and
+   their -rgb channels), so user-selected palettes, custom accents and the
+   density switcher all keep working unchanged.
+   ========================================================================== */
+
+:root {
+  /* Semantic hues that used to be literal hex now ride the theme's own accent,
+     so a custom palette recolours the whole system instead of half of it. */
+  --purple: var(--secondary-accent, #b4762b);
+  --accent-gradient: linear-gradient(135deg, var(--primary), var(--secondary-accent, var(--primary)));
+  --hairline: linear-gradient(90deg, transparent, var(--rule-hairline) 18%, var(--rule-hairline) 82%, transparent);
+  --surface-raised: color-mix(in srgb, var(--surface) 88%, var(--bg));
+  --surface-sunken: color-mix(in srgb, var(--bg) 62%, var(--surface));
+  --shadow-card: 0 1px 1px color-mix(in srgb, black 14%, transparent), 0 12px 30px -26px color-mix(in srgb, black 90%, transparent);
+  --shadow-lifted: 0 2px 4px color-mix(in srgb, black 16%, transparent), 0 26px 52px -34px color-mix(in srgb, black 92%, transparent);
+  --shadow-overlay: 0 44px 96px -40px color-mix(in srgb, black 88%, transparent), 0 0 0 1px color-mix(in srgb, var(--card-text) 10%, transparent);
+}
+
+/* ---------------------------------------------------------------- atmosphere */
+body.app-shell {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 62rem 34rem at 6% -8%, var(--atmosphere-primary), transparent 68%),
+    radial-gradient(ellipse 46rem 30rem at 96% 4%, var(--atmosphere-secondary), transparent 66%),
+    radial-gradient(ellipse 70rem 40rem at 50% 118%, var(--atmosphere-floor), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 34%, transparent), transparent 44rem),
+    linear-gradient(180deg, transparent, color-mix(in srgb, var(--bg) 92%, black) 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* Tactile grain. Fixed, non-interactive, and masked so it never fights text. */
+body.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: -2;
+  pointer-events: none;
+  opacity: var(--grain-opacity, .05);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: var(--grain-scale, 168px) var(--grain-scale, 168px);
+  mask-image: none;
+}
+
+/* Geometric substrate: a hairline grid that only reads at the edges of vision. */
+body.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .5;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--card-text) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--card-text) 4%, transparent) 1px, transparent 1px);
+  background-size: 96px 96px, 96px 96px;
+  mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, black, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, black, transparent 78%);
+}
+
+/* ---------------------------------------------------------------- typography */
+.app-shell h1,
+.app-shell h2,
+.app-shell h3,
+.app-shell h4,
+.app-shell .task-title,
+.app-shell .finance-kpi-value,
+.app-shell #pageTitle {
+  font-synthesis-weight: none;
+}
+.app-shell #pageTitle {
+  position: relative;
+  margin-block: 30px 18px;
+  font-family: var(--font-display);
+  font-size: clamp(27px, 3.1vw, 42px);
+  font-weight: 700;
+  letter-spacing: -.038em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+.app-shell #pageTitle::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: .34em;
+  width: 6px;
+  height: .42em;
+  border-radius: 1px;
+  background: var(--accent-gradient);
+  opacity: .9;
+}
+.app-shell .soloflow-title-group h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -.028em;
+}
+.app-shell .soloflow-title-group span,
+.app-shell .metric-label,
+.app-shell .finance-section-kicker,
+.app-shell .finance-control label,
+.app-shell .finance-segment-field > span,
+.app-shell .settings-group h4,
+.app-shell .sidebar-brand-copy small,
+.app-shell .finance-ledger-head,
+.app-shell .gcal-modal-kicker,
+.app-shell .gcal-detail-label,
+.app-shell .micro-label,
+.app-shell .batch-field,
+.app-shell .finance-table th {
+  font-family: var(--font-body);
+  font-weight: 650;
+  font-size: 9.5px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.app-shell .metric-value-display,
+.app-shell .finance-kpi-value,
+.app-shell .performance-kpi-value,
+.app-shell .focus-quota-value,
+.app-shell .prod-card-value,
+.app-shell .timer-display,
+.app-shell .task-timer,
+.app-shell .finance-ledger-amount,
+.app-shell .finance-table td.numeric,
+.app-shell .rank-amount,
+.app-shell .col-total,
+.app-shell .nav-badge {
+  font-family: var(--font-metric);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  letter-spacing: -.03em;
+}
+.app-shell .task-title {
+  font-family: var(--font-display);
+  font-weight: 650;
+  letter-spacing: -.014em;
+  line-height: 1.3;
+}
+.app-shell .inbox-snippet,
+.app-shell .diagnostic-meta { line-height: 1.6; }
+/* The card clamp (-webkit-line-clamp: 2) is calibrated to this line-height;
+   raising it leaks the third line past the clip box. */
+.app-shell .task-desc { line-height: 1.55; letter-spacing: .002em; }
+/* The clipped box rounds ~2px taller than two line boxes, which lets the
+   ascenders of the third line show under the ellipsis. Pin it to exactly two
+   lines plus the editable affordance's own padding. */
+.app-shell .task-card:not(.is-expanded) .task-desc:not(:focus) {
+  max-height: calc(2lh + 8px);
+}
+
+/* ------------------------------------------------------- geometric dividers */
+.app-shell .section-divider {
+  position: relative;
+  height: 1px;
+  margin: 30px 0;
+  border: 0;
+  background: var(--hairline);
+}
+.app-shell .section-divider::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  translate: -50% -50%;
+  rotate: 45deg;
+  background: var(--primary);
+  opacity: .55;
+}
+.app-shell .sidebar-brand,
+.app-shell .sidebar-footer {
+  border-image: var(--hairline) 1;
+}
+
+/* ------------------------------------------------------------------- shell */
+.app-shell .soloflow-header {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface) 78%, var(--bg)));
+  border: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card), var(--inset-top-light);
+}
+.app-shell .soloflow-header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--secondary-accent, var(--primary)) 80%, transparent) 42%, transparent 78%);
+  opacity: .7;
+}
+.app-shell .soloflow-header-badge {
+  font-family: var(--font-metric);
+  font-size: 10px;
+  letter-spacing: .04em;
+  border-radius: 7px;
+}
+
+.app-shell .app-sidebar {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 97%, transparent), color-mix(in srgb, var(--bg) 94%, transparent) 62%, color-mix(in srgb, var(--bg) 99%, transparent));
+  border-right: 1px solid color-mix(in srgb, var(--card-text) 11%, transparent);
+  box-shadow: 22px 0 60px -50px color-mix(in srgb, black 95%, transparent);
+}
+.app-shell .app-sidebar .view-tab {
+  position: relative;
+  /* The nav reads as a quiet list; the rail below carries the active state,
+     so each row no longer needs a box drawn around it. */
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition:
+    color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    transform var(--motion-fast) var(--ease-spring);
+}
+.app-shell .app-sidebar .view-tab::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 0;
+  translate: 0 -50%;
+  border-radius: 0 2px 2px 0;
+  background: var(--primary);
+  transition: height var(--motion-base) var(--ease-spring);
+}
+.app-shell .app-sidebar .view-tab:hover { transform: translateX(2px); }
+.app-shell .app-sidebar .view-tab.active {
+  background: color-mix(in srgb, var(--primary) 11%, transparent);
+  box-shadow: none;
+}
+.app-shell .app-sidebar .view-tab.active::before { height: 56%; }
+/* The earlier contrast hotfix forces every .view-tab.active to a solid accent
+   block with !important. In the sidebar that reads as a generic SaaS pill, so
+   the rail + tint above takes precedence here — same contrast guarantee (full
+   --card-text on a 13% wash), quieter surface. Deliberately scoped to the
+   sidebar so .command-tab.active and any top-bar tabs keep the hotfix. */
+.app-shell .app-sidebar .view-tab.active {
+  color: var(--card-text) !important;
+  background: color-mix(in srgb, var(--primary) 13%, transparent) !important;
+  border-color: color-mix(in srgb, var(--primary) 26%, transparent) !important;
+  -webkit-text-fill-color: var(--card-text);
+}
+.app-shell .nav-icon {
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--card-text) 9%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--card-text) 4%, transparent);
+  transition: border-color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+}
+.app-shell .app-sidebar .view-tab.active .nav-icon {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 34%, transparent);
+  background: color-mix(in srgb, var(--primary) 13%, transparent);
+}
+.app-shell .nav-badge { border-radius: 6px; font-size: 9px; letter-spacing: 0; }
+.app-shell .sidebar-mark { border-radius: 10px; }
+.app-shell .sidebar-command {
+  border-radius: 9px;
+  background: var(--surface-sunken);
+  border: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+  box-shadow: none;
+  transition: border-color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+}
+.app-shell .sidebar-command:hover {
+  border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+  background: color-mix(in srgb, var(--primary) 7%, var(--surface-sunken));
+  box-shadow: none;
+}
+.app-shell .sidebar-command kbd,
+.app-shell .command-palette kbd,
+.app-shell .settings-key {
+  font-family: var(--font-metric);
+  font-size: 8.5px;
+  letter-spacing: -.02em;
+  border-radius: 5px;
+}
+
+/* ------------------------------------------------------------------ panels */
+.app-shell .control-panel,
+.app-shell .form-card,
+.app-shell .column,
+.app-shell .schedule-container,
+.app-shell .calendar-container,
+.app-shell .inbox-container,
+.app-shell .productivity-container,
+.app-shell .finance-container,
+.app-shell .finance-panel,
+.app-shell .performance-panel {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface) 80%, var(--bg)));
+  border: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card), var(--inset-top-light);
+}
+.app-shell .column { border-radius: 14px; }
+.app-shell .column h3 {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface) 62%, transparent));
+  border-bottom: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.app-shell .col-total {
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  font-size: 10px;
+}
+
+/* ------------------------------------------------------------- task cards */
+.app-shell .task-card {
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--card-text) 11%, transparent);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card), var(--inset-top-light);
+  transition:
+    transform var(--motion-fast) var(--ease-spring),
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-base) var(--ease-out-expo);
+}
+.app-shell .task-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: 12px 0 0 12px;
+  background: var(--accent-gradient);
+  opacity: 0;
+  transition: opacity var(--motion-fast) ease;
+}
+.app-shell .task-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary) 34%, transparent);
+  box-shadow: var(--shadow-lifted), var(--inset-top-light);
+}
+.app-shell .task-card:hover::before,
+.app-shell .task-card:focus-within::before { opacity: .95; }
+.app-shell .task-card:active { transform: translateY(0) scale(.996); }
+
+.app-shell .badge,
+.app-shell .task-card .badge,
+.app-shell .active-task-badge,
+.app-shell .subtask-chip,
+.app-shell .gcal-attendee,
+.app-shell .project-epic-badge {
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 9.5px;
+  font-weight: 650;
+  letter-spacing: .05em;
+}
+.app-shell .badge.high,
+.app-shell .badge.medium,
+.app-shell .badge.low {
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.app-shell .subtask-progress-pill {
+  border-radius: 6px;
+  font-family: var(--font-metric);
+  font-size: 9px;
+  letter-spacing: -.02em;
+}
+.app-shell .task-card-action {
+  border-radius: 7px;
+  transition:
+    color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    transform var(--motion-fast) var(--ease-spring);
+}
+.app-shell .task-card-action:hover { transform: translateY(-1px); }
+.app-shell .task-card-action:active { transform: translateY(0) scale(.96); }
+
+/* ------------------------------------------------------- controls & inputs */
+.app-shell button,
+.app-shell .btn-alt,
+.app-shell .btn-small {
+  border-radius: 9px;
+  box-shadow: none;
+  transition:
+    color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    transform var(--motion-fast) var(--ease-spring);
+}
+.app-shell button:hover { transform: translateY(-1px); }
+.app-shell button:active { transform: translateY(0) scale(.985); }
+.app-shell button:focus-visible,
+.app-shell .view-tab:focus-visible,
+.app-shell [contenteditable="true"]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.app-shell .quick-add-submit {
+  background-image: linear-gradient(180deg, color-mix(in srgb, white 12%, transparent), transparent);
+}
+.app-shell input:not([type="color"]):not([type="file"]):not([type="checkbox"]),
+.app-shell select,
+.app-shell textarea {
+  border-radius: 9px;
+  background: var(--surface-sunken);
+  border: 1px solid color-mix(in srgb, var(--card-text) 12%, transparent);
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    background-color var(--motion-fast) ease;
+}
+.app-shell input:not([type="color"]):not([type="file"]):not([type="checkbox"]):focus,
+.app-shell select:focus,
+.app-shell textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* ------------------------------------------------------------------ dialogs */
+.app-shell .command-palette,
+.command-palette {
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  box-shadow: var(--shadow-overlay);
+  animation: sfDialogIn var(--motion-base) var(--ease-spring) both;
+}
+.command-palette::backdrop {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(var(--primary-rgb), .16), transparent 70%),
+    color-mix(in srgb, var(--bg) 74%, black);
+  backdrop-filter: blur(10px) saturate(120%);
+  animation: sfFade var(--motion-base) ease both;
+}
+.command-palette-shell {
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--card-text) 13%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, transparent), color-mix(in srgb, var(--surface) 88%, var(--bg)));
+  box-shadow: var(--inset-top-light);
+}
+.command-palette-head { border-bottom: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent); }
+.command-result { border-radius: 9px; }
+.command-result-icon { border-radius: 8px; }
+.command-palette-footer { font-family: var(--font-metric); font-size: 9px; letter-spacing: -.02em; }
+
+details.customize-menu[open] {
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--card-text) 13%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, transparent), color-mix(in srgb, var(--surface) 88%, var(--bg)));
+  box-shadow: var(--shadow-overlay);
+  animation: sfDialogIn var(--motion-base) var(--ease-spring) both;
+}
+.gcal-modal {
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--card-text) 13%, transparent);
+  box-shadow: var(--shadow-overlay);
+  animation: sfDialogIn var(--motion-base) var(--ease-spring) both;
+}
+.gcal-modal-backdrop {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(var(--primary-rgb), .14), transparent 70%),
+    color-mix(in srgb, var(--bg) 74%, black);
+}
+.theme-preset-swatch,
+.font-preset-button {
+  border-radius: 11px;
+  transition:
+    border-color var(--motion-fast) ease,
+    transform var(--motion-fast) var(--ease-spring),
+    box-shadow var(--motion-fast) ease;
+}
+.theme-preset-swatch:hover,
+.font-preset-button:hover { transform: translateY(-2px); }
+.preset-dots { border-radius: 8px; }
+
+/* ------------------------------------------------------------ theme-bound accents */
+.app-shell .finance-bar-fill,
+.app-shell .budget-fill,
+.app-shell .rule-fill,
+.app-shell .allocation-fill,
+.app-shell .prod-progress-bar-fill {
+  background: var(--accent-gradient);
+  box-shadow: none;
+}
+.app-shell .rule-fill.needs { background: var(--secondary-accent, var(--primary)); }
+.app-shell .rule-fill.wants { background: var(--warning); }
+.app-shell .rule-fill.savings { background: var(--success); }
+.app-shell .budget-fill.warning { background: var(--warning); }
+.app-shell .budget-fill.danger { background: var(--danger); }
+.app-shell .metric-budget { color: var(--warning); }
+.app-shell .finance-alert {
+  border-color: rgba(var(--warning-rgb), .32);
+  background: rgba(var(--warning-rgb), .09);
+}
+.app-shell .calendar-task {
+  border: 1px solid var(--edge-highlight);
+  border-radius: 7px;
+  box-shadow: none;
+}
+.app-shell .calendar-task.gcal-event {
+  background: color-mix(in srgb, var(--secondary-accent, var(--primary)) 82%, var(--surface));
+  color: var(--primary-contrast-text);
+}
+.app-shell .calendar-task.gcal-event:hover {
+  background: var(--secondary-accent, var(--primary));
+}
+.app-shell .status-dot { box-shadow: 0 0 8px currentColor; }
+.app-shell .dot-success { background: var(--success); color: rgba(var(--success-rgb), .6); }
+.app-shell .dot-warning { background: var(--warning); color: rgba(var(--warning-rgb), .6); }
+.app-shell .dot-primary { background: var(--primary); color: rgba(var(--primary-rgb), .6); }
+.app-shell .dot-danger { background: var(--danger); color: rgba(var(--danger-rgb), .6); }
+.app-shell .dot-purple { background: var(--purple); color: color-mix(in srgb, var(--purple) 60%, transparent); }
+.app-shell .card-profit { background: rgba(var(--success-rgb), .05); border-color: rgba(var(--success-rgb), .2); }
+.app-shell .card-budget,
+.app-shell .card-velocity { background: rgba(var(--warning-rgb), .05); border-color: rgba(var(--warning-rgb), .2); }
+.app-shell .card-finished { background: rgba(var(--primary-rgb), .05); border-color: rgba(var(--primary-rgb), .2); }
+.app-shell .card-overdue { background: rgba(var(--danger-rgb), .05); border-color: rgba(var(--danger-rgb), .2); }
+.app-shell .card-time { background: color-mix(in srgb, var(--purple) 6%, transparent); border-color: color-mix(in srgb, var(--purple) 22%, transparent); }
+
+.app-shell .metric-card-elevated,
+.app-shell .finance-kpi,
+.app-shell .performance-kpi {
+  border-radius: 13px;
+  border: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+  background:
+    linear-gradient(150deg, rgba(var(--primary-rgb), .07), transparent 58%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface) 80%, var(--bg)));
+  box-shadow: var(--shadow-card), var(--inset-top-light);
+  transition:
+    transform var(--motion-fast) var(--ease-spring),
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-base) var(--ease-out-expo);
+}
+.app-shell .metric-card-elevated:hover,
+.app-shell .finance-kpi:hover,
+.app-shell .performance-kpi:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--primary) 32%, transparent);
+  box-shadow: var(--shadow-lifted), var(--inset-top-light);
+}
+.app-shell .empty-state {
+  border-radius: 13px;
+  border: 1px dashed color-mix(in srgb, var(--card-text) 18%, transparent);
+  background: color-mix(in srgb, var(--card-text) 3%, transparent);
+}
+.app-shell .toast-deck-item {
+  border-radius: 11px;
+  border: 1px solid color-mix(in srgb, var(--card-text) 12%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 97%, transparent), color-mix(in srgb, var(--surface) 86%, var(--bg)));
+  box-shadow: var(--shadow-lifted);
+  animation: sfToastIn var(--motion-base) var(--ease-spring) both;
+}
+
+/* ------------------------------------------------------------------- motion */
+@keyframes sfRiseIn {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sfDialogIn {
+  from { opacity: 0; transform: translate3d(0, 8px, 0) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sfFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sfToastIn {
+  from { opacity: 0; transform: translate3d(14px, 0, 0) scale(.97); }
+  to { opacity: 1; transform: none; }
+}
+
+#schedule-container,
+#calendar-container,
+#inbox-container,
+#productivity-container,
+#finance-container,
+.app-shell .board,
+.app-shell .analytics-grid-elevated,
+.app-shell .control-panel {
+  animation: sfRiseIn var(--motion-base) var(--ease-out-expo) both;
+}
+
+/* Orchestrated entrances. --sf-i carries each child's place in the sequence. */
+.app-sidebar .view-tabs > *,
+.app-shell .board > .column,
+.app-shell .analytics-grid-elevated > *,
+.app-shell .finance-kpi-grid > *,
+.app-shell .performance-kpis > * {
+  animation: sfRiseIn var(--motion-slow) var(--ease-out-expo) both;
+  animation-delay: calc(var(--sf-i, 0) * var(--stagger-step));
+}
+:is(.app-sidebar .view-tabs, .board, .analytics-grid-elevated, .finance-kpi-grid, .performance-kpis) > :nth-child(1) { --sf-i: 0; }
+:is(.app-sidebar .view-tabs, .board, .analytics-grid-elevated, .finance-kpi-grid, .performance-kpis) > :nth-child(2) { --sf-i: 1; }
+:is(.app-sidebar .view-tabs, .board, .analytics-grid-elevated, .finance-kpi-grid, .performance-kpis) > :nth-child(3) { --sf-i: 2; }
+:is(.app-sidebar .view-tabs, .board, .analytics-grid-elevated, .finance-kpi-grid, .performance-kpis) > :nth-child(4) { --sf-i: 3; }
+:is(.app-sidebar .view-tabs, .board, .analytics-grid-elevated, .finance-kpi-grid, .performance-kpis) > :nth-child(5) { --sf-i: 4; }
+:is(.app-sidebar .view-tabs, .board, .analytics-grid-elevated, .finance-kpi-grid, .performance-kpis) > :nth-child(6) { --sf-i: 5; }
+:is(.app-sidebar .view-tabs, .board, .analytics-grid-elevated, .finance-kpi-grid, .performance-kpis) > :nth-child(7) { --sf-i: 6; }
+:is(.app-sidebar .view-tabs, .board, .analytics-grid-elevated, .finance-kpi-grid, .performance-kpis) > :nth-child(n + 8) { --sf-i: 7; }
+
+/* Cards re-render on every filter keystroke, so their entrance stays a short
+   opacity-only fade with no stagger — orchestration belongs to the containers. */
+.app-shell .task-card { animation: sfFade var(--motion-fast) ease-out both; }
+.app-shell .task-card.is-dragging,
+.app-shell .task-card.batch-selected { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.app-shell::before { opacity: calc(var(--grain-opacity, .05) * .6); }
+  .app-shell *,
+  .app-shell *::before,
+  .app-shell *::after,
+  .command-palette,
+  .command-palette::backdrop,
+  .gcal-modal {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+  .app-shell .task-card:hover,
+  .app-shell button:hover,
+  .app-shell .app-sidebar .view-tab:hover,
+  .app-shell .metric-card-elevated:hover { transform: none; }
+}
+
+@media print {
+  body.app-shell::before,
+  body.app-shell::after { display: none; }
 }
