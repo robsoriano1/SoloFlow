@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SoloFlow — Task and Events Workspace</title>
-    <meta name="theme-color" content="#0F172A">
+    <meta name="theme-color" content="#14110E">
     <meta name="description" content="An offline-ready command center for tasks, focus, calendar, finance, and project delivery.">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,30 +17,35 @@
     <link rel="icon" type="image/png" href="./assets/soloflow-logo.png">
     <link rel="apple-touch-icon" href="./assets/soloflow-logo.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
-        :root {
-            --bg: #FBF9F1;
-            --surface: #FFFFFF;
-            --text: #1E1E1E;
-            --card-text: #1E1E1E;
-            --primary: #D97706;
-            --todo-bg: #FBEAE2;
-            --inprog-bg: #FBF2DC;
-            --done-bg: #EAF0E1;
+        /* Signature families for first paint. The full selectable catalog is
+           imported by styles/architecture.css and swapped through FONT_PRESETS. */
+        @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Schibsted+Grotesk:wght@400;500;600;700;800&family=Martian+Mono:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
-            --primary-rgb: 217, 119, 6;
-            --primary-contrast-text: #ffffff;
-            --surface-overlay: rgba(255, 255, 255, 0.75);
-            --surface-border: #E5E0D8;
-            --surface-border-strong: #D9D1C2;
-            --focus-ring: rgba(217, 119, 6, 0.18);
+        :root {
+            /* Shipped palette: "Graphite & Ember" (THEME_PRESETS.graphiteEmber).
+               These are pre-hydration values only — modules/theme.js and the
+               user's saved settings overwrite every one of them at runtime. */
+            --bg: #14110E;
+            --surface: #1E1A16;
+            --text: #F4EEE5;
+            --card-text: #F4EEE5;
+            --primary: #E2622F;
+            --todo-bg: #2A231C;
+            --inprog-bg: #3A2718;
+            --done-bg: #1F2C22;
+
+            --primary-rgb: 226, 98, 47;
+            --primary-contrast-text: #0A0A0A;
+            --surface-overlay: rgba(30, 26, 22, 0.75);
+            --surface-border: #393532;
+            --surface-border-strong: #504C49;
+            --focus-ring: rgba(226, 98, 47, 0.24);
             
             --danger: #C0392B;
             --warning: #C08A1E;
             --success: #4E7A51;
             --purple: #8b5cf6;
-            --text-muted: rgba(30, 30, 30, 0.62);
+            --text-muted: rgba(244, 238, 229, 0.64);
             
             --radius-sm: 8px;
             --radius-md: 14px;
@@ -50,10 +55,47 @@
             --shadow-md: 0 4px 20px rgba(30, 22, 10, 0.05);
             --shadow-lg: 0 10px 30px -4px rgba(30, 22, 10, 0.10);
             --transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            --font-display: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            --font-metric: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
-            --surface-rgb: 255, 255, 255;
+            --font-body: 'Schibsted Grotesk', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+            --font-display: 'Bricolage Grotesque', 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
+            --font-metric: 'Martian Mono', ui-monospace, SFMono-Regular, monospace;
+            --surface-rgb: 30, 26, 22;
+
+            /* Channels the theme module recomputes per preset. The literals here
+               are only the pre-hydration fallback for the shipped palette. */
+            --bg-rgb: 20, 17, 14;
+            --secondary-accent: #EFB255;
+            --secondary-accent-rgb: 239, 178, 85;
+
+            /* Atmosphere: every layer is expressed through the channels above so
+               a user-selected palette drives the depth instead of fixed colors. */
+            --atmosphere-primary: rgba(var(--primary-rgb), .17);
+            --atmosphere-secondary: rgba(var(--secondary-accent-rgb), .12);
+            --atmosphere-floor: rgba(var(--primary-rgb), .07);
+            --grain-opacity: .05;
+            --grain-scale: 168px;
+            --rule-hairline: color-mix(in srgb, var(--card-text) 12%, transparent);
+            --edge-highlight: color-mix(in srgb, white 9%, transparent);
+            --inset-top-light: inset 0 1px 0 var(--edge-highlight);
+
+            /* Motion contract. Components reference these instead of inventing
+               their own easings, so density and reduced-motion stay coherent. */
+            --ease-out-expo: cubic-bezier(.16, 1, .3, 1);
+            --ease-spring: cubic-bezier(.2, .9, .28, 1.06);
+            --motion-fast: 120ms;
+            --motion-base: 220ms;
+            --motion-slow: 420ms;
+            --stagger-step: 42ms;
+        }
+
+        :root[data-theme-mode="dark"] {
+            --edge-highlight: color-mix(in srgb, white 7%, transparent);
+            --grain-opacity: .07;
+            color-scheme: dark;
+        }
+        :root[data-theme-mode="light"] {
+            --edge-highlight: color-mix(in srgb, white 62%, transparent);
+            --grain-opacity: .035;
+            color-scheme: light;
         }
         
         * {
@@ -63,7 +105,7 @@
         body {
             font-family: var(--font-body);
             background-color: var(--bg);
-            background-image: radial-gradient(rgba(30, 30, 30, 0.05) 1px, transparent 1px);
+            background-image: radial-gradient(color-mix(in srgb, var(--card-text) 5%, transparent) 1px, transparent 1px);
             background-size: 24px 24px;
             color: var(--text);
             margin: 0;
@@ -840,7 +882,7 @@
             border-style: dashed; 
         }
         .col-total { 
-            font-family: 'Inter', sans-serif; 
+            font-family: var(--font-metric); 
             font-size: 13px; 
             opacity: 0.75; 
             font-weight: 600; 
@@ -1656,8 +1698,6 @@
         .font-preset-button strong { font-size: 13px; }
         .font-preset-button span { font-size: 10px; opacity: .6; }
         .font-preset-button.active { border-color: var(--primary); box-shadow: 0 0 0 3px var(--focus-ring); }
-        .font-preset-button[data-font="tech"] strong { font-family: 'Space Grotesk', sans-serif; }
-        .font-preset-button[data-font="editorial"] strong { font-family: 'Plus Jakarta Sans', sans-serif; }
 
         .view-tabs {
             position: sticky;
@@ -2009,7 +2049,7 @@
         @media(max-width: 620px) { .task-quick-row { grid-template-columns: 1fr; } .task-quick-row > *, .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; } details.task-advanced-fields > summary { width: 100%; } .column h3 { top: 122px; } }
         @media(max-width: 390px) { .task-card.has-photo:not(.is-expanded) { padding-right: 70px; } .task-photo-thumb { right: 11px; top: 12px; } }
     </style>
-    <link rel="stylesheet" href="./styles/architecture.css?v=8">
+    <link rel="stylesheet" href="./styles/architecture.css?v=9">
 </head>
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
@@ -2824,16 +2864,16 @@
 
         const defaultSettings = {
             title: "Rob's Globe and ADMU Task and Events Tracker",
-            bgColor: '#0F172A',
-            surfaceColor: '#151E32',
-            textColor: '#F8FAFC',
-            cardTextColor: '#F8FAFC',
-            primaryColor: '#6366F1',
-            todoBg: '#202A44',
-            inprogBg: '#292A52',
-            doneBg: '#123A37',
-            themePreset: 'midnightSlate',
-            fontPair: 'modern',
+            bgColor: '#14110E',
+            surfaceColor: '#1E1A16',
+            textColor: '#F4EEE5',
+            cardTextColor: '#F4EEE5',
+            primaryColor: '#E2622F',
+            todoBg: '#2A231C',
+            inprogBg: '#3A2718',
+            doneBg: '#1F2C22',
+            themePreset: 'graphiteEmber',
+            fontPair: 'signal',
             bannerUrl: '',
             bannerHeight: '180',
             bannerWidth: '100%',
@@ -2851,19 +2891,19 @@
 
         const FONT_PRESETS = {
             modern: {
-                body: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-                display: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-                metric: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace"
+                body: "'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif",
+                display: "'Bricolage Grotesque', 'Schibsted Grotesk', ui-sans-serif, sans-serif",
+                metric: "'Martian Mono', ui-monospace, SFMono-Regular, monospace"
             },
             tech: {
-                body: "'Space Grotesk', 'Inter', sans-serif",
-                display: "'Space Grotesk', 'Inter', sans-serif",
-                metric: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace"
+                body: "'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif",
+                display: "'Syne', ui-sans-serif, system-ui, sans-serif",
+                metric: "'Azeret Mono', ui-monospace, SFMono-Regular, monospace"
             },
             editorial: {
-                body: "'Plus Jakarta Sans', 'Inter', sans-serif",
-                display: "'Plus Jakarta Sans', 'Inter', sans-serif",
-                metric: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace"
+                body: "'Instrument Sans', ui-sans-serif, system-ui, sans-serif",
+                display: "'Literata', ui-serif, Georgia, serif",
+                metric: "'Geist Mono', ui-monospace, SFMono-Regular, monospace"
             }
         };
 
