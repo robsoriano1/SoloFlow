@@ -2009,7 +2009,7 @@
         @media(max-width: 620px) { .task-quick-row { grid-template-columns: 1fr; } .task-quick-row > *, .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; } details.task-advanced-fields > summary { width: 100%; } .column h3 { top: 122px; } }
         @media(max-width: 390px) { .task-card.has-photo:not(.is-expanded) { padding-right: 70px; } .task-photo-thumb { right: 11px; top: 12px; } }
     </style>
-    <link rel="stylesheet" href="./styles/architecture.css?v=7">
+    <link rel="stylesheet" href="./styles/architecture.css?v=8">
 </head>
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
@@ -4999,8 +4999,11 @@
             marker.setAttribute('aria-hidden', 'true');
             marker.style.gridColumn = String(dayIndex + 2);
             marker.style.gridRow = String(slotIndex + 2);
-            const referenceCell = document.getElementById(`cell-${currentDay}-${slotIndex}`);
-            const slotHeight = referenceCell ? referenceCell.getBoundingClientRect().height : 40;
+            // Measure the time-label track rather than the active day's cell.
+            // Schedule cells can span several rows after merging, which would
+            // multiply the minute offset and place the marker too far down.
+            const referenceTime = grid.querySelectorAll('.schedule-time')[slotIndex];
+            const slotHeight = referenceTime ? referenceTime.getBoundingClientRect().height : 40;
             marker.style.transform = `translateY(${(minuteFraction * slotHeight).toFixed(1)}px)`;
             grid.appendChild(marker);
         };
