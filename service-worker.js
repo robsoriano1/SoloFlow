@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soloflow-command-center-v8';
+const CACHE_NAME = 'soloflow-command-center-v9';
 const APP_SHELL = [
   './', './index.html', './bootstrap.js', './manifest.webmanifest', './styles/architecture.css',
   './core/state.js', './core/firebase.js',

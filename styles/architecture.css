@@ -89,14 +89,14 @@ body.app-shell.sidebar-collapsed { padding-left: calc(var(--sidebar-collapsed-wi
 .sidebar-brand-copy strong { font: 750 15px/1.15 var(--font-display); }
 .sidebar-brand-copy small { margin-top: 4px; color: var(--text-muted); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
 .sidebar-toggle { width: 30px; height: 30px; padding: 0; color: var(--card-text); background: transparent; border: 1px solid var(--surface-border); border-radius: 9px; font-size: 19px; }
-.sidebar-command { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 8px; width: 100%; padding: 10px; color: var(--card-text); text-align: left; background: color-mix(in srgb, var(--bg) 48%, transparent); border: 1px solid var(--surface-border); border-radius: 12px; }
+.sidebar-command { display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 8px; width: 100%; padding: 10px; color: var(--card-text); text-align: left; background: color-mix(in srgb, var(--bg) 48%, transparent); border: 1px solid var(--surface-border); border-radius: 12px; }
 .sidebar-command:hover { border-color: var(--primary); box-shadow: 0 0 0 3px var(--focus-ring); }
 .sidebar-command kbd, .command-palette kbd { padding: 3px 6px; color: var(--text-muted); background: var(--surface); border: 1px solid var(--surface-border); border-bottom-color: var(--surface-border-strong); border-radius: 6px; font: 600 9px/1 var(--font-metric); }
 .app-sidebar .view-tabs { position: static !important; top: auto !important; z-index: auto !important; display: flex !important; flex: 1; flex-direction: column; align-items: stretch; gap: 5px; margin: 0; padding: 0; overflow: visible; background: transparent; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; }
-.app-sidebar .view-tab { position: relative; display: grid; grid-template-columns: 28px minmax(0,1fr) auto; align-items: center; gap: 9px; width: 100%; min-height: 42px; padding: 8px 10px; color: var(--text-muted); text-align: left; background: transparent; border: 1px solid transparent; border-radius: 11px; box-shadow: none; }
+.app-sidebar .view-tab { position: relative; display: grid; grid-template-columns: 20px minmax(0,1fr) auto; align-items: center; gap: 9px; width: 100%; min-height: 42px; padding: 8px 10px; color: var(--text-muted); text-align: left; background: transparent; border: 1px solid transparent; border-radius: 11px; box-shadow: none; }
 .app-sidebar .view-tab:hover { color: var(--card-text); background: color-mix(in srgb, var(--primary) 9%, transparent); border-color: color-mix(in srgb, var(--primary) 22%, transparent); transform: translateX(2px); }
 .app-sidebar .view-tab.active { color: var(--card-text); background: color-mix(in srgb, var(--primary) 15%, var(--surface)); border-color: color-mix(in srgb, var(--primary) 42%, transparent); box-shadow: inset 3px 0 0 var(--primary), 0 8px 25px -22px var(--primary); }
-.nav-icon { display: grid; place-items: center; width: 25px; height: 25px; font: 700 16px/1 var(--font-metric); }
+.nav-icon { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex-shrink: 0; }
 .nav-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nav-badge { min-width: 22px; padding: 4px 6px; text-align: center; color: var(--card-text); background: color-mix(in srgb, var(--primary) 14%, transparent); border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent); border-radius: 999px; font: 600 9px/1 var(--font-metric); }
 .sidebar-footer { display: flex; align-items: center; gap: 9px; padding: 9px 10px; color: var(--text-muted); font-size: 10px; }
@@ -424,11 +424,11 @@ body.app-shell {
 }
 .app-sidebar .view-tab:hover { transform: none; }
 .app-sidebar .view-tab.active { box-shadow: inset 2px 0 0 var(--primary); }
-.nav-icon { width: 23px; height: 23px; font-size: 14px; }
+.nav-icon { width: 20px; height: 20px; }
 .nav-badge { min-width: 21px; padding: 3px 6px; font-size: 8px; }
 .sidebar-settings {
   display: grid;
-  grid-template-columns: 28px minmax(0,1fr) auto;
+  grid-template-columns: 20px minmax(0,1fr) auto;
   align-items: center;
   gap: 9px;
   width: 100%;
@@ -1212,17 +1212,24 @@ body.app-shell::after {
   -webkit-text-fill-color: var(--card-text);
 }
 .app-shell .nav-icon {
-  display: grid;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--card-text) 9%, transparent);
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--card-text) 4%, transparent);
-  transition: border-color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
+.app-shell .nav-icon .ph-icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  transition: color .15s ease;
+}
+.app-shell .nav-icon .ph-icon-fill { display: none; }
+.app-shell .app-sidebar .view-tab.active .nav-icon .ph-icon-regular { display: none; }
+.app-shell .app-sidebar .view-tab.active .nav-icon .ph-icon-fill { display: block; }
 .app-shell .app-sidebar .view-tab.active .nav-icon {
-  color: var(--primary);
-  border-color: color-mix(in srgb, var(--primary) 34%, transparent);
-  background: color-mix(in srgb, var(--primary) 13%, transparent);
+  color: var(--card-text);
 }
 .app-shell .nav-badge { border-radius: 6px; font-size: 9px; letter-spacing: 0; }
 .app-shell .sidebar-mark { border-radius: 10px; }
