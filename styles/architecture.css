@@ -121,8 +121,13 @@ body.sidebar-collapsed .app-sidebar .view-tab:hover::after { content: attr(aria-
 .command-palette { width: min(720px, calc(100vw - 24px)); max-height: min(680px, calc(100vh - 32px)); padding: 0; color: var(--card-text); background: transparent; border: 0; overflow: visible; }
 .command-palette::backdrop { background: rgba(3,7,18,.68); backdrop-filter: blur(9px); }
 .command-palette-shell { overflow: hidden; background: color-mix(in srgb, var(--surface) 95%, transparent); border: 1px solid var(--surface-border-strong); border-radius: 20px; box-shadow: 0 36px 100px -30px rgba(0,0,0,.9); backdrop-filter: blur(24px); }
-.command-palette-head { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--surface-border); }
-.command-palette-head input { width: 100%; padding: 8px 0 !important; color: var(--card-text) !important; background: transparent !important; border: 0 !important; box-shadow: none !important; font-size: 16px; }
+.command-palette-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--surface-border); border-radius: 20px 20px 0 0; transition: box-shadow .16s ease; }
+.command-palette-head:focus-within { box-shadow: inset 0 0 0 2px var(--primary), 0 0 0 3px var(--focus-ring); }
+.command-palette-icon { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 18px; height: 18px; color: var(--text-muted); }
+.command-palette-icon svg { width: 18px; height: 18px; }
+.command-palette-head input { flex: 1; min-width: 0; width: 100%; padding: 8px 0 !important; color: var(--card-text) !important; background: transparent !important; border: 0 !important; box-shadow: none !important; outline: none !important; font-size: 16px; }
+.command-palette-head input::-webkit-search-decoration, .command-palette-head input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.command-palette-head kbd { flex-shrink: 0; }
 .command-palette-results { max-height: min(520px, 65vh); padding: 8px; overflow-y: auto; }
 .command-result { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 10px; color: var(--card-text); text-align: left; background: transparent; border: 1px solid transparent; border-radius: 11px; }
 .command-result:hover, .command-result.is-active { background: color-mix(in srgb, var(--primary) 12%, transparent); border-color: color-mix(in srgb, var(--primary) 28%, transparent); }
@@ -1417,7 +1422,8 @@ body.app-shell::after {
   background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, transparent), color-mix(in srgb, var(--surface) 88%, var(--bg)));
   box-shadow: var(--inset-top-light);
 }
-.command-palette-head { border-bottom: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent); }
+.command-palette-head { border-bottom: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent); border-radius: 18px 18px 0 0; }
+.command-palette-head:focus-within { box-shadow: inset 0 0 0 2px var(--primary), 0 0 0 3px var(--focus-ring); }
 .command-result { border-radius: 9px; }
 .command-result-icon { border-radius: 8px; }
 .command-palette-footer { font-family: var(--font-metric); font-size: 9px; letter-spacing: -.02em; }
