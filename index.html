@@ -2733,7 +2733,7 @@
         const CLOUD_COPY = {
             connecting: { text: '☁️ Connecting to cloud sync…', detail: 'Your work is always saved on this device first.', retry: false },
             synced:     { text: '☁️ Cloud sync on', detail: 'Changes are saved on this device and mirrored to the cloud.', retry: false },
-            local:      { text: '💾 Saved on this device', detail: 'Cloud sync is turned off for this project, so nothing syncs across devices. Your data here is safe.', retry: true },
+            local:      { text: '💾 Saved on this device', detail: 'Automatic cloud backup is off for this project. Sign in with Google to sync across your devices.', retry: true },
             offline:    { text: '📶 Working offline', detail: 'Changes are saved on this device and will sync when you reconnect.', retry: true },
             error:      { text: '⚠️ Cloud sync unavailable', detail: 'Changes are saved on this device. Nothing is lost — only cross-device sync is paused.', retry: true }
         };
@@ -2802,6 +2802,20 @@
                 return false;
             }
 
+            // Let Firebase restore any persisted session first. Without this the
+            // anonymous bootstrap below races the restore, and because the Anonymous
+            // provider may be disabled its rejection would overwrite a perfectly
+            // good signed-in state with "saved on this device".
+            try {
+                if (typeof auth.authStateReady === 'function') await auth.authStateReady();
+            } catch (readyError) {
+                console.warn('SoloFlow: could not await auth state', readyError);
+            }
+            if (auth.currentUser) {
+                // Signed in already; onAuthStateChanged has reported the real status.
+                return true;
+            }
+
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -2810,6 +2824,10 @@
                 }
                 return true;
             } catch (error) {
+                // A session can land while the anonymous attempt is in flight; that
+                // user is authoritative and the failed bootstrap is irrelevant.
+                if (auth.currentUser) return true;
+
                 const code = (error && error.code) || '';
                 const isConfig = CLOUD_CONFIG_ERRORS.has(code);
                 const isNetwork = code === 'auth/network-request-failed';
@@ -2817,9 +2835,10 @@
 
                 if (isConfig) {
                     console.warn(
-                        'SoloFlow: cloud sync is disabled for this Firebase project (' + code + ').\n' +
-                        'Data is still saved locally in this browser. To enable cross-device sync, open\n' +
-                        'Firebase Console → Authentication → Sign-in method and enable the Anonymous provider.'
+                        'SoloFlow: anonymous sign-in is unavailable for this project (' + code + ').\n' +
+                        'Data is still saved locally in this browser. Anonymous auth only adds per-device\n' +
+                        'cloud backup; for cross-device sync use "Sign in to Sync" (Google). To enable the\n' +
+                        'automatic backup, turn on Firebase Console → Authentication → Sign-in method → Anonymous.'
                     );
                 } else {
                     console.error('SoloFlow authentication error:', error);
