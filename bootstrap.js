@@ -4,8 +4,6 @@ import { installThemeModule } from './modules/theme.js';
 import { installTaskModule } from './modules/tasks.js';
 import { installTimerModule } from './modules/timer.js';
 import { installScheduleModule } from './modules/schedule.js';
-import { installCalendarModule } from './modules/calendar.js';
-import { installInboxModule } from './modules/inbox.js';
 import { installProductivityModule } from './modules/productivity.js';
 import { installFinanceModule } from './modules/finance.js';
 import { installShortcutManager } from './modules/shortcuts.js';
@@ -98,15 +96,16 @@ function installGlobalShell(store) {
   applyCollapsed(localStorage.getItem('soloflow_sidebar_collapsed') === 'true');
   toggle?.addEventListener('click', () => applyCollapsed(!document.body.classList.contains('sidebar-collapsed')));
   sidebar?.querySelectorAll('.view-tab').forEach((button) => button.setAttribute('aria-label', button.querySelector('.nav-label')?.textContent || 'Workspace view'));
+  // Keep the collapsed-rail tooltip text off the short mobile label.
+  sidebar?.querySelectorAll('.nav-label-short').forEach((label) => label.setAttribute('aria-hidden', 'true'));
 
   const updateCounters = () => {
     const tasks = window.tasks || [];
     const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
     const values = {
       all: tasks.filter((task) => task.status !== 'done').length,
-      today: tasks.filter((task) => task.status !== 'done' && (task.dueDate === today || task.priority === 'High')).length,
+      today: tasks.filter((task) => task.status !== 'done' && task.dueDate && task.dueDate <= today).length,
       backlog: tasks.filter((task) => task.status !== 'done' && !task.dueDate).length,
-      calendar: (window.events?.length || 0) + tasks.filter((task) => task.syncedToCalendar).length + (window.gcalEvents?.length || 0),
       finance: window.financeTransactions?.length || 0
     };
     Object.entries(values).forEach(([key, value]) => { const badge = document.getElementById(`nav-count-${key}`); if (badge) badge.textContent = value > 99 ? '99+' : String(value); });
@@ -124,7 +123,7 @@ function installGlobalShell(store) {
     return result;
   };
   ['tasks', 'events', 'transactions', 'state:change'].forEach((topic) => store.subscribe(topic, updateCounters));
-  ['renderTasks', 'renderEvents', 'renderCalendar', 'renderFinance'].forEach((functionName) => {
+  ['renderTasks', 'renderEvents', 'renderFinance'].forEach((functionName) => {
     const render = window[functionName];
     if (typeof render !== 'function') return;
     window[functionName] = function renderWithNavigationCounters(...args) {
@@ -152,8 +151,6 @@ function start() {
   const taskModule = installTaskModule(store);
   installTimerModule(store);
   installScheduleModule(store);
-  installCalendarModule(store);
-  installInboxModule(store);
   installProductivityModule(store);
   installFinanceModule(store);
   installShortcutManager(taskModule);

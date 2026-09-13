@@ -138,12 +138,7 @@ export function installTaskModule(store) {
       copy.title = `${task.title} (Copy)`;
       copy.status = 'todo';
       copy.completedAt = null;
-      copy.syncedToCalendar = false;
-      copy.syncedToGCal = false;
-      copy.googleEventId = null;
       copy.integrations = {
-        internalCalendar: { status: 'idle', eventId: null },
-        googleCalendar: { status: 'idle', eventId: null },
         ics: { lastExportedAt: null },
         email: { lastSentAt: null }
       };

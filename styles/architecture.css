@@ -98,6 +98,7 @@ body.app-shell.sidebar-collapsed { padding-left: calc(var(--sidebar-collapsed-wi
 .app-sidebar .view-tab.active { color: var(--card-text); background: color-mix(in srgb, var(--primary) 15%, var(--surface)); border-color: color-mix(in srgb, var(--primary) 42%, transparent); box-shadow: inset 3px 0 0 var(--primary), 0 8px 25px -22px var(--primary); }
 .nav-icon { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex-shrink: 0; }
 .nav-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-label-short { display: none; }
 .nav-badge { min-width: 22px; padding: 4px 6px; text-align: center; color: var(--card-text); background: color-mix(in srgb, var(--primary) 14%, transparent); border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent); border-radius: 999px; font: 600 9px/1 var(--font-metric); }
 .sidebar-footer { display: flex; align-items: center; gap: 9px; padding: 9px 10px; color: var(--text-muted); font-size: 10px; }
 .sync-orbit { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 0 5px rgba(var(--success-rgb), .12); }
@@ -163,7 +164,7 @@ body[data-density="compact"] .task-card .subtask-progress-pill { grid-column: 3;
 body[data-density="compact"] .task-card > .actions { grid-column: 4; margin: 0 !important; }
 body[data-density="compact"] .task-card .task-expand-area { grid-column: 1 / -1; }
 
-/* Drag physics, context actions, calendar density */
+/* Drag physics, context actions */
 .task-card.is-dragging { opacity: .52; transform: rotate(1.2deg) scale(1.025); box-shadow: 0 28px 48px -24px rgba(0,0,0,.78); cursor: grabbing; }
 .task-drop-placeholder { min-height: 62px; margin: 8px 0; background: color-mix(in srgb, var(--primary) 8%, transparent); border: 2px dashed color-mix(in srgb, var(--primary) 62%, transparent); border-radius: var(--radius-md); animation: placeholderPulse 1.1s ease-in-out infinite alternate; }
 @keyframes placeholderPulse { to { background: color-mix(in srgb, var(--primary) 15%, transparent); } }
@@ -171,8 +172,6 @@ body[data-density="compact"] .task-card .task-expand-area { grid-column: 1 / -1;
 .task-context-menu button { display: flex; align-items: center; gap: 9px; width: 100%; padding: 9px 10px; color: var(--card-text); text-align: left; background: transparent; border: 0; border-radius: 8px; font-size: 11px; }
 .task-context-menu button:hover { background: color-mix(in srgb, var(--primary) 12%, transparent); }
 .task-context-menu button.danger { color: var(--danger); }
-.calendar-density-dots { display: flex; gap: 3px; margin: 3px 0 5px; }
-.calendar-density-dot { width: 6px; height: 6px; background: var(--dot-color, var(--primary)); border-radius: 50%; box-shadow: 0 0 0 2px color-mix(in srgb, var(--dot-color, var(--primary)) 18%, transparent); }
 .schedule-cell.is-range-selecting { position: relative; z-index: 20; background: color-mix(in srgb, var(--primary) 20%, var(--surface)) !important; box-shadow: inset 0 0 0 2px var(--primary); user-select: none; }
 .schedule-grid.is-drag-blocking { cursor: row-resize; user-select: none; }
 
@@ -186,19 +185,15 @@ body[data-density="compact"] .task-card .task-expand-area { grid-column: 1 / -1;
 .toast-dismiss { width: 25px; height: 25px; padding: 0; color: var(--text-muted); background: transparent; border: 0; }
 @keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(.97); } }
 
+/* Bottom tab bar. Six equal flex children with labels, so every destination is
+   visible and tappable at 375px with no horizontal scrolling. Search/Settings
+   move to the header (.shell-quick-actions) rather than stealing tab width. */
 @media (max-width: 900px) {
-  body.app-shell, body.app-shell.sidebar-collapsed { padding: 14px 14px 92px !important; }
-  .app-sidebar, body.sidebar-collapsed .app-sidebar { inset: auto 10px 10px; width: auto; height: 70px; flex-direction: row; align-items: center; padding: 8px 10px; border-radius: 18px; }
-  .sidebar-brand, .sidebar-command, .sidebar-footer, .sidebar-toggle { display: none !important; }
-  .app-sidebar .view-tabs { flex-direction: row; justify-content: space-between; overflow-x: auto; }
-  .app-sidebar .view-tab, body.sidebar-collapsed .app-sidebar .view-tab { grid-template-columns: 1fr; justify-items: center; min-width: 52px; width: auto; padding: 7px 9px; }
-  .app-sidebar .nav-label, .app-sidebar .nav-badge { display: none; }
-  .app-sidebar .view-tab:hover { transform: translateY(-2px); }
+  /* Bottom tab bar geometry lives in the authoritative layer at end of file. */
   #fontPresetCatalog { grid-template-columns: 1fr; }
   .app-shell .control-panel { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 560px) {
-  .app-sidebar .view-tab { min-width: 46px; }
   .command-palette-footer { display: none; }
   .density-switcher { width: 100%; }
   .app-shell .control-panel { grid-template-columns: 1fr; }
@@ -368,13 +363,6 @@ body[data-density="compact"] .task-card .task-expand-area { grid-column: 1 / -1;
   caret-color: var(--primary);
 }
 
-@media (max-width: 900px) {
-  .app-sidebar, body.sidebar-collapsed .app-sidebar {
-    inset: auto 10px 10px;
-    border: 1px solid var(--surface-border-strong);
-    border-radius: 18px;
-  }
-}
 @media (max-width: 560px) {
   .task-card-action { flex: 1 1 calc(50% - 7px); }
   .task-card-action.task-action-delete { margin-left: 0; }
@@ -503,22 +491,17 @@ details.customize-menu[open] > .settings-group:last-child { border-bottom: 1px s
 
 /* Active workspaces become deliberate main-canvas surfaces. */
 #schedule-container,
-#calendar-container,
-#inbox-container,
 #productivity-container,
 #finance-container {
   min-height: calc(100vh - 150px);
   animation: workspaceEnter .18s ease-out;
 }
-#inbox-container,
 #productivity-container { display: none; }
 @keyframes workspaceEnter { from { opacity: 0; transform: translateY(4px); } }
 .app-shell .control-panel,
 .app-shell .form-card,
 .app-shell .column,
 .app-shell .schedule-container,
-.app-shell .calendar-container,
-.app-shell .inbox-container,
 .app-shell .productivity-container,
 .app-shell .finance-container,
 .app-shell .finance-panel {
@@ -1074,8 +1057,6 @@ body.app-shell::after {
 .app-shell .settings-group h4,
 .app-shell .sidebar-brand-copy small,
 .app-shell .finance-ledger-head,
-.app-shell .gcal-modal-kicker,
-.app-shell .gcal-detail-label,
 .app-shell .micro-label,
 .app-shell .batch-field,
 .app-shell .finance-table th {
@@ -1108,7 +1089,6 @@ body.app-shell::after {
   letter-spacing: -.014em;
   line-height: 1.3;
 }
-.app-shell .inbox-snippet,
 .app-shell .diagnostic-meta { line-height: 1.6; }
 /* The card clamp (-webkit-line-clamp: 2) is calibrated to this line-height;
    raising it leaks the third line past the clip box. */
@@ -1264,8 +1244,6 @@ body.app-shell::after {
 .app-shell .form-card,
 .app-shell .column,
 .app-shell .schedule-container,
-.app-shell .calendar-container,
-.app-shell .inbox-container,
 .app-shell .productivity-container,
 .app-shell .finance-container,
 .app-shell .finance-panel,
@@ -1328,7 +1306,6 @@ body.app-shell::after {
 .app-shell .task-card .badge,
 .app-shell .active-task-badge,
 .app-shell .subtask-chip,
-.app-shell .gcal-attendee,
 .app-shell .project-epic-badge {
   border-radius: 6px;
   font-family: var(--font-body);
@@ -1435,17 +1412,6 @@ details.customize-menu[open] {
   box-shadow: var(--shadow-overlay);
   animation: sfDialogIn var(--motion-base) var(--ease-spring) both;
 }
-.gcal-modal {
-  border-radius: 18px;
-  border: 1px solid color-mix(in srgb, var(--card-text) 13%, transparent);
-  box-shadow: var(--shadow-overlay);
-  animation: sfDialogIn var(--motion-base) var(--ease-spring) both;
-}
-.gcal-modal-backdrop {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(var(--primary-rgb), .14), transparent 70%),
-    color-mix(in srgb, var(--bg) 74%, black);
-}
 .theme-preset-swatch,
 .font-preset-button {
   border-radius: 11px;
@@ -1476,18 +1442,6 @@ details.customize-menu[open] {
 .app-shell .finance-alert {
   border-color: rgba(var(--warning-rgb), .32);
   background: rgba(var(--warning-rgb), .09);
-}
-.app-shell .calendar-task {
-  border: 1px solid var(--edge-highlight);
-  border-radius: 7px;
-  box-shadow: none;
-}
-.app-shell .calendar-task.gcal-event {
-  background: color-mix(in srgb, var(--secondary-accent, var(--primary)) 82%, var(--surface));
-  color: var(--primary-contrast-text);
-}
-.app-shell .calendar-task.gcal-event:hover {
-  background: var(--secondary-accent, var(--primary));
 }
 .app-shell .status-dot { box-shadow: 0 0 8px currentColor; }
 .app-shell .dot-success { background: var(--success); color: rgba(var(--success-rgb), .6); }
@@ -1552,8 +1506,6 @@ details.customize-menu[open] {
 }
 
 #schedule-container,
-#calendar-container,
-#inbox-container,
 #productivity-container,
 #finance-container,
 .app-shell .board,
@@ -1592,8 +1544,7 @@ details.customize-menu[open] {
   .app-shell *::before,
   .app-shell *::after,
   .command-palette,
-  .command-palette::backdrop,
-  .gcal-modal {
+  .command-palette::backdrop {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
     transition-duration: 1ms !important;
@@ -1607,4 +1558,114 @@ details.customize-menu[open] {
 @media print {
   body.app-shell::before,
   body.app-shell::after { display: none; }
+}
+
+/* ============================================================================
+   MOBILE NAVIGATION - authoritative layer (must stay last)
+   ----------------------------------------------------------------------------
+   architecture.css re-declares .app-sidebar in several later sections, so the
+   bottom tab bar is defined here to win on source order rather than by piling
+   on !important. Six equal flex children, icon + short label, no horizontal
+   scroll at 375px. Search and Settings live in .shell-quick-actions in the
+   header on mobile so they do not compete for tab width.
+   ========================================================================== */
+@media (max-width: 900px) {
+  body.app-shell,
+  body.app-shell.sidebar-collapsed { padding: 14px 14px 104px !important; }
+
+  .app-sidebar,
+  body.sidebar-collapsed .app-sidebar {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: auto;
+    height: auto;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in srgb, var(--surface) 96%, var(--bg));
+    border: 0;
+    border-top: 1px solid var(--surface-border-strong);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -14px 38px -26px rgba(0, 0, 0, .9);
+  }
+
+  .sidebar-brand,
+  .sidebar-command,
+  .sidebar-footer,
+  .sidebar-toggle,
+  .sidebar-settings { display: none !important; }
+
+  .app-sidebar .view-tabs {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 2px;
+    width: 100%;
+    padding-top: 0;
+    overflow: visible;
+  }
+
+  .app-sidebar .view-tab,
+  body.sidebar-collapsed .app-sidebar .view-tab {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    width: auto;
+    min-height: 54px;
+    padding: 6px 2px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: none;
+  }
+
+  .app-sidebar .nav-label,
+  .app-sidebar .nav-badge { display: none; }
+
+  .app-sidebar .nav-label-short {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: 650 10px/1.1 var(--font-body);
+    letter-spacing: -.02em;
+  }
+
+  .app-sidebar .nav-icon { width: 21px; height: 21px; }
+
+  /* The left rail is the wrong axis for a bottom bar. */
+  .app-shell .app-sidebar .view-tab::before,
+  .app-shell .app-sidebar .view-tab.active::before { display: none; }
+
+  /* Active destination reads as selected rather than as a faint tint.
+     !important answers the deliberate !important at the desktop rule above
+     (search "contrast hotfix"), whose quiet-rail intent is desktop-only. */
+  .app-sidebar .view-tab.active,
+  body.sidebar-collapsed .app-sidebar .view-tab.active,
+  .app-shell .app-sidebar .view-tab.active {
+    color: var(--primary-contrast-text) !important;
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    -webkit-text-fill-color: var(--primary-contrast-text);
+    box-shadow: 0 7px 18px -9px var(--primary);
+    transform: none;
+  }
+  .app-shell .app-sidebar .view-tab.active .nav-icon { color: var(--primary-contrast-text); }
+  .app-sidebar .view-tab.active .nav-label-short { font-weight: 750; }
+
+  .app-sidebar .view-tab:hover,
+  .app-shell .app-sidebar .view-tab:hover { transform: none; }
+  body.sidebar-collapsed .app-sidebar .view-tab:hover::after { display: none; }
+}
+
+@media (max-width: 380px) {
+  .app-sidebar .nav-label-short { font-size: 9px; letter-spacing: -.03em; }
+  .app-sidebar .view-tab,
+  body.sidebar-collapsed .app-sidebar .view-tab { padding-inline: 1px; }
+  .app-sidebar .nav-icon { width: 20px; height: 20px; }
 }

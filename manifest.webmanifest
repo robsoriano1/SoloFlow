@@ -1,7 +1,7 @@
 {
-  "name": "SoloFlow — Task and Events Workspace",
+  "name": "SoloFlow",
   "short_name": "SoloFlow",
-  "description": "Offline-ready task, focus, calendar, finance, and project command center.",
+  "description": "Offline-ready task, focus, schedule, finance, and project command center.",
   "id": "./index.html",
   "start_url": "./index.html",
   "scope": "./",

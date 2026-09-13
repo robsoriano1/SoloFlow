@@ -23,7 +23,6 @@ function fuzzyScore(query, text) {
 }
 
 function closeOverlays(taskModule) {
-  window.closeGCalEventModal?.();
   document.querySelectorAll('.format-toolbar, .modal-backdrop, dialog[open]').forEach((element) => {
     if (element instanceof HTMLDialogElement) element.close();
     else element.classList.remove('visible', 'active', 'open');
@@ -49,8 +48,7 @@ export function installShortcutManager(taskModule) {
     { icon: '₱', title: '> Go to Finance', detail: 'Open the Financial Command Center', kind: 'Command', keywords: 'money ledger budget cash', run: () => window.setView('finance') },
     { icon: '◐', title: '> Toggle Theme', detail: 'Cycle through accessible colorways', kind: 'Command', keywords: 'appearance palette dark light', run: () => window.cycleSoloFlowTheme?.() },
     { icon: '⚙', title: '> Open Settings', detail: 'Customize appearance, accounts, and data', kind: 'Command', keywords: 'settings customize theme backup account', run: () => { const settings = document.getElementById('workspaceSettings'); if (settings) settings.open = true; } },
-    { icon: '▤', title: '> Go to Schedule', detail: 'Open the weekly schedule matrix', kind: 'Command', keywords: 'week time blocks', run: () => window.setView('schedule') },
-    { icon: '◫', title: '> Go to Calendar', detail: 'Open monthly events', kind: 'Command', keywords: 'month dates gcal', run: () => window.setView('calendar') }
+    { icon: '▤', title: '> Go to Schedule', detail: 'Open the weekly schedule', kind: 'Command', keywords: 'week time blocks', run: () => window.setView('schedule') }
   ];
 
   function workspaceItems() {
@@ -64,7 +62,7 @@ export function installShortcutManager(taskModule) {
         requestAnimationFrame(() => document.querySelector(`.task-card[data-task-id="${CSS.escape(task.id)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
       }
     }));
-    const eventItems = (window.events || []).map((event) => ({ icon: '◫', title: event.title || 'Untitled event', detail: `${event.date || 'No date'} ${event.time || ''}`.trim(), kind: 'Event', keywords: event.link || '', run: () => window.setView('calendar') }));
+    const eventItems = (window.events || []).map((event) => ({ icon: '◫', title: event.title || 'Untitled event', detail: `${event.date || 'No date'} ${event.time || ''}`.trim(), kind: 'Event', keywords: event.link || '', run: () => { window.setView('all'); requestAnimationFrame(() => document.getElementById('events-list')?.scrollIntoView({ behavior: 'smooth', block: 'center' })); } }));
     const financeItems = (window.financeTransactions || []).map((transaction) => ({
       icon: transaction.amountCents >= 0 ? '↗' : '↘', title: transaction.payee || 'Finance record', detail: `${transaction.category || 'Uncategorized'} · ${new Intl.NumberFormat(undefined, { style: 'currency', currency: 'PHP' }).format(Math.abs(transaction.amountCents || 0) / 100)}`, kind: 'Finance', keywords: `${transaction.date || ''} ${transaction.nature || ''}`, run: () => window.setView('finance')
     }));
@@ -142,7 +140,7 @@ export function installShortcutManager(taskModule) {
   });
   dialog?.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
 
-  const views = { '1': 'all', '2': 'today', '3': 'backlog', '4': 'schedule', '5': 'calendar', '6': 'finance' };
+  const views = { '1': 'all', '2': 'today', '3': 'backlog', '4': 'schedule', '5': 'productivity', '6': 'finance' };
   addEventListener('keydown', (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openPalette(); return; }
     if ((event.metaKey || event.ctrlKey) && event.key === ',') {

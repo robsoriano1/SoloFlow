@@ -1,6 +1,6 @@
-# SoloFlow Command Center PWA
+# SoloFlow
 
-This package keeps the original SoloFlow DOM IDs, Firebase listeners, Google Calendar and Gmail REST integrations, local-storage schema, finance ledgers, and import/export behavior. Its modular enhancement layer adds reactive state events, debounced cloud writes, an accurate worker timer, batch operations, charts, reporting, an accessible command shell, inline editing, and offline support.
+This package keeps the original SoloFlow DOM IDs, Firebase listeners, local-storage schema, finance ledgers, and import/export behavior. Its modular enhancement layer adds reactive state events, debounced cloud writes, an accurate worker timer, batch operations, charts, reporting, an accessible command shell, inline editing, and offline support.
 
 ## Run locally
 
@@ -18,7 +18,7 @@ Open `http://localhost:8080/index.html`.
 - `Cmd/Ctrl + K` or `/`: open the global command palette
 - `F`: focus the Kanban search field
 - `Space` or `P`: toggle focus timer
-- `1`–`6`: Kanban, Focus, Backlog, Schedule, Calendar, Finance
+- `1`–`6`: Kanban, Focus, Backlog, Schedule, Productivity, Finance
 - `Escape`: close overlays and clear batch selection
 
 Multi-select Kanban cards with `Shift+Click` for a range or `Ctrl/Cmd+Click` for individual cards.
