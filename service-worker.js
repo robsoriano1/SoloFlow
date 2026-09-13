@@ -1,9 +1,9 @@
-const CACHE_NAME = 'soloflow-command-center-v9';
+const CACHE_NAME = 'soloflow-command-center-v11';
 const APP_SHELL = [
   './', './index.html', './bootstrap.js', './manifest.webmanifest', './styles/architecture.css',
   './core/state.js', './core/firebase.js',
-  './modules/tasks.js', './modules/timer.js', './modules/schedule.js', './modules/calendar.js',
-  './modules/inbox.js', './modules/productivity.js', './modules/finance.js', './modules/theme.js',
+  './modules/tasks.js', './modules/timer.js', './modules/schedule.js',
+  './modules/productivity.js', './modules/finance.js', './modules/theme.js',
   './modules/shortcuts.js', './modules/reports.js', './assets/icon.svg', './assets/soloflow-logo.png'
 ];
 const OPTIONAL_REMOTE_ASSETS = [
@@ -24,17 +24,44 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))).then(() => self.clients.claim()));
 });
 
+// Code must not be cache-first: a cached index.html/JS/CSS would otherwise
+// outlive every future deploy, which reads to the user as "my changes vanished".
+const isAppShellCode = (request, url) =>
+  request.mode === 'navigate' ||
+  request.destination === 'document' ||
+  request.destination === 'script' ||
+  request.destination === 'style' ||
+  /\.(?:html|js|mjs|css)$/i.test(url.pathname);
+
+const putInCache = (request, response) => {
+  if (!response || !(response.ok || response.type === 'opaque')) return;
+  const copy = response.clone();
+  caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+};
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const requestUrl = new URL(event.request.url);
   const cacheableExternalAsset = ['fonts.googleapis.com', 'fonts.gstatic.com', 'www.gstatic.com'].includes(requestUrl.hostname);
   if (requestUrl.origin !== self.location.origin && !cacheableExternalAsset) return;
+
+  const sameOrigin = requestUrl.origin === self.location.origin;
+
+  if (sameOrigin && isAppShellCode(event.request, requestUrl)) {
+    // Network-first, cache as backup so offline still boots.
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => { putInCache(event.request, response); return response; })
+        .catch(() => caches.match(event.request).then((cached) =>
+          cached || (event.request.mode === 'navigate' ? caches.match('./index.html') : Response.error())))
+    );
+    return;
+  }
+
+  // Everything else (fonts, images, icons) stays cache-first.
   event.respondWith(
     caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
-      if (response.ok || response.type === 'opaque') {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-      }
+      putInCache(event.request, response);
       return response;
     }).catch(() => event.request.mode === 'navigate' ? caches.match('./index.html') : Response.error()))
   );
