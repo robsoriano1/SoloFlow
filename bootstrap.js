@@ -4,6 +4,7 @@ import { installThemeModule } from './modules/theme.js';
 import { installTaskModule } from './modules/tasks.js';
 import { installTimerModule } from './modules/timer.js';
 import { installScheduleModule } from './modules/schedule.js';
+import { installPomodoroModule } from './modules/pomodoro.js';
 import { installProductivityModule } from './modules/productivity.js';
 import { installFinanceModule } from './modules/finance.js';
 import { installShortcutManager } from './modules/shortcuts.js';
@@ -151,6 +152,7 @@ function start() {
   const taskModule = installTaskModule(store);
   installTimerModule(store);
   installScheduleModule(store);
+  installPomodoroModule(store);
   installProductivityModule(store);
   installFinanceModule(store);
   installShortcutManager(taskModule);

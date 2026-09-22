@@ -2017,7 +2017,7 @@
         @media(max-width: 620px) { .task-quick-row { grid-template-columns: 1fr; } .task-quick-row > *, .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; } details.task-advanced-fields > summary { width: 100%; } .column h3 { top: 122px; } }
         @media(max-width: 390px) { .task-card.has-photo:not(.is-expanded) { padding-right: 70px; } .task-photo-thumb { right: 11px; top: 12px; } }
     </style>
-    <link rel="stylesheet" href="./styles/architecture.css?v=11">
+    <link rel="stylesheet" href="./styles/architecture.css?v=12">
 </head>
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
@@ -2034,6 +2034,7 @@
             <button class="view-tab" id="tab-today" data-view="today" onclick="setView('today')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M221.87,83.16A104.1,104.1,0,1,1,195.67,49l22.67-22.68a8,8,0,0,1,11.32,11.32l-96,96a8,8,0,0,1-11.32-11.32l27.72-27.72a40,40,0,1,0,17.87,31.09,8,8,0,1,1,16-.9,56,56,0,1,1-22.38-41.65L184.3,60.39a87.88,87.88,0,1,0,23.13,29.67,8,8,0,0,1,14.44-6.9Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M221.87,83.16A104.1,104.1,0,1,1,195.67,49l22.67-22.68a8,8,0,0,1,11.32,11.32L167.6,99.71h0l-37.71,37.71-23.95,23.95a40,40,0,0,0,62-35.67,8,8,0,1,1,16-.9,56,56,0,0,1-95.5,42.79h0a56,56,0,0,1,73.13-84.43L184.3,60.39a87.88,87.88,0,1,0,23.13,29.67,8,8,0,0,1,14.44-6.9Z"/></svg></span><span class="nav-label">Today’s Focus</span><span class="nav-label-short" aria-hidden="true">Today</span><span class="nav-badge" id="nav-count-today">0</span></button>
             <button class="view-tab" id="tab-backlog" data-view="backlog" onclick="setView('backlog')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M230.91,172A8,8,0,0,1,228,182.91l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,36,169.09l92,53.65,92-53.65A8,8,0,0,1,230.91,172ZM220,121.09l-92,53.65L36,121.09A8,8,0,0,0,28,134.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,121.09ZM24,80a8,8,0,0,1,4-6.91l96-56a8,8,0,0,1,8.06,0l96,56a8,8,0,0,1,0,13.82l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,24,80Zm23.88,0L128,126.74,208.12,80,128,33.26Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M220,169.09l-92,53.65L36,169.09A8,8,0,0,0,28,182.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,169.09Z"/><path d="M220,121.09l-92,53.65L36,121.09A8,8,0,0,0,28,134.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,121.09Z"/><path d="M28,86.91l96,56a8,8,0,0,0,8.06,0l96-56a8,8,0,0,0,0-13.82l-96-56a8,8,0,0,0-8.06,0l-96,56a8,8,0,0,0,0,13.82Z"/></svg></span><span class="nav-label">Backlog</span><span class="nav-label-short" aria-hidden="true">Backlog</span><span class="nav-badge" id="nav-count-backlog">0</span></button>
             <button class="view-tab" id="tab-schedule" data-view="schedule" onclick="setView('schedule')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-38.34-85.66a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L116,164.69l42.34-42.35A8,8,0,0,1,169.66,122.34Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM169.66,133.66l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L116,164.69l42.34-42.35a8,8,0,0,1,11.32,11.32ZM48,80V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80Z"/></svg></span><span class="nav-label">Weekly Schedule</span><span class="nav-label-short" aria-hidden="true">Schedule</span></button>
+            <button class="view-tab" id="tab-calendar" data-view="calendar" onclick="setView('calendar')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208ZM96,128a8,8,0,0,1-8,8H72a8,8,0,0,1,0-16H88A8,8,0,0,1,96,128Zm48,0a8,8,0,0,1-8,8H120a8,8,0,0,1,0-16h16A8,8,0,0,1,144,128Zm48,0a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h16A8,8,0,0,1,192,128ZM96,168a8,8,0,0,1-8,8H72a8,8,0,0,1,0-16H88A8,8,0,0,1,96,168Zm48,0a8,8,0,0,1-8,8H120a8,8,0,0,1,0-16h16A8,8,0,0,1,144,168Zm48,0a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h16A8,8,0,0,1,192,168Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM88,176H72a8,8,0,0,1,0-16H88a8,8,0,0,1,0,16Zm0-40H72a8,8,0,0,1,0-16H88a8,8,0,0,1,0,16Zm48,40H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-40H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm48,40H168a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-40H168a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm24-56H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z"/></svg></span><span class="nav-label">Month Calendar</span><span class="nav-label-short" aria-hidden="true">Month</span></button>
             <button class="view-tab" id="tab-productivity" data-view="productivity" onclick="setView('productivity')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,144a15.78,15.78,0,0,1-10.42,14.94L146,178l-19,51.62a15.92,15.92,0,0,1-29.88,0L78,178l-51.62-19a15.92,15.92,0,0,1,0-29.88L78,110l19-51.62a15.92,15.92,0,0,1,29.88,0L146,110l51.62,19A15.78,15.78,0,0,1,208,144ZM152,48h16V64a8,8,0,0,0,16,0V48h16a8,8,0,0,0,0-16H184V16a8,8,0,0,0-16,0V32H152a8,8,0,0,0,0,16Zm88,32h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z"/></svg></span><span class="nav-label">Productivity Hub</span><span class="nav-label-short" aria-hidden="true">Progress</span></button>
             <button class="view-tab" id="tab-finance" data-view="finance" onclick="setView('finance')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M216,64H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,56V184a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64Zm0,128H56a8,8,0,0,1-8-8V78.63A23.84,23.84,0,0,0,56,80H216Zm-48-60a12,12,0,1,1,12,12A12,12,0,0,1,168,132Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M216,64H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,56V184a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64Zm-36,80a12,12,0,1,1,12-12A12,12,0,0,1,180,144Z"/></svg></span><span class="nav-label">Finance Tracker</span><span class="nav-label-short" aria-hidden="true">Finance</span><span class="nav-badge" id="nav-count-finance">0</span></button>
         </nav>
@@ -2341,6 +2342,19 @@
 
         <!-- Weekly Schedule Container -->
         <div id="schedule-container" class="schedule-container" style="display: none;">
+            <div class="schedule-week-nav" aria-label="Schedule week navigation">
+                <button type="button" class="btn-alt schedule-week-step" onclick="changeScheduleWeek(-1)" aria-label="Previous week">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg>
+                </button>
+                <div class="schedule-week-current">
+                    <strong id="schedule-week-label">This week</strong>
+                    <span id="schedule-week-hint"></span>
+                </div>
+                <button type="button" class="btn-small" id="schedule-week-today" onclick="goToScheduleThisWeek()">This week</button>
+                <button type="button" class="btn-alt schedule-week-step" onclick="changeScheduleWeek(1)" aria-label="Next week">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>
+                </button>
+            </div>
             <div id="schedule-day-nav" class="schedule-day-nav" hidden>
                 <button type="button" class="btn-alt schedule-day-step" onclick="changeScheduleDay(-1)" aria-label="Previous day">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg>
@@ -2355,6 +2369,24 @@
                 </button>
             </div>
             <div id="schedule-grid" class="schedule-grid"></div>
+        </div>
+
+        <!-- Month Calendar Container -->
+        <div id="calendar-container" class="calendar-container" style="display: none;">
+            <div class="calendar-nav" aria-label="Month navigation">
+                <button type="button" class="btn-alt calendar-step" onclick="changeCalendarMonth(-1)" aria-label="Previous month">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg>
+                </button>
+                <div class="calendar-current">
+                    <strong id="calendar-month-label">Month</strong>
+                    <span id="calendar-month-hint"></span>
+                </div>
+                <button type="button" class="btn-small" id="calendar-today" onclick="goToCalendarToday()">Today</button>
+                <button type="button" class="btn-alt calendar-step" onclick="changeCalendarMonth(1)" aria-label="Next month">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>
+                </button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
         </div>
 
         <!-- PRODUCTIVITY DASHBOARD CONTAINER -->
@@ -4123,7 +4155,8 @@
             all:          { title: 'Kanban Board',      sub: 'Every task, grouped by status.' },
             today:        { title: 'Today\u2019s Focus', sub: 'Due today or overdue \u2014 what actually needs doing now.' },
             backlog:      { title: 'Backlog',           sub: 'Tasks with no due date yet.' },
-            schedule:     { title: 'Weekly Schedule',   sub: 'Block out your week in 30-minute slots.' },
+            schedule:     { title: 'Weekly Schedule',   sub: 'Block out your week in 30-minute slots, with tasks and events overlaid.' },
+            calendar:     { title: 'Month Calendar',    sub: 'Every task, event and blocked hour across the month.' },
             productivity: { title: 'Productivity Hub',  sub: 'What you are finishing, and what needs attention.' },
             finance:      { title: 'Finance Tracker',   sub: 'Log what you spend and earn, and track your budget.' }
         };
@@ -4164,6 +4197,7 @@
             if (activeTab) activeTab.classList.add('active');
             
             const scheduleContainer = document.getElementById('schedule-container');
+            const calendarContainer = document.getElementById('calendar-container');
             const prodContainer = document.getElementById('productivity-container');
             const financeContainer = document.getElementById('finance-container');
             const kanbanControls = document.querySelector('.control-panel');
@@ -4171,6 +4205,7 @@
             const kanbanBoard = document.querySelector('.board');
 
             scheduleContainer.style.display = 'none';
+            if (calendarContainer) calendarContainer.style.display = 'none';
             if (prodContainer) prodContainer.style.display = 'none';
             if (financeContainer) financeContainer.style.display = 'none';
             kanbanControls.style.display = 'none';
@@ -4180,6 +4215,11 @@
             if (view === 'schedule') {
                 scheduleContainer.style.display = 'block';
                 window.renderSchedule();
+            } else if (view === 'calendar') {
+                if (calendarContainer) {
+                    calendarContainer.style.display = 'block';
+                    window.renderMonthCalendar();
+                }
             } else if (view === 'productivity') {
                 if (prodContainer) {
                     prodContainer.style.display = 'block';
@@ -4614,21 +4654,37 @@
         };
 
         // --- WEEKLY SCHEDULE LOGIC ---
-        window.updateScheduleCell = function(day, time, element) {
-            const key = `${day}-${time}`;
-            let data = window.scheduleData[key];
-            
-            if (typeof data !== 'object' || data === null) {
-                data = { text: '', bg: '', span: 1, hidden: false };
-            }
+        // Cells are addressed by calendar date (`2026-09-22-7:00 AM`). Entries still
+        // keyed by weekday name are the older format and now act as a recurring
+        // template: they show on every week until that date gets its own entry, so
+        // an existing routine keeps working instead of being stranded in one week.
+        const scheduleWeekdayName = (dateISO) => new Date(`${dateISO}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long' });
+        const asScheduleEntry = (raw) => (typeof raw === 'string' ? { text: raw, bg: '', span: 1, hidden: false } : raw);
+
+        function scheduleTemplateEntry(dateISO, time) {
+            return asScheduleEntry(window.scheduleData[`${scheduleWeekdayName(dateISO)}-${time}`]) || null;
+        }
+
+        window.readScheduleCell = function(dateISO, time) {
+            const own = window.scheduleData[`${dateISO}-${time}`];
+            if (own !== undefined) return asScheduleEntry(own);
+            const template = scheduleTemplateEntry(dateISO, time);
+            return template ? { ...template, fromTemplate: true } : null;
+        };
+
+        window.updateScheduleCell = function(dateISO, time, element) {
+            const key = `${dateISO}-${time}`;
+            const existing = window.scheduleData[key];
+            const data = (typeof existing === 'object' && existing !== null) ? existing : { text: '', bg: '', span: 1, hidden: false };
 
             data.text = element.innerHTML.trim();
+            element.classList.remove('is-template-block');
 
-            if (!data.text && !data.bg && data.span === 1 && !data.hidden) {
-                delete window.scheduleData[key];
-            } else {
-                window.scheduleData[key] = data;
-            }
+            const empty = !data.text && !data.bg && (data.span || 1) === 1 && !data.hidden;
+            // An emptied cell sitting on a recurring template has to persist as an
+            // explicit blank, or dropping the key would resurrect the template text.
+            if (empty && !scheduleTemplateEntry(dateISO, time)) delete window.scheduleData[key];
+            else window.scheduleData[key] = data;
             window.saveSchedule();
         };
 
@@ -4649,18 +4705,56 @@
             return window.scheduleDayIndex;
         };
 
+        // SCHEDULE_DAYS is Monday-first, so weeks are anchored to Monday to keep
+        // the weekday index and the column order the same number.
+        const scheduleStartOfWeek = (date) => {
+            const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+            return start;
+        };
+        const scheduleAddDays = (date, days) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+        const scheduleDateAt = (dayNumber) => scheduleAddDays(window.scheduleWeekStart, dayNumber);
+        const scheduleISOAt = (dayNumber) => localISODate(scheduleDateAt(dayNumber));
+
+        window.scheduleWeekStart = scheduleStartOfWeek(new Date());
+
         const rebuildSchedule = () => {
             const grid = document.getElementById('schedule-grid');
             if (grid) grid.innerHTML = '';
             window.renderSchedule();
         };
 
+        window.changeScheduleWeek = function(offset) {
+            window.scheduleWeekStart = scheduleAddDays(window.scheduleWeekStart, offset * 7);
+            rebuildSchedule();
+        };
+
+        window.goToScheduleThisWeek = function() {
+            window.scheduleWeekStart = scheduleStartOfWeek(new Date());
+            window.scheduleDayIndex = scheduleTodayIndex();
+            rebuildSchedule();
+        };
+
+        // Entry point for the month view: open whichever week holds that date.
+        window.goToScheduleDate = function(dateISO) {
+            const target = new Date(`${dateISO}T12:00:00`);
+            window.scheduleWeekStart = scheduleStartOfWeek(target);
+            window.scheduleDayIndex = (target.getDay() + 6) % 7;
+            window.setView('schedule');
+        };
+
+        // Days are real dates now, so stepping past either end of the column set
+        // moves to the neighbouring week rather than wrapping within this one.
         window.changeScheduleDay = function(offset) {
-            window.scheduleDayIndex = (currentScheduleDayIndex() + offset + SCHEDULE_DAYS.length) % SCHEDULE_DAYS.length;
+            const next = currentScheduleDayIndex() + offset;
+            const weekShift = Math.floor(next / SCHEDULE_DAYS.length);
+            if (weekShift) window.scheduleWeekStart = scheduleAddDays(window.scheduleWeekStart, weekShift * 7);
+            window.scheduleDayIndex = next - (weekShift * SCHEDULE_DAYS.length);
             rebuildSchedule();
         };
 
         window.goToScheduleToday = function() {
+            window.scheduleWeekStart = scheduleStartOfWeek(new Date());
             window.scheduleDayIndex = scheduleTodayIndex();
             rebuildSchedule();
         };
@@ -4675,13 +4769,19 @@
             const grid = document.getElementById('schedule-grid');
             const dayView = window.isScheduleDayView();
             const dayIndex = currentScheduleDayIndex();
-            const signature = dayView ? `day:${dayIndex}` : 'week';
-            if (grid.children.length > 0 && grid.dataset.scheduleMode === signature) { window.updateScheduleTimeMarker(); return; }
+            const signature = `${dayView ? `day:${dayIndex}` : 'week'}@${localISODate(window.scheduleWeekStart)}`;
+            if (grid.children.length > 0 && grid.dataset.scheduleMode === signature) {
+                window.renderScheduleOverlays();
+                window.updateScheduleTimeMarker();
+                return;
+            }
             grid.dataset.scheduleMode = signature;
             grid.classList.toggle('is-day-view', dayView);
+            updateScheduleWeekNav();
             updateScheduleDayNav(dayView, dayIndex);
 
-            const days = dayView ? [SCHEDULE_DAYS[dayIndex]] : SCHEDULE_DAYS;
+            const dayNumbers = dayView ? [dayIndex] : SCHEDULE_DAYS.map((_, index) => index);
+            const todayISO = localISODate();
             const times = [];
 
             for (let h = 7; h <= 20; h++) {
@@ -4692,40 +4792,154 @@
             }
 
             let html = `<div class="schedule-header" style="grid-row: 1; grid-column: 1;">Time</div>`;
-            days.forEach((day, dIdx) => {
-                html += `<div class="schedule-header" style="grid-row: 1; grid-column: ${dIdx + 2};">${day}</div>`;
+            dayNumbers.forEach((dayNumber, dIdx) => {
+                const date = scheduleDateAt(dayNumber);
+                const iso = localISODate(date);
+                html += `<div class="schedule-header${iso === todayISO ? ' is-today' : ''}" style="grid-row: 1; grid-column: ${dIdx + 2};">
+                    <span class="schedule-header-day">${SCHEDULE_DAYS[dayNumber]}</span>
+                    <span class="schedule-header-date">${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                    <span class="schedule-header-chips" data-rail="${iso}"></span>
+                </div>`;
             });
 
             times.forEach((time, tIdx) => {
                 const row = tIdx + 2;
                 html += `<div class="schedule-time" style="grid-row: ${row}; grid-column: 1;">${time}</div>`;
 
-                days.forEach((day, dIdx) => {
+                dayNumbers.forEach((dayNumber, dIdx) => {
                     const col = dIdx + 2;
-                    const key = `${day}-${time}`;
-                    let data = window.scheduleData[key];
-                    
-                    if (typeof data === 'string') {
-                        data = { text: data, bg: '', span: 1, hidden: false };
-                        window.scheduleData[key] = data; 
-                    }
-                    
+                    const day = SCHEDULE_DAYS[dayNumber];
+                    const iso = scheduleISOAt(dayNumber);
+                    const data = window.readScheduleCell(iso, time);
+
                     const content = data ? data.text : '';
                     const bg = data && data.bg ? data.bg : '';
                     const span = data && data.span ? data.span : 1;
                     const hidden = data && data.hidden ? 'display: none;' : '';
+                    const templateClass = data && data.fromTemplate && content ? ' is-template-block' : '';
 
-                    html += `<div class="schedule-cell editable" contenteditable="true" spellcheck="false" 
+                    html += `<div class="schedule-cell editable${templateClass}" contenteditable="true" spellcheck="false"
                         id="cell-${day}-${tIdx}"
-                        data-day="${day}" data-time="${time}" data-tidx="${tIdx}" data-row="${row}" data-col="${col}"
+                        data-day="${day}" data-date="${iso}" data-time="${time}" data-tidx="${tIdx}" data-row="${row}" data-col="${col}"
                         style="grid-row: ${row} / span ${span}; grid-column: ${col}; background-color: ${bg}; ${hidden}"
-                        onblur="updateScheduleCell('${day}', '${time}', this)">${content}</div>`;
+                        onblur="updateScheduleCell('${iso}', '${time}', this)">${content}</div>`;
                 });
             });
 
             grid.innerHTML = html;
+            window.renderScheduleOverlays();
             window.updateScheduleTimeMarker();
             if (!window.scheduleMarkerInterval) window.scheduleMarkerInterval = setInterval(window.updateScheduleTimeMarker, 60000);
+        };
+
+        function updateScheduleWeekNav() {
+            const label = document.getElementById('schedule-week-label');
+            const hint = document.getElementById('schedule-week-hint');
+            const thisWeek = document.getElementById('schedule-week-today');
+            const start = window.scheduleWeekStart;
+            const end = scheduleAddDays(start, 6);
+            const sameMonth = start.getMonth() === end.getMonth();
+            if (label) {
+                const startLabel = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const endLabel = end.toLocaleDateString('en-US', sameMonth ? { day: 'numeric' } : { month: 'short', day: 'numeric' });
+                label.textContent = `${startLabel} – ${endLabel}, ${end.getFullYear()}`;
+            }
+            const isCurrent = localISODate(start) === localISODate(scheduleStartOfWeek(new Date()));
+            if (hint) hint.textContent = isCurrent ? 'This week' : '';
+            if (thisWeek) thisWeek.hidden = isCurrent;
+        }
+
+        // --- SCHEDULE OVERLAYS: tasks + events drawn on top of the week grid ---
+        // Chips are grid siblings of the cells rather than children, because the
+        // cells are contenteditable and would otherwise absorb them into the text.
+        const SCHEDULE_OPENING_MINUTES = 7 * 60;
+        const SCHEDULE_CLOSING_MINUTES = 20 * 60;
+
+        function scheduleSlotForTime(time24) {
+            if (!time24) return null;
+            const [hours, minutes] = String(time24).split(':').map(Number);
+            if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return null;
+            const total = (hours * 60) + minutes;
+            if (total < SCHEDULE_OPENING_MINUTES || total > SCHEDULE_CLOSING_MINUTES) return null;
+            return Math.min(26, Math.floor((total - SCHEDULE_OPENING_MINUTES) / 30));
+        }
+
+        window.scheduleItemsForDate = function(dateISO) {
+            const items = [];
+            (window.tasks || []).forEach(task => {
+                if (task.status === 'done' || task.dueDate !== dateISO) return;
+                items.push({ kind: 'task', id: task.id, title: task.title, time: task.dueTime || '', priority: task.priority });
+            });
+            (window.events || []).forEach(event => {
+                if (event.date !== dateISO) return;
+                items.push({ kind: 'event', id: event.id, title: event.title, time: event.time || '', link: event.link });
+            });
+            return items.sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+        };
+
+        function buildScheduleChip(item) {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = `schedule-chip is-${item.kind}`;
+            if (item.kind === 'task' && item.priority) chip.dataset.priority = item.priority;
+            const when = item.time ? formatTime(item.time) : 'no time set';
+            chip.title = item.kind === 'task'
+                ? `Task · ${item.title} · ${when} · click to focus`
+                : `Event · ${item.title} · ${when}`;
+            chip.innerHTML = `<span class="schedule-chip-dot" aria-hidden="true"></span><span class="schedule-chip-text"></span>`;
+            chip.querySelector('.schedule-chip-text').textContent = item.title;
+            chip.addEventListener('click', (clickEvent) => {
+                clickEvent.stopPropagation();
+                if (item.kind === 'task') { window.focusTaskInPomodoro?.(item.id); return; }
+                const link = taskSafeUrl(item.link);
+                if (link) window.open(link, '_blank', 'noopener');
+                else window.showToast?.(`${item.title} — ${when}`, 'info');
+            });
+            return chip;
+        }
+
+        window.renderScheduleOverlays = function() {
+            const grid = document.getElementById('schedule-grid');
+            if (!grid || !grid.children.length) return;
+            grid.querySelectorAll('.schedule-chip-stack').forEach(stack => stack.remove());
+            grid.querySelectorAll('.schedule-header-chips').forEach(rail => { rail.innerHTML = ''; });
+
+            const dayView = grid.classList.contains('is-day-view');
+            const dayNumbers = dayView ? [currentScheduleDayIndex()] : SCHEDULE_DAYS.map((_, index) => index);
+            dayNumbers.forEach((dayNumber, dIdx) => {
+                const iso = scheduleISOAt(dayNumber);
+                const column = dIdx + 2;
+                const rail = grid.querySelector(`.schedule-header-chips[data-rail="${iso}"]`);
+                const bySlot = new Map();
+
+                window.scheduleItemsForDate(iso).forEach(item => {
+                    // Untimed items, and anything outside the 7am-8pm grid, ride the
+                    // day header instead of being parked in a misleading slot.
+                    const slot = scheduleSlotForTime(item.time);
+                    if (slot === null) { rail?.append(buildScheduleChip(item)); return; }
+                    if (!bySlot.has(slot)) bySlot.set(slot, []);
+                    bySlot.get(slot).push(item);
+                });
+
+                bySlot.forEach((items, slot) => {
+                    const stack = document.createElement('div');
+                    stack.className = 'schedule-chip-stack';
+                    stack.style.gridColumn = String(column);
+                    stack.style.gridRow = String(slot + 2);
+                    // A 30-minute row fits two chips; more than that would grow the
+                    // row and drag every block below it out of alignment.
+                    const shown = items.length > 2 ? items.slice(0, 1) : items;
+                    shown.forEach(item => stack.append(buildScheduleChip(item)));
+                    if (items.length > shown.length) {
+                        const more = document.createElement('span');
+                        more.className = 'schedule-chip is-more';
+                        more.textContent = `+${items.length - shown.length} more`;
+                        more.title = items.slice(shown.length).map(item => item.title).join('\n');
+                        stack.append(more);
+                    }
+                    grid.append(stack);
+                });
+            });
         };
 
         function updateScheduleDayNav(dayView, dayIndex) {
@@ -4735,9 +4949,10 @@
             if (!dayView) return;
             const label = document.getElementById('schedule-day-label');
             const hint = document.getElementById('schedule-day-hint');
-            const isToday = dayIndex === scheduleTodayIndex();
+            const date = scheduleDateAt(dayIndex);
+            const isToday = localISODate(date) === localISODate();
             if (label) label.textContent = SCHEDULE_DAYS[dayIndex];
-            if (hint) hint.textContent = isToday ? 'Today' : `Day ${dayIndex + 1} of 7`;
+            if (hint) hint.textContent = `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}${isToday ? ' · Today' : ''}`;
             nav.querySelector('.schedule-day-today')?.toggleAttribute('hidden', isToday);
         }
 
@@ -4751,6 +4966,8 @@
             const openingMinutes = 7 * 60;
             const closingMinutes = 20 * 60;
             if (minutes < openingMinutes || minutes > closingMinutes) return;
+            // The grid can be parked on any week; "now" only exists on this one.
+            if (localISODate(window.scheduleWeekStart) !== localISODate(scheduleStartOfWeek(now))) return;
             const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
             let dayIndex = SCHEDULE_DAYS.indexOf(currentDay);
             if (dayIndex < 0) return;
@@ -4779,11 +4996,10 @@
         window.applyCellColor = function(color) {
             if (!window.activeScheduleCell) return;
             const cell = window.activeScheduleCell;
-            cell.style.backgroundColor = color; 
+            cell.style.backgroundColor = color;
 
-            const day = cell.dataset.day;
             const time = cell.dataset.time;
-            const key = `${day}-${time}`;
+            const key = `${cell.dataset.date}-${time}`;
 
             if(typeof window.scheduleData[key] !== 'object') {
                 window.scheduleData[key] = { text: cell.innerHTML, bg: '', span: 1, hidden: false };
@@ -4816,12 +5032,12 @@
                 nextCell.innerHTML = '';
             }
 
-            const key1 = `${day}-${cell.dataset.time}`;
+            const key1 = `${cell.dataset.date}-${cell.dataset.time}`;
             if(typeof window.scheduleData[key1] !== 'object') window.scheduleData[key1] = {text: cell.innerHTML, bg: cell.style.backgroundColor, span: 1, hidden: false};
             window.scheduleData[key1].span = newSpan;
-            window.scheduleData[key1].text = cell.innerHTML; 
+            window.scheduleData[key1].text = cell.innerHTML;
 
-            const key2 = `${day}-${nextCell.dataset.time}`;
+            const key2 = `${nextCell.dataset.date}-${nextCell.dataset.time}`;
             if(typeof window.scheduleData[key2] !== 'object') window.scheduleData[key2] = {text: '', bg: '', span: 1, hidden: false};
             window.scheduleData[key2].hidden = true;
             window.scheduleData[key2].text = '';
@@ -4840,21 +5056,101 @@
             if (currentSpan <= 1) return; 
 
             cell.style.gridRow = `${cell.dataset.row} / span 1`;
-            const key1 = `${day}-${cell.dataset.time}`;
+            const key1 = `${cell.dataset.date}-${cell.dataset.time}`;
             if(window.scheduleData[key1]) window.scheduleData[key1].span = 1;
 
             for(let i = 1; i < currentSpan; i++) {
                 const hiddenTidx = tIdx + i;
                 const hiddenCell = document.getElementById(`cell-${day}-${hiddenTidx}`);
                 if (hiddenCell) {
-                    hiddenCell.style.display = ''; 
-                    const hiddenKey = `${day}-${hiddenCell.dataset.time}`;
+                    hiddenCell.style.display = '';
+                    const hiddenKey = `${hiddenCell.dataset.date}-${hiddenCell.dataset.time}`;
                     if(window.scheduleData[hiddenKey]) window.scheduleData[hiddenKey].hidden = false;
                 }
             }
 
             window.saveSchedule();
             cell.focus();
+        };
+
+        // --- MONTH CALENDAR LOGIC ---
+        // Same task/event source as the week overlays, laid out a month at a time.
+        // Clicking a day hands off to the weekly schedule via goToScheduleDate.
+        window.calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+        window.changeCalendarMonth = function(offset) {
+            window.calendarMonth = new Date(window.calendarMonth.getFullYear(), window.calendarMonth.getMonth() + offset, 1);
+            window.renderMonthCalendar();
+        };
+
+        window.goToCalendarToday = function() {
+            const now = new Date();
+            window.calendarMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            window.renderMonthCalendar();
+        };
+
+        function countScheduleBlocks(dateISO) {
+            let count = 0;
+            for (let h = 7; h <= 20; h++) {
+                const hour12 = h > 12 ? h - 12 : h;
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                const slots = h === 20 ? [`${hour12}:00 ${ampm}`] : [`${hour12}:00 ${ampm}`, `${hour12}:30 ${ampm}`];
+                slots.forEach(time => {
+                    const entry = window.readScheduleCell(dateISO, time);
+                    if (entry && entry.text && !entry.hidden) count += 1;
+                });
+            }
+            return count;
+        }
+
+        window.renderMonthCalendar = function() {
+            const grid = document.getElementById('calendar-grid');
+            if (!grid) return;
+
+            const month = window.calendarMonth;
+            const label = document.getElementById('calendar-month-label');
+            const hint = document.getElementById('calendar-month-hint');
+            const todayButton = document.getElementById('calendar-today');
+            const now = new Date();
+            const isCurrentMonth = month.getFullYear() === now.getFullYear() && month.getMonth() === now.getMonth();
+            if (label) label.textContent = month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            if (hint) hint.textContent = isCurrentMonth ? 'This month' : '';
+            if (todayButton) todayButton.hidden = isCurrentMonth;
+
+            const firstCell = scheduleStartOfWeek(month);
+            const monthEnd = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+            const lastCell = scheduleAddDays(scheduleStartOfWeek(monthEnd), 6);
+            const totalDays = Math.round((lastCell - firstCell) / 86400000) + 1;
+            const todayISO = localISODate();
+
+            let html = SCHEDULE_DAYS.map(day => `<div class="calendar-head">${day.slice(0, 3)}</div>`).join('');
+
+            for (let offset = 0; offset < totalDays; offset++) {
+                const date = scheduleAddDays(firstCell, offset);
+                const iso = localISODate(date);
+                const outside = date.getMonth() !== month.getMonth();
+                const items = window.scheduleItemsForDate(iso);
+                const blocks = countScheduleBlocks(iso);
+
+                const chips = items.slice(0, 3).map(item => `
+                    <span class="calendar-chip is-${item.kind}" title="${taskEscape(`${item.kind === 'task' ? 'Task' : 'Event'} · ${item.title}${item.time ? ` · ${formatTime(item.time)}` : ''}`)}">
+                        <span class="calendar-chip-dot" aria-hidden="true"></span><span class="calendar-chip-text">${taskEscape(item.title)}</span>
+                    </span>`).join('');
+                const hidden = items.slice(3);
+                const overflow = hidden.length
+                    ? `<span class="calendar-more" title="${taskEscape(hidden.map(item => item.title).join('\n'))}">+${hidden.length}</span>`
+                    : '';
+                const blockBadge = blocks ? `<span class="calendar-blocks" title="${blocks} scheduled block${blocks === 1 ? '' : 's'}">${blocks}▦</span>` : '';
+
+                html += `<button type="button" class="calendar-day${outside ? ' is-outside' : ''}${iso === todayISO ? ' is-today' : ''}"
+                    onclick="goToScheduleDate('${iso}')"
+                    aria-label="${taskEscape(date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }))} — open in weekly schedule">
+                    <span class="calendar-day-top"><span class="calendar-date">${date.getDate()}</span>${blockBadge}</span>
+                    <span class="calendar-day-items">${chips}${overflow}</span>
+                </button>`;
+            }
+
+            grid.innerHTML = html;
         };
 
         // --- FINANCIAL COMMAND CENTER LOGIC ---

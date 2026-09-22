@@ -16,25 +16,26 @@ export function installScheduleModule(store) {
     if (!selection || selection.start === selection.end) return;
     const cells = cellsInRange(selection.day, selection.start, selection.end);
     if (cells.length < 2) return;
+    const cellKey = (cell) => `${cell.dataset.date}-${cell.dataset.time}`;
     const before = cells.map((cell) => ({
-      time: cell.dataset.time,
+      key: cellKey(cell),
       text: cell.textContent,
       display: cell.style.display,
       gridRow: cell.style.gridRow,
-      data: structuredClone(window.scheduleData[`${selection.day}-${cell.dataset.time}`] ?? null)
+      data: structuredClone(window.scheduleData[cellKey(cell)] ?? null)
     }));
     const first = cells[0];
     const combinedText = cells.map((cell) => cell.textContent.trim()).filter(Boolean).join('\n');
     first.textContent = combinedText;
     first.style.display = '';
     first.style.gridRow = `${first.dataset.row} / span ${cells.length}`;
-    const firstKey = `${selection.day}-${first.dataset.time}`;
+    const firstKey = cellKey(first);
     const prior = typeof window.scheduleData[firstKey] === 'object' ? window.scheduleData[firstKey] : {};
     window.scheduleData[firstKey] = { text: combinedText, bg: prior.bg || first.style.backgroundColor || '', span: cells.length, hidden: false };
     cells.slice(1).forEach((cell) => {
       cell.style.display = 'none';
       cell.textContent = '';
-      window.scheduleData[`${selection.day}-${cell.dataset.time}`] = { text: '', bg: '', span: 1, hidden: true };
+      window.scheduleData[cellKey(cell)] = { text: '', bg: '', span: 1, hidden: true };
     });
     window.saveSchedule?.();
     store.bus.emit('schedule:block-created', { day: selection.day, start: first.dataset.time, slots: cells.length });
@@ -42,11 +43,10 @@ export function installScheduleModule(store) {
       label: 'Undo', action: () => {
         cells.forEach((cell, index) => {
           const snapshot = before[index];
-          const key = `${selection?.day || cell.dataset.day}-${snapshot.time}`;
           cell.textContent = snapshot.text;
           cell.style.display = snapshot.display;
           cell.style.gridRow = snapshot.gridRow;
-          if (snapshot.data === null) delete window.scheduleData[key]; else window.scheduleData[key] = snapshot.data;
+          if (snapshot.data === null) delete window.scheduleData[snapshot.key]; else window.scheduleData[snapshot.key] = snapshot.data;
         });
         window.saveSchedule?.();
       }
@@ -101,6 +101,15 @@ export function installScheduleModule(store) {
     const grid = document.getElementById('schedule-grid');
     if (grid && grid.offsetParent && typeof window.updateScheduleTimeMarker === 'function') window.updateScheduleTimeMarker();
   };
+
+  // Tasks and events are drawn over the week grid and inside the month cells,
+  // so both have to repaint when either collection changes.
+  const repaintOverlays = () => {
+    if (document.getElementById('schedule-grid')?.offsetParent) window.renderScheduleOverlays?.();
+    if (document.getElementById('calendar-container')?.offsetParent) window.renderMonthCalendar?.();
+  };
+  ['tasks', 'events'].forEach((topic) => store.subscribe(topic, repaintOverlays));
+
   const interval = setInterval(refresh, 60_000);
   bindDragBlocking();
   refresh();

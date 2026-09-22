@@ -1669,3 +1669,211 @@ details.customize-menu[open] {
   body.sidebar-collapsed .app-sidebar .view-tab { padding-inline: 1px; }
   .app-sidebar .nav-icon { width: 20px; height: 20px; }
 }
+
+/* ==========================================================================
+   DATED WEEK · MONTH CALENDAR · POMODORO
+   Appended at the end deliberately: this file re-declares its own selectors in
+   successive layers, so a rule inserted next to the one it overrides loses to
+   a later declaration of equal specificity.
+   ========================================================================== */
+
+/* --- Week navigation ---------------------------------------------------- */
+.schedule-week-nav {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--surface-border);
+}
+.schedule-week-current { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; text-align: center; }
+.schedule-week-current strong { font: 750 15px/1.15 var(--font-display); letter-spacing: -.02em; color: var(--card-text); }
+.schedule-week-current span { font-size: 11px; opacity: .62; min-height: 13px; }
+.schedule-week-step { flex-shrink: 0; display: grid; place-items: center; width: 38px; height: 38px; padding: 0; }
+
+/* These bars and their buttons are toggled with the `hidden` attribute, which a
+   plain `display: flex` on the same element silently outranks. */
+.schedule-day-nav[hidden],
+.schedule-day-nav [hidden],
+.schedule-week-nav [hidden],
+.calendar-nav [hidden] { display: none !important; }
+
+/* --- Dated day headers -------------------------------------------------- */
+.schedule-header { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.schedule-header-day { font-weight: 700; line-height: 1.1; }
+.schedule-header-date { font-size: 10.5px; font-weight: 600; opacity: .6; letter-spacing: .01em; }
+.schedule-header.is-today { color: var(--primary); box-shadow: inset 0 -2px 0 var(--primary), 0 1px 2px rgba(0, 0, 0, .06); }
+.schedule-header.is-today .schedule-header-date { opacity: .95; }
+.schedule-header-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; width: 100%; margin-top: 3px; }
+.schedule-header-chips:empty { display: none; }
+
+/* A block inherited from the older weekday-keyed data: it shows on every week
+   until that date gets an entry of its own. */
+.schedule-cell.is-template-block { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--card-text) 26%, transparent); }
+
+/* --- Task / event overlay chips ----------------------------------------- */
+.schedule-chip-stack {
+  align-self: end; justify-self: stretch; z-index: 22;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 0 3px 3px; min-width: 0; pointer-events: none;
+}
+.schedule-chip {
+  display: flex; align-items: center; gap: 4px;
+  width: 100%; min-width: 0; padding: 2px 6px;
+  font: 650 10px/1.45 inherit; text-align: left;
+  color: var(--card-text); background: color-mix(in srgb, var(--surface) 86%, var(--card-text));
+  border: 1px solid color-mix(in srgb, var(--card-text) 18%, transparent);
+  border-radius: 999px; cursor: pointer; pointer-events: auto;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.schedule-chip:hover { transform: translateY(-1px); box-shadow: 0 4px 10px -6px rgba(0, 0, 0, .7); }
+.schedule-chip-text, .schedule-chip.is-more { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.schedule-chip-dot { flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+.schedule-chip.is-event .schedule-chip-dot { background: var(--warning, #d97706); }
+.schedule-chip.is-task[data-priority="High"] .schedule-chip-dot { background: var(--danger, #dc2626); }
+.schedule-chip.is-more { justify-content: center; cursor: default; opacity: .72; font-weight: 600; }
+.schedule-chip.is-more:hover { transform: none; box-shadow: none; }
+.schedule-header-chips .schedule-chip { width: auto; max-width: 100%; }
+
+/* --- Month calendar ----------------------------------------------------- */
+.calendar-container { margin-bottom: 24px; color: var(--card-text); }
+.calendar-nav {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--surface-border);
+}
+.calendar-current { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; text-align: center; }
+.calendar-current strong { font: 750 17px/1.15 var(--font-display); letter-spacing: -.02em; }
+.calendar-current span { font-size: 11px; opacity: .62; min-height: 13px; }
+.calendar-step { flex-shrink: 0; display: grid; place-items: center; width: 38px; height: 38px; padding: 0; }
+
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px;
+  background: var(--surface-border); border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm); overflow: hidden;
+}
+.calendar-head {
+  padding: 9px 6px; text-align: center; font-size: 11px; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase; opacity: .68; background: var(--surface);
+}
+.calendar-day {
+  display: flex; flex-direction: column; gap: 4px;
+  /* Chrome's UA rules centre a button's flex children, which lets a wide chip
+     size past the cell and clip on both edges. Stretch has to be explicit. */
+  align-items: stretch;
+  min-height: 104px; min-width: 0; padding: 6px; overflow: hidden;
+  text-align: left; font: inherit;
+  color: var(--card-text); background: var(--surface);
+  border: 0; cursor: pointer; transition: background .14s ease;
+}
+.calendar-day:hover { background: color-mix(in srgb, var(--primary) 8%, var(--surface)); }
+.calendar-day:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.calendar-day.is-outside { opacity: .42; }
+.calendar-day.is-today { box-shadow: inset 0 0 0 2px var(--primary); }
+.calendar-day-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; min-width: 0; }
+.calendar-date { font: 700 13px/1 var(--font-display); }
+.calendar-day.is-today .calendar-date { color: var(--primary); }
+.calendar-blocks { font-size: 9.5px; font-weight: 700; opacity: .55; letter-spacing: -.02em; }
+.calendar-day-items { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; min-width: 0; }
+.calendar-chip {
+  display: flex; align-items: center; gap: 4px; min-width: 0; max-width: 100%;
+  padding: 1px 5px; font-size: 10px; font-weight: 650; line-height: 1.5;
+  background: color-mix(in srgb, var(--surface) 86%, var(--card-text));
+  border-radius: 999px; overflow: hidden;
+}
+/* Flex items default to min-width:auto, so the label needs its own floor or a
+   long title pushes the chip straight out of the day cell. */
+.calendar-chip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-chip-dot { flex-shrink: 0; width: 5px; height: 5px; border-radius: 50%; background: var(--primary); }
+.calendar-chip.is-event .calendar-chip-dot { background: var(--warning, #d97706); }
+.calendar-more { padding-left: 5px; font-size: 9.5px; font-weight: 650; opacity: .6; }
+
+@media (max-width: 720px) {
+  .calendar-day { min-height: 76px; padding: 4px; }
+  .calendar-chip { font-size: 9px; padding: 1px 4px; }
+}
+
+/* Below this a 7-column month cell only fits two or three characters, so the
+   labels stop earning their space and the day becomes a row of dots. */
+@media (max-width: 560px) {
+  .calendar-day-items { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; }
+  .calendar-chip { padding: 0; background: none; border-radius: 0; }
+  .calendar-chip-text { display: none; }
+  .calendar-chip-dot { width: 7px; height: 7px; }
+  .calendar-more { padding-left: 0; font-size: 9px; opacity: .75; }
+}
+
+/* --- Pomodoro ----------------------------------------------------------- */
+.pomodoro-fab {
+  position: fixed; right: 22px; bottom: 22px; z-index: 1500;
+  display: grid; place-items: center; width: 88px; height: 88px; padding: 0;
+  color: var(--primary-contrast-text, #fff); background: var(--primary);
+  border: 0; border-radius: 50%; cursor: pointer;
+  box-shadow: 0 16px 34px -14px var(--primary), 0 3px 10px -4px rgba(0, 0, 0, .45);
+  transition: transform .16s cubic-bezier(.16, 1, .3, 1), box-shadow .16s ease;
+}
+.pomodoro-fab:hover { transform: translateY(-2px) scale(1.03); }
+.pomodoro-fab:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.pomodoro-fab[data-phase="break"] { background: var(--success, #16a34a); box-shadow: 0 16px 34px -14px var(--success, #16a34a), 0 3px 10px -4px rgba(0, 0, 0, .45); }
+.pomodoro-fab-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.pomodoro-fab-ring circle { fill: none; stroke-width: 5; }
+.pomodoro-fab-track { stroke: rgba(255, 255, 255, .26); }
+.pomodoro-fab-progress { stroke: #fff; stroke-linecap: round; transition: stroke-dashoffset .3s linear; }
+.pomodoro-fab-face { display: flex; flex-direction: column; align-items: center; gap: 1px; line-height: 1; }
+.pomodoro-fab-time { font: 800 19px/1 var(--font-display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.pomodoro-fab-phase { font-size: 8.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; opacity: .85; }
+.pomodoro-fab[data-running="true"] { animation: pomodoroBreathe 3.4s ease-in-out infinite; }
+@keyframes pomodoroBreathe { 50% { box-shadow: 0 18px 42px -12px var(--primary), 0 3px 10px -4px rgba(0, 0, 0, .5); } }
+
+/* Keep the bottom-right stack clear of the button. */
+.toast-deck { bottom: 122px; }
+.offline-banner { bottom: 122px; }
+
+.pomodoro-dialog {
+  width: min(430px, calc(100vw - 28px)); padding: 0; color: var(--card-text);
+  background: var(--surface); border: 1px solid var(--surface-border-strong);
+  border-radius: 20px; box-shadow: var(--shadow-lg);
+}
+.pomodoro-dialog::backdrop { background: rgba(10, 10, 12, .58); backdrop-filter: blur(3px); }
+.pomodoro-shell { display: flex; flex-direction: column; gap: 16px; padding: 20px; }
+.pomodoro-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pomodoro-title { margin: 0; font: 750 17px/1.2 var(--font-display); letter-spacing: -.02em; }
+.pomodoro-close { width: 30px; height: 30px; padding: 0; font-size: 13px; color: inherit; background: transparent; border: 1px solid var(--surface-border); border-radius: 9px; cursor: pointer; }
+.pomodoro-close:hover { background: var(--surface-border); }
+
+.pomodoro-stage { position: relative; display: grid; place-items: center; width: 212px; height: 212px; margin: 0 auto; }
+.pomodoro-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.pomodoro-ring circle { fill: none; stroke-width: 6; }
+.pomodoro-ring-track { stroke: var(--surface-border-strong); }
+.pomodoro-ring-progress { stroke: var(--primary); stroke-linecap: round; transition: stroke-dashoffset .3s linear; }
+.pomodoro-dialog[data-phase="break"] .pomodoro-ring-progress { stroke: var(--success, #16a34a); }
+.pomodoro-readout { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pomodoro-phase { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .62; }
+.pomodoro-clock { font: 800 50px/1 var(--font-display); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.pomodoro-cycles { font-size: 11px; opacity: .62; }
+
+.pomodoro-task { display: flex; flex-direction: column; gap: 5px; }
+.pomodoro-task label { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .66; }
+.pomodoro-task select { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; color: var(--card-text); background: var(--bg, var(--surface)); border: 1px solid var(--surface-border-strong); border-radius: 10px; }
+.pomodoro-task-note { margin: 0; font-size: 11px; opacity: .58; }
+
+.pomodoro-actions { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+.pomodoro-primary { min-height: 44px; font-size: 14px; font-weight: 750; }
+
+.pomodoro-settings { border: 1px solid var(--surface-border); border-radius: 12px; }
+.pomodoro-settings > summary { padding: 10px 12px; font-size: 12px; font-weight: 700; cursor: pointer; list-style: none; }
+.pomodoro-settings > summary::-webkit-details-marker { display: none; }
+.pomodoro-settings > summary::after { content: "\25BE"; float: right; opacity: .5; }
+.pomodoro-settings[open] > summary { border-bottom: 1px solid var(--surface-border); }
+.pomodoro-settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; padding: 12px; }
+.pomodoro-settings-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 650; opacity: .8; }
+.pomodoro-settings-grid input { padding: 7px 9px; font: inherit; font-size: 13px; color: var(--card-text); background: var(--bg, var(--surface)); border: 1px solid var(--surface-border-strong); border-radius: 8px; }
+.pomodoro-check { display: flex; align-items: center; gap: 8px; padding: 0 12px 10px; font-size: 12px; }
+.pomodoro-check input { width: 15px; height: 15px; }
+
+@media (max-width: 900px) {
+  /* The nav becomes a bottom bar here, so the button and the toasts move up. */
+  .pomodoro-fab { right: 16px; bottom: calc(104px + env(safe-area-inset-bottom, 0px)); width: 68px; height: 68px; }
+  .pomodoro-fab-time { font-size: 15px; }
+  .pomodoro-fab-phase { font-size: 7.5px; }
+  .toast-deck, .offline-banner { bottom: calc(182px + env(safe-area-inset-bottom, 0px)); }
+  .pomodoro-stage { width: 182px; height: 182px; }
+  .pomodoro-clock { font-size: 42px; }
+}
