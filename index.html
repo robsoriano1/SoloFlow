@@ -2017,7 +2017,7 @@
         @media(max-width: 620px) { .task-quick-row { grid-template-columns: 1fr; } .task-quick-row > *, .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; } details.task-advanced-fields > summary { width: 100%; } .column h3 { top: 122px; } }
         @media(max-width: 390px) { .task-card.has-photo:not(.is-expanded) { padding-right: 70px; } .task-photo-thumb { right: 11px; top: 12px; } }
     </style>
-    <link rel="stylesheet" href="./styles/architecture.css?v=12">
+    <link rel="stylesheet" href="./styles/architecture.css?v=13">
 </head>
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
@@ -2582,7 +2582,7 @@
             <div class="task-quick-row">
                 <label class="sr-only" for="taskTitle">Task title</label>
                 <input type="text" id="taskTitle" class="flex-grow" placeholder="What needs to be done?" required>
-                <button type="button" class="btn-email" onclick="parseEmailToTask()" title="Paste text copied from any email client">📧 Paste Email to Task</button>
+                <button type="button" class="btn-email btn-alt" onclick="parseEmailToTask()" title="Paste text copied from any email client">📧 Paste Email to Task</button>
                 <label class="sr-only" for="taskPriority">Priority</label>
                 <select id="taskPriority">
                     <option value="Low">Low Priority</option>

@@ -1877,3 +1877,50 @@ details.customize-menu[open] {
   .pomodoro-stage { width: 182px; height: 182px; }
   .pomodoro-clock { font-size: 42px; }
 }
+
+/* --- Theme-safe polish -------------------------------------------------- */
+/* Appended last on purpose: earlier layers in index.html (notably the
+   "CROSS-THEME INTERACTION CONTRAST" hotfix) use !important, and everything
+   here has to hold for any user-chosen colours and font pairing. */
+
+/* Native controls (date/time pickers, select menus, scrollbars) follow the
+   app theme rather than the OS, so a dark theme on a light-mode OS no longer
+   pops white pickers. theme.js derives data-theme-mode from the canvas. */
+html[data-theme-mode="dark"] { color-scheme: dark; }
+html[data-theme-mode="light"] { color-scheme: light; }
+
+/* Column totals render '' at zero; without this the pill still paints. */
+.app-shell .col-total:empty { display: none; }
+
+/* Desktop: the sidebar already carries the brand and navigation, so the
+   header bar is visually removed. It stays in the accessibility tree
+   because it holds the page's only <h1>. */
+@media (min-width: 901px) {
+  .app-shell .soloflow-header {
+    position: absolute !important;
+    width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  /* The contrast hotfix boxes every .view-tab with a surface fill and strong
+     border, which undoes the quiet sidebar list above (rail + tint marks the
+     active row). Inactive rows go back to bare text; hover is a wash of the
+     user's own text colour so it reads on light and dark canvases alike. */
+  .app-shell .app-sidebar .view-tab:not(.active) {
+    background: transparent !important;
+    border-color: transparent !important;
+  }
+  .app-shell .app-sidebar .view-tab:not(.active):hover {
+    background: color-mix(in srgb, var(--card-text) 7%, transparent) !important;
+  }
+}
+
+/* Pomodoro ring draws in the FAB's text colour (--primary-contrast-text), so
+   it stays visible on light primaries instead of always being white. */
+.pomodoro-fab-track { stroke: color-mix(in srgb, currentColor 26%, transparent); }
+.pomodoro-fab-progress { stroke: currentColor; }
+
+/* Settings scrim is the theme's own canvas, darkened, instead of fixed navy. */
+details.customize-menu[open] {
+  background: color-mix(in srgb, color-mix(in srgb, rgb(var(--bg-rgb)) 70%, black) 74%, transparent);
+}
