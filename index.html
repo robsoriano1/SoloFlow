@@ -3330,8 +3330,27 @@
                 }
             }, (error) => console.error("Finance Command Sync Error:", error));
 
-            unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub, financeUnsub, financeCommandUnsub);
+            // The Pomodoro's shared state. Only server copies count: a cached one
+            // may be stale, and this device already keeps every copy it received.
+            // The first snapshot can arrive before pomodoro.js is installed, so the
+            // latest copy is also left for it.
+            const pomodoroUnsub = onSnapshot(getDocPath('trackerData', 'pomodoro'), (doc) => {
+                if (doc.metadata.hasPendingWrites || doc.metadata.fromCache) return;
+                window.soloflowPomodoroCloud = doc.exists() ? doc.data() : null;
+                window.SoloFlowPomodoro?.receive(window.soloflowPomodoroCloud);
+            }, (error) => console.error("Pomodoro Sync Error:", error));
+
+            unsubscribers.push(settingsUnsub, tasksUnsub, eventsUnsub, scheduleUnsub, financeUnsub, financeCommandUnsub, pomodoroUnsub);
         }
+
+        // Written straight through rather than via the debounced queue: these are
+        // occasional, user-paced changes the other devices should see at once.
+        // Firestore holds the write while offline and sends it on reconnect.
+        window.savePomodoroState = function(state) {
+            if (!userId) return;
+            setDoc(getDocPath('trackerData', 'pomodoro'), state)
+                .catch(e => console.error("Failed to sync the Pomodoro", e));
+        };
 
         window.saveSettings = function() {
             window.settings = {

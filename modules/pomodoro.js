@@ -1,7 +1,14 @@
 import { createHeartbeat } from './timer.js';
 
 const STORAGE_KEY = 'soloflow_pomodoro';
+const DEVICE_KEY = 'soloflow_device_id';
 const DEFAULT_SETTINGS = { work: 25, short: 5, long: 15, longEvery: 4, autoStart: true, sound: true };
+// Shared with the user's other devices; the chime stays a per-device choice.
+const SYNCED_SETTINGS = ['work', 'short', 'long', 'longEvery', 'autoStart'];
+// An interval noticed later than this ended while SoloFlow wasn't running
+// (closed, asleep, or a frozen background tab). It stops there rather than
+// auto-starting a next interval that would already be partly gone.
+const LATE_MS = 60_000;
 const PHASES = {
   work: { label: 'Focus', accent: 'work' },
   short: { label: 'Short break', accent: 'break' },
@@ -18,6 +25,15 @@ const formatClock = (ms) => {
   return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 };
 
+// { phase, endsAt } while running, { phase, remaining } while paused; anything
+// else (a malformed cloud or storage copy) reads as no session.
+function validSession(value) {
+  if (!value || !PHASES[value.phase]) return null;
+  if (Number.isFinite(value.endsAt)) return { phase: value.phase, endsAt: value.endsAt };
+  if (Number.isFinite(value.remaining)) return { phase: value.phase, remaining: Math.max(0, value.remaining) };
+  return null;
+}
+
 function readStored() {
   try {
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
@@ -25,20 +41,40 @@ function readStored() {
       settings: { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) },
       cycles: Number(parsed.cycles) || 0,
       taskId: parsed.taskId || null,
-      session: parsed.session || null
+      session: validSession(parsed.session),
+      owner: parsed.owner || null,
+      updatedAt: Number(parsed.updatedAt) || 0
     };
   } catch {
-    return { settings: { ...DEFAULT_SETTINGS }, cycles: 0, taskId: null, session: null };
+    return { settings: { ...DEFAULT_SETTINGS }, cycles: 0, taskId: null, session: null, owner: null, updatedAt: 0 };
+  }
+}
+
+// Tells this browser apart from the user's other signed-in devices.
+function readDeviceId() {
+  const fresh = () => crypto.randomUUID?.() || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  try {
+    let id = localStorage.getItem(DEVICE_KEY);
+    if (!id) { id = fresh(); localStorage.setItem(DEVICE_KEY, id); }
+    return id;
+  } catch {
+    return fresh();
   }
 }
 
 export function installPomodoroModule(store) {
+  const deviceId = readDeviceId();
   const stored = readStored();
   let settings = stored.settings;
   let cycles = stored.cycles;
   let taskId = stored.taskId;
   // session: { phase, endsAt } while running, { phase, remaining } while paused.
   let session = null;
+  // The device where the timer was last started or resumed. Only it runs the
+  // task clock, so a block followed on two devices is logged once.
+  let owner = stored.owner || deviceId;
+  // When this state was last published. Of two copies, the newer one wins.
+  let updatedAt = stored.updatedAt;
   let audioContext = null;
   // True while this module moves the task clock itself, so the activeTimer
   // listener only follows clocks started or stopped from somewhere else.
@@ -47,9 +83,29 @@ export function installPomodoroModule(store) {
 
   function persist() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings, cycles, taskId, session }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings, cycles, taskId, session, owner, updatedAt }));
     } catch { /* storage full or blocked; the timer still runs in memory */ }
   }
+
+  const sharedState = () => ({
+    session,
+    cycles,
+    taskId: taskId || null,
+    owner,
+    settings: Object.fromEntries(SYNCED_SETTINGS.map((key) => [key, settings[key]])),
+    updatedAt
+  });
+
+  // Save, and hand the new state to the user's other devices (index.html
+  // writes it to Firestore when signed in).
+  function publish() {
+    updatedAt = Date.now();
+    persist();
+    window.savePomodoroState?.(sharedState());
+  }
+
+  // Starting or resuming here makes this the device that logs focus time.
+  function claim() { owner = deviceId; }
 
   function phaseMinutes(phase) {
     if (phase === 'work') return settings.work;
@@ -85,15 +141,18 @@ export function installPomodoroModule(store) {
 
   function attachTaskClock() {
     const clock = window.SoloFlowTimer;
-    if (!taskId || !clock || clock.activeTaskId === taskId) return;
+    if (!clock || owner !== deviceId) return;
+    taskId = resolveTaskId(); // never log to a finished or deleted task
+    if (!taskId || clock.activeTaskId === taskId) return;
     steer(() => {
       if (clock.activeTaskId) clock.stop();
       clock.start(taskId);
     });
   }
 
+  // Any running task clock belongs to this timer; see the activeTimer listener.
   function detachTaskClock() {
-    if (taskId && window.SoloFlowTimer?.activeTaskId === taskId) steer(() => window.SoloFlowTimer.stop());
+    if (window.SoloFlowTimer?.activeTaskId) steer(() => window.SoloFlowTimer.stop());
   }
 
   // --- feedback --------------------------------------------------------------
@@ -118,53 +177,76 @@ export function installPomodoroModule(store) {
   }
 
   // --- transitions -----------------------------------------------------------
-  function nextPhase(finished) {
+  // `completed` counts the focus block that just finished, so with a long break
+  // every 4 it follows the 4th block, not the 3rd.
+  function nextPhase(finished, completed) {
     if (finished !== 'work') return 'work';
-    return (cycles + 1) % Math.max(1, settings.longEvery) === 0 ? 'long' : 'short';
+    return completed % Math.max(1, settings.longEvery) === 0 ? 'long' : 'short';
   }
 
-  function startPhase(phase, { auto = false } = {}) {
+  function startPhase(phase) {
+    claim();
     session = { phase, endsAt: Date.now() + phaseMinutes(phase) * 60_000 };
     if (phase === 'work') attachTaskClock(); else detachTaskClock();
-    persist();
+    publish();
     paint();
     startTicker();
-    store.bus.emit('pomodoro:start', { phase, taskId, auto });
+    store.bus.emit('pomodoro:start', { phase, taskId, auto: false });
   }
 
   function completePhase() {
     const finished = currentPhase();
-    if (finished === 'work') cycles += 1;
+    const endedAt = session.endsAt;
+    const late = Date.now() - endedAt > LATE_MS;
+    // Stop the task clock while the session still ends at endedAt, so it logs
+    // no further than the block itself.
     detachTaskClock();
     stopTicker();
-    chime();
-
-    const upcoming = nextPhase(finished);
-    const task = linkedTask();
-    const message = finished === 'work'
-      ? `Focus block done${task ? ` — ${task.title}` : ''}. ${PHASES[upcoming].label} next.`
-      : 'Break over. Back to focus.';
-    window.showToast?.(message, 'success');
+    if (finished === 'work') cycles += 1;
+    const upcoming = nextPhase(finished, cycles);
+    const length = phaseMinutes(upcoming) * 60_000;
+    // Timed from the scheduled end rather than from now, so every device that
+    // watches the interval end arrives at the same next one.
+    session = settings.autoStart && !late
+      ? { phase: upcoming, endsAt: endedAt + length }
+      : { phase: upcoming, remaining: length };
     store.bus.emit('pomodoro:complete', { phase: finished, cycles, taskId });
 
-    if (settings.autoStart) startPhase(upcoming, { auto: true });
-    else { session = { phase: upcoming, remaining: phaseMinutes(upcoming) * 60_000 }; persist(); paint(); }
+    if (late) {
+      // Kept to this device: one that saw the end live has the better copy.
+      persist();
+      window.showToast?.(`Your ${PHASES[finished].label.toLowerCase()} interval ended while SoloFlow was away.`, 'info');
+    } else {
+      chime();
+      const task = linkedTask();
+      window.showToast?.(finished === 'work'
+        ? `Focus block done${task ? ` — ${task.title}` : ''}. ${PHASES[upcoming].label} next.`
+        : 'Break over. Back to focus.', 'success');
+      publish();
+    }
+    if (isRunning()) {
+      if (upcoming === 'work') attachTaskClock();
+      startTicker();
+      store.bus.emit('pomodoro:start', { phase: upcoming, taskId, auto: true });
+    }
+    paint();
   }
 
   function pause() {
     if (!isRunning()) return;
-    session = { phase: session.phase, remaining: remainingMs() };
     detachTaskClock();
+    session = { phase: session.phase, remaining: remainingMs() };
     stopTicker();
-    persist();
+    publish();
     paint();
   }
 
   function resume() {
     if (!session || isRunning()) return;
+    claim();
     session = { phase: session.phase, endsAt: Date.now() + session.remaining };
     if (session.phase === 'work') attachTaskClock();
-    persist();
+    publish();
     paint();
     startTicker();
   }
@@ -174,7 +256,7 @@ export function installPomodoroModule(store) {
     detachTaskClock();
     stopTicker();
     session = { phase, remaining: phaseMinutes(phase) * 60_000 };
-    persist();
+    publish();
     paint();
   }
 
@@ -182,9 +264,9 @@ export function installPomodoroModule(store) {
     const finished = currentPhase();
     detachTaskClock();
     stopTicker();
-    const upcoming = nextPhase(finished);
+    const upcoming = nextPhase(finished, cycles + 1);
     session = { phase: upcoming, remaining: phaseMinutes(upcoming) * 60_000 };
-    persist();
+    publish();
     paint();
   }
 
@@ -197,14 +279,47 @@ export function installPomodoroModule(store) {
   // Put a task on the focus clock: retarget a running focus block, otherwise
   // resume the paused one or start a fresh block (ending any break early).
   function focusOn(id) {
-    if (isRunning() && currentPhase() === 'work') {
-      if (id !== taskId) { detachTaskClock(); taskId = id; attachTaskClock(); }
-    } else {
-      taskId = id;
-      if (session?.phase === 'work' && session.remaining > 0) resume();
-      else startPhase('work');
-    }
+    claim();
+    taskId = id;
+    if (isRunning() && currentPhase() === 'work') { attachTaskClock(); publish(); paint(); }
+    else if (session?.phase === 'work' && session.remaining > 0) resume();
+    else startPhase('work');
+    if (dialog.open) paintTaskSelect();
+  }
+
+  // A copy from another device (via index.html's Firestore listener). The newer
+  // copy wins; an older one means this device has news, so it is sent back.
+  function receive(remote) {
+    if (!remote) { if (updatedAt) window.savePomodoroState?.(sharedState()); return; }
+    const remoteAt = Number(remote.updatedAt) || 0;
+    if (remoteAt < updatedAt) { window.savePomodoroState?.(sharedState()); return; }
+    if (remoteAt === updatedAt) return; // the copy this device already has
+
+    const next = validSession(remote.session);
+    const nextOwner = typeof remote.owner === 'string' ? remote.owner : null;
+    const nextTask = remote.taskId || null;
+    const keepsClock = Boolean(next?.endsAt) && next.phase === 'work' && nextOwner === deviceId
+      && nextTask === window.SoloFlowTimer?.activeTaskId;
+    if (!keepsClock) detachTaskClock();
+
+    session = next;
+    cycles = Number(remote.cycles) || 0;
+    taskId = nextTask;
+    owner = nextOwner;
+    SYNCED_SETTINGS.forEach((key) => {
+      const value = remote.settings?.[key];
+      if (value === undefined) return;
+      settings[key] = key === 'autoStart' ? Boolean(value) : clampMinutes(value, DEFAULT_SETTINGS[key]);
+    });
+    updatedAt = remoteAt;
     persist();
+
+    stopTicker();
+    if (isRunning()) {
+      if (currentPhase() === 'work' && remainingMs() > 0) attachTaskClock();
+      startTicker(); // an interval that has already ended completes on the first tick
+    }
+    paintSettings();
     paint();
     if (dialog.open) paintTaskSelect();
   }
@@ -366,11 +481,9 @@ export function installPomodoroModule(store) {
   dialog.querySelector('[data-action="skip"]').addEventListener('click', () => skip());
 
   taskSelect.addEventListener('change', () => {
-    const wasRunningWork = isRunning() && currentPhase() === 'work';
-    if (wasRunningWork) detachTaskClock();
     taskId = taskSelect.value || null;
-    if (wasRunningWork) attachTaskClock();
-    persist();
+    if (isRunning() && currentPhase() === 'work') { claim(); attachTaskClock(); }
+    publish();
     paint();
   });
 
@@ -382,24 +495,17 @@ export function installPomodoroModule(store) {
       paintSettings();
       // A length change only takes effect on the next interval, never mid-run.
       if (!isRunning()) session = { phase: currentPhase(), remaining: phaseMinutes(currentPhase()) * 60_000 };
-      persist();
+      publish();
       paint();
     });
   });
 
-  // Restore whatever was running before the reload.
-  if (stored.session) {
-    if (stored.session.endsAt && stored.session.endsAt <= Date.now()) {
-      const finished = stored.session.phase;
-      if (finished === 'work') cycles += 1;
-      const upcoming = nextPhase(finished);
-      session = { phase: upcoming, remaining: phaseMinutes(upcoming) * 60_000 };
-      window.showToast?.(`Your ${PHASES[finished].label.toLowerCase()} interval finished while SoloFlow was closed.`, 'info');
-    } else {
-      session = stored.session;
-      if (isRunning()) { attachTaskClock(); startTicker(); }
-    }
-    persist();
+  // Restore whatever was running before the reload. An interval that ended
+  // meanwhile completes on the first tick, as it would have live.
+  session = stored.session;
+  if (isRunning()) {
+    if (currentPhase() === 'work' && remainingMs() > 0) attachTaskClock();
+    startTicker();
   }
 
   paintTaskSelect();
@@ -408,18 +514,22 @@ export function installPomodoroModule(store) {
 
   // Schedule chips hand a task straight to the timer, without cutting a running break short.
   window.focusTaskInPomodoro = (id) => {
-    if (isRunning() && currentPhase() !== 'work') { taskId = id; persist(); }
+    if (isRunning() && currentPhase() !== 'work') { taskId = id; publish(); }
     else focusOn(id);
     open();
   };
 
   window.openPomodoro = open;
   window.SoloFlowPomodoro = {
-    open, toggle, reset, skip,
+    open, toggle, reset, skip, receive,
     get phase() { return currentPhase(); },
     get running() { return isRunning(); },
-    get taskId() { return taskId; }
+    get taskId() { return taskId; },
+    // The task clock logs no further than this, even if the tab slept through it.
+    get focusEndsAt() { return isRunning() && currentPhase() === 'work' ? session.endsAt : null; }
   };
+  // The first cloud snapshot can land before this module is installed.
+  if ('soloflowPomodoroCloud' in window) receive(window.soloflowPomodoroCloud);
 
   ['tasks', 'state:change'].forEach((topic) => store.subscribe(topic, () => {
     if (dialog.open) paintTaskSelect();
@@ -428,7 +538,7 @@ export function installPomodoroModule(store) {
   // Task cards, the Productivity Hub, the context menu and shortcuts all start
   // and stop the task clock directly. Follow them so this clock never disagrees:
   // a clock started anywhere runs a focus block, and one stopped anywhere
-  // (Stop, or deleting or clearing the task) pauses it.
+  // (Stop, or finishing, deleting or clearing the task) pauses it.
   store.subscribe('activeTimer', ({ value }) => {
     if (steering) return;
     if (value?.taskId) focusOn(value.taskId);
