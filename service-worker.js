@@ -43,6 +43,8 @@ const putInCache = (request, response) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const requestUrl = new URL(event.request.url);
+  // Firebase's auth handler is proxied here (vercel.json); it must always hit the network.
+  if (requestUrl.pathname.startsWith('/__/')) return;
   const cacheableExternalAsset = ['fonts.googleapis.com', 'fonts.gstatic.com', 'www.gstatic.com'].includes(requestUrl.hostname);
   if (requestUrl.origin !== self.location.origin && !cacheableExternalAsset) return;
 

@@ -2664,13 +2664,21 @@
     <script type="module">
         import { ICONS } from './modules/icons.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Production serves Firebase's auth handler from its own origin: vercel.json
+        // proxies /__/auth/* to firebaseapp.com. Browsers partition third-party storage,
+        // so a handler on another domain cannot hand a redirect sign-in back to this page.
+        // Requires https://<host>/__/auth/handler as an authorized redirect URI on the
+        // project's OAuth web client in Google Cloud Console.
+        const SAME_ORIGIN_AUTH_HOSTS = ['solo-flow-eta.vercel.app'];
+        const sameOriginAuth = SAME_ORIGIN_AUTH_HOSTS.includes(location.hostname);
 
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAOzHxHzVdHZrioqmVqPmD6wOvdUQL9zS8",
-            authDomain: "soloflow-41bfb.firebaseapp.com",
+            authDomain: sameOriginAuth ? location.hostname : "soloflow-41bfb.firebaseapp.com",
             projectId: "soloflow-41bfb",
             storageBucket: "soloflow-41bfb.firebasestorage.app",
             messagingSenderId: "642151949374",
@@ -2940,26 +2948,129 @@
             }
         });
 
-        document.getElementById('btn-google-login').addEventListener('click', async (e) => {
-            e.preventDefault(); 
-            
-            grecaptcha.enterprise.ready(async () => {
-                try {
-                    const token = await grecaptcha.enterprise.execute('6Lcvq4otAAAAAGNDRtcejDcv3A5IKBTFEMBc7jz4', {action: 'LOGIN'});
-                    console.log("reCAPTCHA Token Generated:", token);
+        // --- GOOGLE SIGN-IN ---
+        // Phone browsers only allow a popup opened inside the tap itself; any network
+        // wait in between gets it blocked. So the reCAPTCHA LOGIN token is minted while
+        // the button is on screen (tokens stay valid for two minutes) instead of being
+        // awaited between the tap and signInWithPopup.
+        const RECAPTCHA_SITE_KEY = '6Lcvq4otAAAAAGNDRtcejDcv3A5IKBTFEMBc7jz4';
+        const LOGIN_TOKEN_TTL_MS = 110 * 1000;
+        const LOGIN_TOKEN_REFRESH_MS = 60 * 1000;
+        let loginToken = null;
+        let loginTokenRequest = null;
+        let loginTokenTimer = null;
 
-                    const provider = new GoogleAuthProvider();
-                    window.showToast("Opening Google Sign-in...");
-                    
-                    await signInWithPopup(auth, provider);
-                    window.showToast("Successfully signed in!", "success");
-                    
+        function mintLoginToken() {
+            if (!loginTokenRequest) {
+                loginTokenRequest = new Promise((resolve, reject) => {
+                    grecaptcha.enterprise.ready(() => {
+                        grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, { action: 'LOGIN' }).then(resolve, reject);
+                    });
+                })
+                    .then((value) => { loginToken = { value, mintedAt: Date.now() }; return value; })
+                    .catch((cause) => {
+                        const error = new Error('reCAPTCHA did not return a LOGIN token', { cause });
+                        error.code = 'soloflow/recaptcha-unavailable';
+                        throw error;
+                    })
+                    .finally(() => { loginTokenRequest = null; });
+            }
+            return loginTokenRequest;
+        }
+
+        const hasFreshLoginToken = () => Boolean(loginToken) && Date.now() - loginToken.mintedAt < LOGIN_TOKEN_TTL_MS;
+
+        const isInstalledApp = () =>
+            window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+        // Popup failures a full-page redirect gets around. Redirects are only used where
+        // the auth handler is same-origin; cross-origin they silently lose the result.
+        const POPUP_UNAVAILABLE = new Set(['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment']);
+        const SIGN_IN_CANCELLED = new Set(['auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/user-cancelled']);
+
+        function describeSignInError(error) {
+            const code = (error && error.code) || '';
+            if (SIGN_IN_CANCELLED.has(code)) return 'Sign-in cancelled.';
+            switch (code) {
+                case 'soloflow/recaptcha-unavailable':
+                    return "Google's sign-in check (reCAPTCHA) didn't load. A content blocker may be stopping it — allow it for this site and try again.";
+                case 'auth/popup-blocked':
+                    return 'Your browser blocked the Google sign-in window. Tap Sign in again, or allow pop-ups for this site.';
+                case 'auth/unauthorized-domain':
+                    return `Google sign-in isn't enabled for ${location.hostname}. Open SoloFlow from its main address.`;
+                case 'auth/network-request-failed':
+                    return 'Could not reach Google. Check your connection and try again.';
+                case 'auth/web-storage-unsupported':
+                    return 'Sign-in needs site storage, which this browser is blocking (private browsing?).';
+                default:
+                    return `Sign-in failed (${code || 'unknown error'}). Your data is still saved on this device.`;
+            }
+        }
+
+        function reportSignInError(error) {
+            const cancelled = SIGN_IN_CANCELLED.has(error && error.code);
+            if (!cancelled) console.error('SoloFlow sign-in failed:', error);
+            window.showToast(describeSignInError(error), cancelled ? 'info' : 'error');
+            // Tokens are single-use; have the next one ready so a retry tap opens instantly.
+            if (error && error.code !== 'soloflow/recaptcha-unavailable') mintLoginToken().catch(() => {});
+        }
+
+        const btnGoogleLogin = document.getElementById('btn-google-login');
+
+        // Keep a token ready only while the button is actually visible to be tapped.
+        new IntersectionObserver(([entry]) => {
+            clearInterval(loginTokenTimer);
+            loginTokenTimer = null;
+            if (!entry.isIntersecting) return;
+            const refresh = () => mintLoginToken().catch(() => {}); // a failure resurfaces on tap
+            if (!loginToken || Date.now() - loginToken.mintedAt > LOGIN_TOKEN_REFRESH_MS / 2) refresh();
+            loginTokenTimer = setInterval(refresh, LOGIN_TOKEN_REFRESH_MS);
+        }).observe(btnGoogleLogin);
+
+        btnGoogleLogin.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const provider = new GoogleAuthProvider();
+            const signInViaRedirect = () => signInWithRedirect(auth, provider).catch(reportSignInError);
+
+            // Without a pre-minted token the popup opens after a network wait: fine on
+            // desktop, and on phones a blocked popup falls through to the redirect below.
+            if (!hasFreshLoginToken()) {
+                try {
+                    await mintLoginToken();
                 } catch (error) {
-                    console.error("Auth or reCAPTCHA Error:", error);
-                    window.showToast("Sign in cancelled or failed.", "error");
+                    reportSignInError(error);
+                    return;
                 }
-            });
+            }
+            loginToken = null; // single-use
+            window.showToast("Opening Google Sign-in...");
+
+            // An installed home-screen app opens popups in a separate browser that can't
+            // report back to the app, so it signs in with a full-page redirect instead.
+            if (sameOriginAuth && isInstalledApp()) {
+                await signInViaRedirect();
+                return;
+            }
+
+            try {
+                await signInWithPopup(auth, provider);
+                window.showToast("Successfully signed in!", "success");
+            } catch (error) {
+                if (sameOriginAuth && POPUP_UNAVAILABLE.has(error && error.code)) {
+                    await signInViaRedirect();
+                    return;
+                }
+                reportSignInError(error);
+            }
         });
+
+        if (sameOriginAuth) {
+            // Reports how a redirect sign-in ended. Firebase restores the session itself
+            // before authStateReady() resolves, so initAuth never races it.
+            getRedirectResult(auth)
+                .then((result) => { if (result && result.user) window.showToast("Successfully signed in!", "success"); })
+                .catch(reportSignInError);
+        }
 
         document.getElementById('btn-google-logout').addEventListener('click', async () => {
             try {
