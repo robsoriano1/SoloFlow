@@ -27,7 +27,9 @@ function formatDuration(seconds) {
   return `⏱ ${hours ? `${hours}h ` : ''}${minutes}m${remainder}s`;
 }
 
-export function installTimerModule(store) {
+// A worker's interval keeps its pace in a background tab, where the page's own
+// setInterval can be throttled to once a minute.
+export function createHeartbeat(onTick) {
   const workerSource = `
     let heartbeat = null;
     self.onmessage = ({ data }) => {
@@ -42,6 +44,17 @@ export function installTimerModule(store) {
   `;
   const url = URL.createObjectURL(new Blob([workerSource], { type: 'text/javascript' }));
   const worker = new Worker(url);
+  worker.addEventListener('message', ({ data }) => {
+    if (data.type === 'tick') onTick(data.now);
+  });
+  return {
+    start: () => worker.postMessage({ type: 'start' }),
+    stop: () => worker.postMessage({ type: 'stop' })
+  };
+}
+
+export function installTimerModule(store) {
+  const heartbeat = createHeartbeat((now) => commit(now));
   let session = null;
   let lastPersistedSecond = -1;
 
@@ -60,7 +73,7 @@ export function installTimerModule(store) {
     if (!session) return;
     const task = window.tasks.find((item) => item.id === session.taskId);
     if (!task) {
-      worker.postMessage({ type: 'stop' });
+      heartbeat.stop();
       session = null;
       window.activeTaskId = null;
       window.timerInterval = null;
@@ -86,7 +99,7 @@ export function installTimerModule(store) {
     if (!session) return;
     const priorId = session.taskId;
     commit(Date.now(), persist);
-    worker.postMessage({ type: 'stop' });
+    heartbeat.stop();
     paint(priorId, window.tasks.find((item) => item.id === priorId)?.timeSpent || 0, false);
     session = null;
     window.activeTaskId = null;
@@ -103,14 +116,10 @@ export function installTimerModule(store) {
     window.activeTaskId = taskId;
     window.timerInterval = null;
     lastPersistedSecond = -1;
-    worker.postMessage({ type: 'start' });
+    heartbeat.start();
     paint(taskId, task.timeSpent, true);
     store.set('activeTimer', { taskId, startedAt: now }, { source: 'timer' });
   }
-
-  worker.addEventListener('message', ({ data }) => {
-    if (data.type === 'tick') commit(data.now);
-  });
 
   window.toggleTimer = (taskId) => {
     if (session?.taskId === taskId) return stop();

@@ -1,3 +1,5 @@
+import { createHeartbeat } from './timer.js';
+
 const STORAGE_KEY = 'soloflow_pomodoro';
 const DEFAULT_SETTINGS = { work: 25, short: 5, long: 15, longEvery: 4, autoStart: true, sound: true };
 const PHASES = {
@@ -37,8 +39,10 @@ export function installPomodoroModule(store) {
   let taskId = stored.taskId;
   // session: { phase, endsAt } while running, { phase, remaining } while paused.
   let session = null;
-  let ticker = null;
   let audioContext = null;
+  // True while this module moves the task clock itself, so the activeTimer
+  // listener only follows clocks started or stopped from somewhere else.
+  let steering = false;
   const baseTitle = document.title;
 
   function persist() {
@@ -74,14 +78,22 @@ export function installPomodoroModule(store) {
     return (window.tasks || []).find((task) => task.id === taskId) || null;
   }
 
+  function steer(action) {
+    steering = true;
+    try { action(); } finally { steering = false; }
+  }
+
   function attachTaskClock() {
-    if (!taskId || window.SoloFlowTimer?.activeTaskId === taskId) return;
-    window.SoloFlowTimer?.start(taskId);
+    const clock = window.SoloFlowTimer;
+    if (!taskId || !clock || clock.activeTaskId === taskId) return;
+    steer(() => {
+      if (clock.activeTaskId) clock.stop();
+      clock.start(taskId);
+    });
   }
 
   function detachTaskClock() {
-    // Only stop a clock this timer owns, so a manually started task keeps running.
-    if (taskId && window.SoloFlowTimer?.activeTaskId === taskId) window.SoloFlowTimer.stop();
+    if (taskId && window.SoloFlowTimer?.activeTaskId === taskId) steer(() => window.SoloFlowTimer.stop());
   }
 
   // --- feedback --------------------------------------------------------------
@@ -182,20 +194,29 @@ export function installPomodoroModule(store) {
     startPhase(currentPhase());
   }
 
-  function startTicker() {
-    stopTicker();
-    // Wall-clock driven, so background throttling shortens the tick, never the block.
-    ticker = setInterval(() => {
-      if (!isRunning()) return;
-      if (remainingMs() <= 0) completePhase();
-      else paint();
-    }, 250);
+  // Put a task on the focus clock: retarget a running focus block, otherwise
+  // resume the paused one or start a fresh block (ending any break early).
+  function focusOn(id) {
+    if (isRunning() && currentPhase() === 'work') {
+      if (id !== taskId) { detachTaskClock(); taskId = id; attachTaskClock(); }
+    } else {
+      taskId = id;
+      if (session?.phase === 'work' && session.remaining > 0) resume();
+      else startPhase('work');
+    }
+    persist();
+    paint();
+    if (dialog.open) paintTaskSelect();
   }
 
-  function stopTicker() {
-    clearInterval(ticker);
-    ticker = null;
-  }
+  // Wall-clock driven, so a late tick shortens the wait, never the block.
+  const heartbeat = createHeartbeat(() => {
+    if (!isRunning()) return;
+    if (remainingMs() <= 0) completePhase();
+    else paint();
+  });
+  const startTicker = () => heartbeat.start();
+  const stopTicker = () => heartbeat.stop();
 
   // --- interface -------------------------------------------------------------
   const fab = document.createElement('button');
@@ -385,13 +406,11 @@ export function installPomodoroModule(store) {
   paintSettings();
   paint();
 
-  // Schedule chips hand a task straight to the timer.
+  // Schedule chips hand a task straight to the timer, without cutting a running break short.
   window.focusTaskInPomodoro = (id) => {
-    taskId = id;
-    persist();
+    if (isRunning() && currentPhase() !== 'work') { taskId = id; persist(); }
+    else focusOn(id);
     open();
-    if (!isRunning()) { startPhase('work'); paint(); }
-    else { paintTaskSelect(); paint(); }
   };
 
   window.openPomodoro = open;
@@ -405,6 +424,16 @@ export function installPomodoroModule(store) {
   ['tasks', 'state:change'].forEach((topic) => store.subscribe(topic, () => {
     if (dialog.open) paintTaskSelect();
   }));
+
+  // Task cards, the Productivity Hub, the context menu and shortcuts all start
+  // and stop the task clock directly. Follow them so this clock never disagrees:
+  // a clock started anywhere runs a focus block, and one stopped anywhere
+  // (Stop, or deleting or clearing the task) pauses it.
+  store.subscribe('activeTimer', ({ value }) => {
+    if (steering) return;
+    if (value?.taskId) focusOn(value.taskId);
+    else if (isRunning() && currentPhase() === 'work') pause();
+  });
 
   return () => { stopTicker(); fab.remove(); dialog.remove(); };
 }
