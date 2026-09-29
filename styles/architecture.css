@@ -1974,3 +1974,35 @@ details.customize-menu[open] {
   .task-quick-row > *,
   .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; }
 }
+
+/* Sidebar collapse handle. It used to share the brand row, where the
+   uppercase "Personal workspace" label (width: max-content) ran 4-17px under
+   it in every font pairing, and the global 42px button min-height stretched
+   it into a tall box. It now sits on the sidebar's edge in both states, where
+   the collapsed rail already put it, so the brand has the whole row and the
+   handle stays put when toggled. The chevron flips with `rotate` so the
+   shared button hover transform can't un-flip it. */
+.sidebar-brand { grid-template-columns: auto minmax(0, 1fr); }
+.sidebar-brand-copy strong,
+.sidebar-brand-copy small { width: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.app-shell .sidebar-toggle {
+  position: absolute;
+  top: 22px;
+  right: -12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  min-height: 0;
+  padding: 0;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--surface-border-strong);
+  border-radius: 50%;
+  box-shadow: 0 6px 14px -8px rgba(0, 0, 0, .55);
+  transform: none;
+}
+body.app-shell .sidebar-toggle:hover { color: var(--card-text); border-color: var(--primary); transform: none; }
+.sidebar-toggle svg { transition: rotate var(--motion-fast) ease; }
+body.sidebar-collapsed .sidebar-toggle svg { rotate: 180deg; }
