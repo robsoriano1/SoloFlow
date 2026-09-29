@@ -1924,3 +1924,31 @@ html[data-theme-mode="light"] { color-scheme: light; }
 details.customize-menu[open] {
   background: color-mix(in srgb, color-mix(in srgb, rgb(var(--bg-rgb)) 70%, black) 74%, transparent);
 }
+
+/* Status cards: users pick the To Do / In Progress / Done colours, so the
+   card re-scopes the text tokens its children read (.task-title uses
+   --card-text, .task-desc uses --text-muted). theme.js sets --todo-text etc.
+   to the theme's card text when readable, else the best contrasting text. */
+:root {
+  --todo-text: var(--card-text);
+  --inprog-text: var(--card-text);
+  --done-text: var(--card-text);
+}
+.app-shell .task-card.card-todo {
+  --card-text: var(--todo-text);
+  --text-muted: color-mix(in srgb, var(--todo-text) 68%, transparent);
+  color: var(--todo-text);
+}
+.app-shell .task-card.card-inprogress {
+  --card-text: var(--inprog-text);
+  --text-muted: color-mix(in srgb, var(--inprog-text) 68%, transparent);
+  color: var(--inprog-text);
+}
+.app-shell .task-card.card-done {
+  --card-text: var(--done-text);
+  --text-muted: color-mix(in srgb, var(--done-text) 68%, transparent);
+  color: var(--done-text);
+}
+.live-preview-badge.todo { color: var(--todo-text); }
+.live-preview-badge.inprog { color: var(--inprog-text); }
+.live-preview-badge.done { color: var(--done-text); }

@@ -92,6 +92,21 @@ function setInput(id, value) {
   if (input) input.value = value;
 }
 
+const USER_COLOR_SETTINGS = ['bgColor', 'surfaceColor', 'textColor', 'cardTextColor', 'primaryColor', 'todoBg', 'inprogBg', 'doneBg'];
+const isHexColor = (value) => /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(value || '').trim());
+
+/* The colour inputs can diverge from the named preset (a custom primary on
+   top of Nordic Frost, say). Derived tokens (--primary-rgb, borders, focus
+   ring, status text) must follow the colours actually on screen, not the
+   preset they started from. */
+function effectiveTheme(presetKey) {
+  const preset = THEME_PRESETS[presetKey] || THEME_PRESETS[DEFAULT_THEME_KEY];
+  const custom = Object.fromEntries(USER_COLOR_SETTINGS
+    .filter((name) => isHexColor(window.settings?.[name]))
+    .map((name) => [name, window.settings[name]]));
+  return ThemeAccessibilityEngine.normalize({ ...preset, ...custom });
+}
+
 function applyDerivedTokens(preset) {
   const root = document.documentElement;
   const primary = parseHex(preset.primaryColor);
@@ -111,6 +126,11 @@ function applyDerivedTokens(preset) {
   setToken('--secondary-accent', preset.secondaryAccent || preset.primaryColor);
   setToken('--focus-ring', `rgba(${primary.r}, ${primary.g}, ${primary.b}, .24)`);
   setToken('--primary-contrast-text', ThemeAccessibilityEngine.safeText(preset.primaryColor, '#FFFFFF'));
+  /* Status colours are user-editable, so card text keeps the theme's own
+     card-text colour only while it stays readable on that status colour. */
+  setToken('--todo-text', ThemeAccessibilityEngine.safeText(preset.todoBg, preset.cardTextColor));
+  setToken('--inprog-text', ThemeAccessibilityEngine.safeText(preset.inprogBg, preset.cardTextColor));
+  setToken('--done-text', ThemeAccessibilityEngine.safeText(preset.doneBg, preset.cardTextColor));
   root.dataset.contrast = contrastRatio(preset.textColor, preset.bgColor) >= 4.5 && contrastRatio(preset.cardTextColor, preset.surfaceColor) >= 4.5 ? 'aa' : 'adjusted';
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', preset.bgColor);
 }
@@ -221,18 +241,17 @@ export function installThemeModule(store) {
   root.style.setProperty('--font-display', font.display);
   root.style.setProperty('--font-metric', font.metric);
   document.body.style.fontFamily = font.body;
-  applyDerivedTokens(ThemeAccessibilityEngine.normalize(THEME_PRESETS[activeTheme]));
+  applyDerivedTokens(effectiveTheme(activeTheme));
 
   const persistedSaveSettings = window.saveSettings;
   window.saveSettings = function saveSettingsWithThemeEngine(...args) {
     const result = persistedSaveSettings?.apply(this, args);
     const activeFontPreset = FONT_PRESETS[window.activeFontPreset] || FONT_PRESETS[DEFAULT_FONT_KEY];
-    const activeThemePreset = ThemeAccessibilityEngine.normalize(THEME_PRESETS[window.activeThemePreset] || THEME_PRESETS[DEFAULT_THEME_KEY]);
     root.style.setProperty('--font-body', activeFontPreset.body);
     root.style.setProperty('--font-display', activeFontPreset.display);
     root.style.setProperty('--font-metric', activeFontPreset.metric);
     document.body.style.fontFamily = activeFontPreset.body;
-    applyDerivedTokens(activeThemePreset);
+    applyDerivedTokens(effectiveTheme(window.activeThemePreset));
     return result;
   };
 
@@ -259,7 +278,7 @@ export function installThemeModule(store) {
       if (root.style.getPropertyValue('--font-display').trim() !== expectedFont.display) root.style.setProperty('--font-display', expectedFont.display);
       if (root.style.getPropertyValue('--font-metric').trim() !== expectedFont.metric) root.style.setProperty('--font-metric', expectedFont.metric);
       document.body.style.fontFamily = expectedFont.body;
-      applyDerivedTokens(ThemeAccessibilityEngine.normalize(THEME_PRESETS[themeKey] || THEME_PRESETS[DEFAULT_THEME_KEY]));
+      applyDerivedTokens(effectiveTheme(themeKey));
       renderFontCatalog(fontKey);
       renderThemeCatalog(themeKey);
     });
