@@ -54,7 +54,12 @@ export function createHeartbeat(onTick) {
 }
 
 export function installTimerModule(store) {
-  const heartbeat = createHeartbeat((now) => commit(now));
+  const heartbeat = createHeartbeat((now) => {
+    // Finishing the task ends its focus, wherever it was marked done: a card,
+    // the context menu, a batch move, or another device.
+    if (window.tasks.find((item) => item.id === session?.taskId)?.status === 'done') stop();
+    else commit(now);
+  });
   let session = null;
   let lastPersistedSecond = -1;
 
@@ -71,6 +76,9 @@ export function installTimerModule(store) {
 
   function commit(now = Date.now(), persist = false) {
     if (!session) return;
+    // Never past the end of the Pomodoro focus block, e.g. after a device slept through it.
+    const blockEnd = window.SoloFlowPomodoro?.focusEndsAt;
+    if (blockEnd) now = Math.min(now, blockEnd);
     const task = window.tasks.find((item) => item.id === session.taskId);
     if (!task) {
       heartbeat.stop();
