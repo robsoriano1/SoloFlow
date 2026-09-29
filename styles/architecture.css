@@ -1953,3 +1953,23 @@ details.customize-menu[open] {
 .live-preview-badge.inprog { color: var(--inprog-text); }
 .live-preview-badge.done { color: var(--done-text); }
 
+/* Quick capture reflows on the width it actually has, not the viewport's.
+   The viewport breakpoints in index.html ignore the 215px sidebar, so from
+   ~940px to ~1200px the five-column row overran its card (Add Task off the
+   edge, "Paste Email to Task" wrapped to four lines), and wide pairings
+   (Cyber, Apparatus) clipped the priority select at larger widths too. */
+#kanban-task-form { container: quick-capture / inline-size; }
+.task-quick-row {
+  grid-template-columns: minmax(220px, 1fr) auto minmax(max-content, .35fr) minmax(145px, .35fr) auto;
+}
+.task-quick-row > button { white-space: nowrap; }
+@container quick-capture (max-width: 880px) {
+  .task-quick-row { grid-template-columns: minmax(180px, 1fr) auto minmax(max-content, 1fr); }
+  .task-quick-row #taskDueDate { grid-column: span 1; }
+  .task-quick-row .quick-add-submit { grid-column: span 2; }
+}
+@container quick-capture (max-width: 560px) {
+  .task-quick-row { grid-template-columns: 1fr; }
+  .task-quick-row > *,
+  .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; }
+}
