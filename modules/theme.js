@@ -53,15 +53,15 @@ export const ThemeAccessibilityEngine = {
 };
 
 export const FONT_PRESETS = {
-  signal: { name: 'Signal Grotesque', sample: 'Deliberate work', detail: 'Bricolage Grotesque · Schibsted Grotesk', display: "'Bricolage Grotesque', 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif", body: "'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif", metric: "'Martian Mono', ui-monospace, SFMono-Regular, monospace" },
-  broadsheet: { name: 'Broadsheet Editorial', sample: 'The daily ledger', detail: 'Literata · Instrument Sans', display: "'Literata', ui-serif, Georgia, serif", body: "'Instrument Sans', ui-sans-serif, system-ui, sans-serif", metric: "'Geist Mono', ui-monospace, SFMono-Regular, monospace" },
-  apparatus: { name: 'Apparatus Technical', sample: 'BUILT TO SHIP', detail: 'Syne · Schibsted Grotesk', display: "'Syne', ui-sans-serif, system-ui, sans-serif", body: "'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif", metric: "'Azeret Mono', ui-monospace, SFMono-Regular, monospace" },
-  neo: { name: 'Minimalist Neo-Grotesque', sample: 'Quiet clarity', detail: 'Outfit · DM Mono', display: "'Outfit', sans-serif", body: "'Outfit', sans-serif", metric: "'DM Mono', monospace" },
-  cyber: { name: 'Cyber / Industrial Mono', sample: 'SYSTEM READY', detail: 'Chakra Petch · Fira Code', display: "'Chakra Petch', sans-serif", body: "'Fira Code', monospace", metric: "'Fira Code', monospace" },
-  executive: { name: 'Executive Editorial', sample: 'Decisive focus', detail: 'Fraunces · Manrope', display: "'Fraunces', serif", body: "'Manrope', sans-serif", metric: "'JetBrains Mono', monospace" },
-  geometric: { name: 'Geometric Studio', sample: 'Shape the work', detail: 'Sora · DM Sans', display: "'Sora', sans-serif", body: "'DM Sans', sans-serif", metric: "'Space Mono', monospace" },
-  humanist: { name: 'Humanist Warmth', sample: 'Made for people', detail: 'Epilogue · Public Sans', display: "'Epilogue', sans-serif", body: "'Public Sans', sans-serif", metric: "'IBM Plex Mono', monospace" },
-  academic: { name: 'Classic Academic Focus', sample: 'Deep work, clearly', detail: 'Newsreader · Source Sans 3', display: "'Newsreader', serif", body: "'Source Sans 3', sans-serif", metric: "'JetBrains Mono', monospace" }
+  signal: { name: 'Signal Grotesque', sample: 'Deliberate work', detail: 'Bricolage Grotesque · Schibsted Grotesk', display: "'Bricolage Grotesque', 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif", body: "'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif", metric: "'Martian Mono', ui-monospace, SFMono-Regular, monospace", families: 'family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Schibsted+Grotesk:wght@400..700&family=Martian+Mono:wght@400..700' },
+  broadsheet: { name: 'Broadsheet Editorial', sample: 'The daily ledger', detail: 'Literata · Instrument Sans', display: "'Literata', ui-serif, Georgia, serif", body: "'Instrument Sans', ui-sans-serif, system-ui, sans-serif", metric: "'Geist Mono', ui-monospace, SFMono-Regular, monospace", families: 'family=Literata:opsz,wght@7..72,400..700&family=Instrument+Sans:wght@400..700&family=Geist+Mono:wght@400..700' },
+  apparatus: { name: 'Apparatus Technical', sample: 'BUILT TO SHIP', detail: 'Syne · Schibsted Grotesk', display: "'Syne', ui-sans-serif, system-ui, sans-serif", body: "'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif", metric: "'Azeret Mono', ui-monospace, SFMono-Regular, monospace", families: 'family=Syne:wght@400..700&family=Schibsted+Grotesk:wght@400..700&family=Azeret+Mono:wght@400..700' },
+  neo: { name: 'Minimalist Neo-Grotesque', sample: 'Quiet clarity', detail: 'Outfit · DM Mono', display: "'Outfit', sans-serif", body: "'Outfit', sans-serif", metric: "'DM Mono', monospace", families: 'family=Outfit:wght@400..700&family=DM+Mono:wght@400;500' },
+  cyber: { name: 'Cyber / Industrial Mono', sample: 'SYSTEM READY', detail: 'Chakra Petch · Fira Code', display: "'Chakra Petch', sans-serif", body: "'Fira Code', monospace", metric: "'Fira Code', monospace", families: 'family=Chakra+Petch:wght@400;500;600;700&family=Fira+Code:wght@400..700' },
+  executive: { name: 'Executive Editorial', sample: 'Decisive focus', detail: 'Fraunces · Manrope', display: "'Fraunces', serif", body: "'Manrope', sans-serif", metric: "'JetBrains Mono', monospace", families: 'family=Fraunces:opsz,wght@9..144,400..700&family=Manrope:wght@400..700&family=JetBrains+Mono:wght@400..700' },
+  geometric: { name: 'Geometric Studio', sample: 'Shape the work', detail: 'Sora · DM Sans', display: "'Sora', sans-serif", body: "'DM Sans', sans-serif", metric: "'Space Mono', monospace", families: 'family=Sora:wght@400..700&family=DM+Sans:opsz,wght@9..40,400..700&family=Space+Mono:wght@400;700' },
+  humanist: { name: 'Humanist Warmth', sample: 'Made for people', detail: 'Epilogue · Public Sans', display: "'Epilogue', sans-serif", body: "'Public Sans', sans-serif", metric: "'IBM Plex Mono', monospace", families: 'family=Epilogue:wght@400..700&family=Public+Sans:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600;700' },
+  academic: { name: 'Classic Academic Focus', sample: 'Deep work, clearly', detail: 'Newsreader · Source Sans 3', display: "'Newsreader', serif", body: "'Source Sans 3', sans-serif", metric: "'JetBrains Mono', monospace", families: 'family=Newsreader:opsz,wght@6..72,400..700&family=Source+Sans+3:wght@400..700&family=JetBrains+Mono:wght@400..700' }
 };
 
 export const THEME_PRESETS = {
@@ -86,6 +86,41 @@ export const THEME_PRESETS = {
    without scattering literal preset keys through the module. */
 export const DEFAULT_FONT_KEY = 'signal';
 export const DEFAULT_THEME_KEY = 'graphiteEmber';
+
+const GOOGLE_FONTS_CSS = 'https://fonts.googleapis.com/css2?';
+export const FONT_HREF_STORAGE_KEY = 'soloflowFontHref';
+const fontStylesheetHref = (preset) => `${GOOGLE_FONTS_CSS}${preset.families}&display=swap`;
+
+/* Only the active pairing's families are requested. index.html inserts
+   #fontPairStylesheet before first paint from the URL remembered here, so a
+   returning user on a non-default pairing does not flash the default. */
+function useFontStylesheet(preset) {
+  const href = fontStylesheetHref(preset);
+  let link = document.getElementById('fontPairStylesheet');
+  if (!link) {
+    link = document.createElement('link');
+    link.id = 'fontPairStylesheet';
+    link.rel = 'stylesheet';
+    document.head.append(link);
+  }
+  if (link.getAttribute('href') !== href) link.setAttribute('href', href);
+  try {
+    if (localStorage.getItem(FONT_HREF_STORAGE_KEY) !== href) localStorage.setItem(FONT_HREF_STORAGE_KEY, href);
+  } catch { /* storage can be unavailable */ }
+}
+
+/* The typography picker previews every pairing, so the whole catalog loads
+   the first time Settings opens instead of on every page load. @font-face is
+   lazy: this costs one stylesheet plus only the faces the samples render. */
+function loadFontCatalogFamilies() {
+  if (document.getElementById('fontCatalogStylesheet')) return;
+  const families = [...new Set(Object.values(FONT_PRESETS).flatMap((preset) => preset.families.split('&')))];
+  const link = document.createElement('link');
+  link.id = 'fontCatalogStylesheet';
+  link.rel = 'stylesheet';
+  link.href = `${GOOGLE_FONTS_CSS}${families.join('&')}&display=swap`;
+  document.head.append(link);
+}
 
 function setInput(id, value) {
   const input = document.getElementById(id);
@@ -200,6 +235,7 @@ export function installThemeModule(store) {
     root.style.setProperty('--font-display', preset.display);
     root.style.setProperty('--font-metric', preset.metric);
     document.body.style.fontFamily = preset.body;
+    useFontStylesheet(preset);
     renderFontCatalog(normalizedKey);
     store.set('settings.fontPair', normalizedKey, { source: 'theme' });
   };
@@ -241,7 +277,12 @@ export function installThemeModule(store) {
   root.style.setProperty('--font-display', font.display);
   root.style.setProperty('--font-metric', font.metric);
   document.body.style.fontFamily = font.body;
+  useFontStylesheet(font);
   applyDerivedTokens(effectiveTheme(activeTheme));
+
+  const settingsDialog = document.getElementById('workspaceSettings');
+  settingsDialog?.addEventListener('toggle', () => { if (settingsDialog.open) loadFontCatalogFamilies(); });
+  if (settingsDialog?.open) loadFontCatalogFamilies();
 
   const persistedSaveSettings = window.saveSettings;
   window.saveSettings = function saveSettingsWithThemeEngine(...args) {
@@ -251,6 +292,7 @@ export function installThemeModule(store) {
     root.style.setProperty('--font-display', activeFontPreset.display);
     root.style.setProperty('--font-metric', activeFontPreset.metric);
     document.body.style.fontFamily = activeFontPreset.body;
+    useFontStylesheet(activeFontPreset);
     applyDerivedTokens(effectiveTheme(window.activeThemePreset));
     return result;
   };
@@ -278,6 +320,7 @@ export function installThemeModule(store) {
       if (root.style.getPropertyValue('--font-display').trim() !== expectedFont.display) root.style.setProperty('--font-display', expectedFont.display);
       if (root.style.getPropertyValue('--font-metric').trim() !== expectedFont.metric) root.style.setProperty('--font-metric', expectedFont.metric);
       document.body.style.fontFamily = expectedFont.body;
+      useFontStylesheet(expectedFont);
       applyDerivedTokens(effectiveTheme(themeKey));
       renderFontCatalog(fontKey);
       renderThemeCatalog(themeKey);

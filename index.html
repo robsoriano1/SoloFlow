@@ -16,10 +16,27 @@
     <!-- SoloFlow brand artwork -->
     <link rel="icon" type="image/png" href="./assets/soloflow-logo.png">
     <link rel="apple-touch-icon" href="./assets/soloflow-logo.png">
+    <!-- Only the active font pairing loads. modules/theme.js keeps
+         #fontPairStylesheet on the user's pairing and remembers its URL, so a
+         returning user's fonts are requested here, before first paint. The
+         default is FONT_PRESETS.signal. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script>
+        (() => {
+            let href = 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Schibsted+Grotesk:wght@400..700&family=Martian+Mono:wght@400..700&display=swap';
+            try {
+                const saved = localStorage.getItem('soloflowFontHref');
+                if (saved && saved.startsWith('https://fonts.googleapis.com/css2?')) href = saved;
+            } catch (_) { /* storage can be unavailable */ }
+            const link = document.createElement('link');
+            link.id = 'fontPairStylesheet';
+            link.rel = 'stylesheet';
+            link.href = href;
+            document.head.appendChild(link);
+        })();
+    </script>
     <style>
-        /* Signature families for first paint. The full selectable catalog is
-           imported by styles/architecture.css and swapped through FONT_PRESETS. */
-        @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Schibsted+Grotesk:wght@400;500;600;700;800&family=Martian+Mono:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
         :root {
             /* Shipped palette: "Graphite & Ember" (THEME_PRESETS.graphiteEmber).
