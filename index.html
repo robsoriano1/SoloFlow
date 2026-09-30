@@ -3543,6 +3543,8 @@
         const taskSafeUrl = (value, allowImageData = false) => {
             try {
                 const input = String(value || '').trim();
+                // An empty string would otherwise resolve to this page's own URL.
+                if (!input) return '';
                 if (allowImageData && /^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(input)) return input;
                 const parsed = new URL(input, location.href);
                 return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
