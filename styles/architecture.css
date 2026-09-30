@@ -2006,3 +2006,207 @@ body.app-shell .sidebar-toggle {
 body.app-shell .sidebar-toggle:hover { color: var(--card-text); border-color: var(--primary); transform: none; }
 .sidebar-toggle svg { transition: rotate var(--motion-fast) ease; }
 body.sidebar-collapsed .sidebar-toggle svg { rotate: 180deg; }
+
+/* --- Events view ------------------------------------------------------------
+   Events used to trail every view as an "Upcoming Events" section; they are
+   now a destination of their own. A colour tag arrives as --event-color on
+   each card and overlay chip. Untagged events keep the warning hue they have
+   always had, and tags only ever tint edges, dots and badges, never text. */
+.events-container { margin-bottom: 24px; color: var(--card-text); }
+.events-container [hidden] { display: none !important; }
+
+.schedule-chip.is-event .schedule-chip-dot,
+.calendar-chip.is-event .calendar-chip-dot { background: var(--event-color, var(--warning, #d97706)); }
+
+/* Add / edit form */
+.event-form { gap: 12px; }
+.event-quick-row { display: grid; align-items: end; gap: 10px; }
+.event-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.event-field-label { padding: 0; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .68; }
+.event-field-label small { font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.event-colors > legend { margin-bottom: 5px; }
+.event-field input,
+.event-field select,
+.event-field textarea { width: 100%; min-width: 0; box-sizing: border-box; }
+.event-field textarea { min-height: 64px; }
+.event-quick-row input[type="date"] { min-width: 150px; }
+.event-quick-row input[type="time"] { min-width: 118px; }
+.event-submit { min-height: 44px; white-space: nowrap; }
+
+.event-more { border-top: 1px solid var(--surface-border); padding-top: 10px; }
+.event-more > summary {
+  display: inline-flex; align-items: center; gap: 8px;
+  width: fit-content; margin-left: -10px; padding: 7px 10px;
+  color: var(--primary); font-size: 12px; font-weight: 700;
+  list-style: none; cursor: pointer; user-select: none; border-radius: var(--radius-md);
+}
+.event-more > summary::-webkit-details-marker { display: none; }
+.event-more > summary::before {
+  content: ''; width: 6px; height: 6px;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg); transition: transform var(--motion-fast, 120ms) ease;
+}
+.event-more[open] > summary::before { transform: rotate(45deg); }
+.event-more > summary span { color: var(--text-muted); font-weight: 600; }
+.event-more > summary:hover { background: color-mix(in srgb, var(--primary) 8%, transparent); }
+.event-more-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-top: 10px; }
+.event-field-wide { grid-column: 1 / -1; }
+
+.event-swatches { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-height: 44px; }
+.event-swatch { position: relative; display: inline-grid; place-items: center; padding: 4px; cursor: pointer; }
+/* Radios pick up the global 44px input box; this one only needs to be clickable. */
+.event-swatch input { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; margin: 0; padding: 0; opacity: 0; cursor: pointer; }
+.event-swatch-dot {
+  display: block; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--swatch); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .2);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.event-swatch:hover .event-swatch-dot { transform: scale(1.08); }
+.event-swatch input:checked + .event-swatch-dot { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--swatch); }
+.event-swatch input:focus-visible + .event-swatch-dot { outline: 2px solid var(--primary); outline-offset: 5px; }
+
+/* Toolbar */
+.events-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 4px; }
+.events-filter { display: inline-flex; padding: 3px; background: color-mix(in srgb, var(--bg) 55%, transparent); border: 1px solid var(--surface-border); border-radius: var(--radius-md); }
+.events-filter-button {
+  gap: 6px; min-height: 34px; padding: 6px 12px;
+  color: var(--text-muted); background: transparent; border: 0; border-radius: var(--radius-sm);
+  font-size: 12px; box-shadow: none;
+}
+.events-filter-button:hover { color: var(--card-text); transform: none; box-shadow: none; }
+.events-filter-button.active { color: var(--primary-contrast-text); background: var(--primary); box-shadow: var(--shadow-sm); }
+.events-filter-count { font: 600 11px/1 var(--font-metric); opacity: .75; }
+.events-filter-count:empty { display: none; }
+.events-search { flex: 1 1 220px; min-width: 0; }
+#eventsExport:disabled { opacity: .5; cursor: not-allowed; }
+
+/* List */
+.events-list { display: grid; }
+.events-list > .empty-state { margin-top: 14px; }
+.events-group { display: grid; gap: 10px; margin-top: 18px; }
+.events-group-title { display: flex; align-items: baseline; gap: 8px; margin: 0; color: var(--card-text); font: 700 13px/1.2 var(--font-display); letter-spacing: -.01em; }
+.events-group-title span { font: 600 11px/1 var(--font-metric); opacity: .55; }
+
+.events-container .event-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 16px;
+  margin: 0;
+  padding: 16px 18px 16px 20px;
+}
+.events-container .event-card::before {
+  content: ''; position: absolute; left: 0; top: 14px; bottom: 14px;
+  width: 3px; border-radius: 0 3px 3px 0; background: var(--event-color, var(--warning));
+}
+.events-container .event-card.is-now { border-color: color-mix(in srgb, var(--primary) 55%, var(--surface-border)); }
+.events-container .event-card.is-past,
+.events-container .event-card.is-ended { opacity: .68; }
+.events-container .event-card.is-past:hover,
+.events-container .event-card.is-past:focus-within,
+.events-container .event-card.is-ended:hover,
+.events-container .event-card.is-ended:focus-within { opacity: 1; }
+.events-container .event-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.events-container .event-card.is-flash { outline: 2px solid transparent; outline-offset: 3px; animation: eventFlash 1.6s ease-out; }
+@keyframes eventFlash { 0%, 40% { outline-color: var(--primary); } 100% { outline-color: transparent; } }
+/* Each card is its own stacking context (backdrop blur), so an open menu has
+   to lift its whole card above the cards that follow it. */
+.events-container .event-card:has(.event-menu[open]) { z-index: 40; }
+
+.event-date-badge {
+  display: grid; justify-items: center; align-content: center; gap: 3px;
+  width: 58px; padding: 8px 0; text-align: center;
+  background: color-mix(in srgb, var(--event-color, var(--warning)) 14%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--event-color, var(--warning)) 36%, transparent);
+  border-radius: var(--radius-md);
+}
+.event-date-month { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+.event-date-day { font: 700 22px/1 var(--font-display); letter-spacing: -.03em; }
+.event-date-weekday { font-size: 11px; font-weight: 600; opacity: .62; }
+
+.event-body { display: grid; gap: 6px; min-width: 0; }
+.event-title { margin: 0; color: var(--card-text); font: 700 16px/1.3 var(--font-display); letter-spacing: -.01em; overflow-wrap: anywhere; }
+.event-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; }
+.event-when { opacity: .82; }
+.event-relative { padding: 2px 8px; font-size: 11px; font-weight: 700; background: color-mix(in srgb, var(--card-text) 9%, transparent); border-radius: 999px; }
+.event-card.is-today .event-relative,
+.event-card.is-soon .event-relative { color: var(--primary); background: color-mix(in srgb, var(--primary) 14%, transparent); }
+.event-card.is-now .event-relative { color: var(--primary-contrast-text); background: var(--primary); }
+.event-repeat,
+.event-location { display: inline-flex; align-items: center; gap: 5px; min-width: 0; font-size: 12px; opacity: .8; }
+.event-location { width: fit-content; max-width: 100%; color: var(--card-text); text-decoration: none; }
+.event-location span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.event-location:hover { opacity: 1; text-decoration: underline; }
+.event-repeat .btn-icon,
+.event-location .btn-icon { flex-shrink: 0; width: 13px; height: 13px; }
+.event-notes { margin: 2px 0 0; font-size: 13px; line-height: 1.5; opacity: .82; white-space: pre-line; overflow-wrap: anywhere; }
+
+.event-actions { display: flex; align-items: center; gap: 8px; }
+.event-actions .btn-small { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; white-space: nowrap; }
+.event-menu { position: relative; }
+.event-menu > summary { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; list-style: none; cursor: pointer; }
+.event-menu > summary::-webkit-details-marker { display: none; }
+.event-menu-list {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 60;
+  display: grid; min-width: 210px; padding: 6px;
+  background: var(--surface); border: 1px solid var(--surface-border-strong); border-radius: var(--radius-md);
+  box-shadow: 0 18px 44px -18px rgba(0, 0, 0, .6);
+}
+.event-menu-list button {
+  justify-content: flex-start; width: 100%; min-height: 36px; padding: 8px 10px;
+  color: var(--card-text); background: transparent; border: 0; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; text-align: left; box-shadow: none;
+}
+.event-menu-list button:hover,
+.event-menu-list button:focus-visible { background: color-mix(in srgb, var(--primary) 10%, transparent); transform: none; box-shadow: none; }
+.event-menu-list .is-danger { color: var(--danger); }
+
+/* Inline editor */
+.events-container .event-card.is-editing { display: block; padding: 18px 18px 18px 20px; border-color: color-mix(in srgb, var(--event-color, var(--primary)) 45%, var(--surface-border)); }
+.event-editor { display: grid; gap: 12px; }
+.event-editor-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Breakpoints follow the view's own width, not the window's, for the same
+   reason quick capture does: the sidebar and wide font pairings take space a
+   viewport query never sees. The inline editor sits inside a card, so it gets
+   its own container rather than borrowing the add form's. */
+.events-container { container: events / inline-size; }
+.event-form,
+.event-editor { container: event-form / inline-size; }
+.event-quick-row { grid-template-columns: minmax(200px, 1fr) repeat(3, auto) auto; }
+.event-editor .event-quick-row { grid-template-columns: minmax(200px, 1fr) repeat(3, auto); }
+
+@container event-form (max-width: 780px) {
+  .event-quick-row,
+  .event-editor .event-quick-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .event-quick-row .event-field-title,
+  .event-quick-row .event-submit { grid-column: 1 / -1; }
+  .event-quick-row input[type="date"],
+  .event-quick-row input[type="time"] { min-width: 0; }
+}
+@container event-form (max-width: 460px) {
+  .event-quick-row,
+  .event-editor .event-quick-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .event-quick-row .event-field:nth-child(2) { grid-column: 1 / -1; }
+  .event-more-grid { grid-template-columns: 1fr; }
+  .event-editor-actions > * { flex: 1 1 0; }
+}
+@container events (max-width: 560px) {
+  .events-filter { width: 100%; }
+  .events-filter-button { flex: 1 1 0; }
+  .events-search { flex-basis: 100%; }
+  .events-container .event-card { grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 14px 14px 14px 18px; }
+  /* Right-aligned so the menu, which opens leftward, stays on screen. */
+  .event-actions { grid-column: 1 / -1; flex-wrap: wrap; justify-content: flex-end; }
+  .event-date-badge { width: 50px; }
+}
+
+/* Eight destinations since Events got its own tab. Equal-width tabs (flex
+   basis 0) left 40px apiece at 375px, which clipped "Schedule" and
+   "Progress"; starting each tab from its label width and sharing out the
+   slack fits every short label on the bar. */
+@media (max-width: 900px) {
+  .app-sidebar .view-tab,
+  body.sidebar-collapsed .app-sidebar .view-tab { flex: 1 1 auto; }
+}
