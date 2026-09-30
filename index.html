@@ -2034,7 +2034,7 @@
         @media(max-width: 620px) { .task-quick-row { grid-template-columns: 1fr; } .task-quick-row > *, .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; } details.task-advanced-fields > summary { width: 100%; } .column h3 { top: 122px; } }
         @media(max-width: 390px) { .task-card.has-photo:not(.is-expanded) { padding-right: 70px; } .task-photo-thumb { right: 11px; top: 12px; } }
     </style>
-    <link rel="stylesheet" href="./styles/architecture.css?v=16">
+    <link rel="stylesheet" href="./styles/architecture.css?v=17">
 </head>
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
@@ -4963,13 +4963,19 @@
         // cells are contenteditable and would otherwise absorb them into the text.
         const SCHEDULE_OPENING_MINUTES = 7 * 60;
         const SCHEDULE_CLOSING_MINUTES = 20 * 60;
+        // The last row is labelled 8:00 PM and covers the half hour after it.
+        const SCHEDULE_GRID_END_MINUTES = SCHEDULE_CLOSING_MINUTES + 30;
 
-        function scheduleSlotForTime(time24) {
+        function scheduleMinutes(time24) {
             if (!time24) return null;
             const [hours, minutes] = String(time24).split(':').map(Number);
             if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return null;
-            const total = (hours * 60) + minutes;
-            if (total < SCHEDULE_OPENING_MINUTES || total > SCHEDULE_CLOSING_MINUTES) return null;
+            return (hours * 60) + minutes;
+        }
+
+        function scheduleSlotForTime(time24) {
+            const total = scheduleMinutes(time24);
+            if (total === null || total < SCHEDULE_OPENING_MINUTES || total > SCHEDULE_CLOSING_MINUTES) return null;
             return Math.min(26, Math.floor((total - SCHEDULE_OPENING_MINUTES) / 30));
         }
 
@@ -4984,26 +4990,22 @@
             (window.events || []).forEach(event => {
                 if (eventsApi ? !eventsApi.occursOn(event, dateISO) : event.date !== dateISO) return;
                 items.push({
-                    kind: 'event', id: event.id, title: event.title, time: event.time || '', link: event.link,
+                    kind: 'event', id: event.id, title: event.title, time: event.time || '', endTime: event.endTime || '', link: event.link,
                     when: eventsApi?.timeRange(event) || '', location: event.location || '', color: eventsApi?.colorValue(event.color) || ''
                 });
             });
             return items.sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
         };
 
-        function buildScheduleChip(item) {
-            const chip = document.createElement('button');
-            chip.type = 'button';
-            chip.className = `schedule-chip is-${item.kind}`;
-            if (item.kind === 'task' && item.priority) chip.dataset.priority = item.priority;
-            if (item.color) chip.style.setProperty('--event-color', item.color);
+        // Tooltip and click behaviour shared by chips and timed event blocks.
+        function bindScheduleItem(element, item) {
+            element.type = 'button';
+            if (item.color) element.style.setProperty('--event-color', item.color);
             const when = item.time ? formatTime(item.time) : 'no time set';
-            chip.title = item.kind === 'task'
+            element.title = item.kind === 'task'
                 ? `Task · ${item.title} · ${when} · click to focus`
                 : `Event · ${item.title} · ${item.when || when}${item.location ? ` · ${item.location}` : ''}`;
-            chip.innerHTML = `<span class="schedule-chip-dot" aria-hidden="true"></span><span class="schedule-chip-text"></span>`;
-            chip.querySelector('.schedule-chip-text').textContent = item.title;
-            chip.addEventListener('click', (clickEvent) => {
+            element.addEventListener('click', (clickEvent) => {
                 clickEvent.stopPropagation();
                 if (item.kind === 'task') { window.focusTaskInPomodoro?.(item.id); return; }
                 const link = taskSafeUrl(item.link);
@@ -5011,13 +5013,95 @@
                 else if (window.SoloFlowEvents) window.SoloFlowEvents.show(item.id);
                 else window.showToast?.(`${item.title} — ${when}`, 'info');
             });
-            return chip;
+            return element;
+        }
+
+        function buildScheduleChip(item) {
+            const chip = document.createElement('button');
+            chip.className = `schedule-chip is-${item.kind}`;
+            if (item.kind === 'task' && item.priority) chip.dataset.priority = item.priority;
+            chip.innerHTML = `<span class="schedule-chip-dot" aria-hidden="true"></span><span class="schedule-chip-text"></span>`;
+            chip.querySelector('.schedule-chip-text').textContent = item.title;
+            return bindScheduleItem(chip, item);
+        }
+
+        // The part of an event with an end time that falls inside the grid's
+        // hours, in minutes after midnight, or null when none of it does.
+        // An end at or before the start runs past midnight.
+        function scheduleEventSpan(item) {
+            const start = scheduleMinutes(item.time);
+            let end = scheduleMinutes(item.endTime);
+            if (item.kind !== 'event' || start === null || end === null) return null;
+            if (end <= start) end += 24 * 60;
+            const from = Math.max(start, SCHEDULE_OPENING_MINUTES);
+            const to = Math.min(end, SCHEDULE_GRID_END_MINUTES);
+            if (to <= from) return null;
+            return { item, start: from, end: to, clippedStart: start < from, clippedEnd: end > to };
+        }
+
+        // Overlapping events (and chip stacks) share their day's column in
+        // side-by-side lanes. A cluster is a run of items that overlap one
+        // another; every item in it takes the cluster's lane count so the lanes
+        // line up.
+        function layoutScheduleEventLanes(spans) {
+            spans.sort((a, b) => a.start - b.start || b.end - a.end);
+            let cluster = [];
+            let laneEnds = [];
+            let clusterEnd = -Infinity;
+            const closeCluster = () => {
+                cluster.forEach(span => { span.lanes = laneEnds.length; });
+                cluster = [];
+                laneEnds = [];
+                clusterEnd = -Infinity;
+            };
+            spans.forEach(span => {
+                if (cluster.length && span.start >= clusterEnd) closeCluster();
+                let lane = laneEnds.findIndex(end => end <= span.start);
+                if (lane < 0) { lane = laneEnds.length; laneEnds.push(span.end); }
+                else laneEnds[lane] = span.end;
+                span.lane = lane;
+                cluster.push(span);
+                clusterEnd = Math.max(clusterEnd, span.end);
+            });
+            closeCluster();
+            return spans;
+        }
+
+        // The block's grid area covers every half-hour row the event touches;
+        // the block is then inset by percentages of that area, so an event
+        // from 9:15 to 10:45 starts and ends mid-row and stays aligned when the
+        // rows resize, with nothing to measure.
+        function buildScheduleEventBlock(span, column) {
+            const firstRow = Math.floor((span.start - SCHEDULE_OPENING_MINUTES) / 30);
+            const lastRow = Math.ceil((span.end - SCHEDULE_OPENING_MINUTES) / 30);
+            const rows = lastRow - firstRow;
+            const area = document.createElement('div');
+            area.className = 'schedule-event-area';
+            area.style.gridColumn = String(column);
+            area.style.gridRow = `${firstRow + 2} / ${lastRow + 2}`;
+
+            const block = bindScheduleItem(document.createElement('button'), span.item);
+            block.className = 'schedule-event-block';
+            block.classList.toggle('is-clipped-start', span.clippedStart);
+            block.classList.toggle('is-clipped-end', span.clippedEnd);
+            block.classList.toggle('is-short', span.end - span.start < 30);
+            const top = ((span.start - SCHEDULE_OPENING_MINUTES) / 30 - firstRow) / rows * 100;
+            const bottom = (lastRow - (span.end - SCHEDULE_OPENING_MINUTES) / 30) / rows * 100;
+            block.style.top = `${top.toFixed(3)}%`;
+            block.style.bottom = `${bottom.toFixed(3)}%`;
+            block.style.setProperty('--lane', String(span.lane));
+            block.style.setProperty('--lanes', String(span.lanes));
+            block.innerHTML = `<span class="schedule-event-title"></span><span class="schedule-event-time"></span>`;
+            block.querySelector('.schedule-event-title').textContent = span.item.title;
+            block.querySelector('.schedule-event-time').textContent = span.item.when;
+            area.append(block);
+            return area;
         }
 
         window.renderScheduleOverlays = function() {
             const grid = document.getElementById('schedule-grid');
             if (!grid || !grid.children.length) return;
-            grid.querySelectorAll('.schedule-chip-stack').forEach(stack => stack.remove());
+            grid.querySelectorAll('.schedule-chip-stack, .schedule-event-area').forEach(overlay => overlay.remove());
             grid.querySelectorAll('.schedule-header-chips').forEach(rail => { rail.innerHTML = ''; });
 
             const dayView = grid.classList.contains('is-day-view');
@@ -5027,8 +5111,12 @@
                 const column = dIdx + 2;
                 const rail = grid.querySelector(`.schedule-header-chips[data-rail="${iso}"]`);
                 const bySlot = new Map();
+                const spans = [];
 
                 window.scheduleItemsForDate(iso).forEach(item => {
+                    // Events with an end time fill the rows they last for.
+                    const span = scheduleEventSpan(item);
+                    if (span) { spans.push(span); return; }
                     // Untimed items, and anything outside the 7am-8pm grid, ride the
                     // day header instead of being parked in a misleading slot.
                     const slot = scheduleSlotForTime(item.time);
@@ -5037,11 +5125,25 @@
                     bySlot.get(slot).push(item);
                 });
 
+                // Each row's chip stack takes a lane for its half hour, so a chip
+                // sits beside an event block it overlaps instead of covering it.
                 bySlot.forEach((items, slot) => {
+                    const start = SCHEDULE_OPENING_MINUTES + (slot * 30);
+                    spans.push({ stack: items, slot, start, end: start + 30 });
+                });
+
+                layoutScheduleEventLanes(spans).forEach(span => {
+                    if (!span.stack) { grid.append(buildScheduleEventBlock(span, column)); return; }
+                    const items = span.stack;
                     const stack = document.createElement('div');
                     stack.className = 'schedule-chip-stack';
                     stack.style.gridColumn = String(column);
-                    stack.style.gridRow = String(slot + 2);
+                    stack.style.gridRow = String(span.slot + 2);
+                    if (span.lanes > 1) {
+                        stack.classList.add('is-in-lane');
+                        stack.style.setProperty('--lane', String(span.lane));
+                        stack.style.setProperty('--lanes', String(span.lanes));
+                    }
                     // A 30-minute row fits two chips; more than that would grow the
                     // row and drag every block below it out of alignment.
                     const shown = items.length > 2 ? items.slice(0, 1) : items;
