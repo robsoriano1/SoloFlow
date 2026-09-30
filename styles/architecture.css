@@ -1714,8 +1714,11 @@ details.customize-menu[open] {
 }
 .schedule-chip {
   display: flex; align-items: center; gap: 4px;
-  width: 100%; min-width: 0; padding: 2px 6px;
-  font: 600 11px/1.45 inherit; text-align: left;
+  width: 100%; min-width: 0; min-height: 0; padding: 2px 6px;
+  /* Longhands: `font: 600 11px/1.45 inherit` is invalid (the shorthand's
+     family can't be `inherit`), so it was dropped and chips took the global
+     button's 14px text and 42px height, one chip filling a whole row. */
+  font-family: inherit; font-size: 11px; font-weight: 600; line-height: 1.45; text-align: left;
   color: var(--card-text); background: color-mix(in srgb, var(--surface) 86%, var(--card-text));
   border: 1px solid color-mix(in srgb, var(--card-text) 18%, transparent);
   border-radius: 999px; cursor: pointer; pointer-events: auto;
