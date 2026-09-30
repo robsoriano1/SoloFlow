@@ -5025,14 +5025,16 @@
             return bindScheduleItem(chip, item);
         }
 
-        // The part of an event with an end time that falls inside the grid's
-        // hours, in minutes after midnight, or null when none of it does.
-        // An end at or before the start runs past midnight.
+        // The part of a timed event that falls inside the grid's hours, in
+        // minutes after midnight, or null when none of it does. With no end
+        // time it lasts an hour, as in the Events tab and calendar exports; an
+        // end at or before the start runs past midnight.
         function scheduleEventSpan(item) {
             const start = scheduleMinutes(item.time);
+            if (item.kind !== 'event' || start === null) return null;
             let end = scheduleMinutes(item.endTime);
-            if (item.kind !== 'event' || start === null || end === null) return null;
-            if (end <= start) end += 24 * 60;
+            if (end === null) end = start + 60;
+            else if (end <= start) end += 24 * 60;
             const from = Math.max(start, SCHEDULE_OPENING_MINUTES);
             const to = Math.min(end, SCHEDULE_GRID_END_MINUTES);
             if (to <= from) return null;
@@ -5114,7 +5116,7 @@
                 const spans = [];
 
                 window.scheduleItemsForDate(iso).forEach(item => {
-                    // Events with an end time fill the rows they last for.
+                    // Timed events fill the rows they last for.
                     const span = scheduleEventSpan(item);
                     if (span) { spans.push(span); return; }
                     // Untimed items, and anything outside the 7am-8pm grid, ride the
