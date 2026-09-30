@@ -2034,7 +2034,7 @@
         @media(max-width: 620px) { .task-quick-row { grid-template-columns: 1fr; } .task-quick-row > *, .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; } details.task-advanced-fields > summary { width: 100%; } .column h3 { top: 122px; } }
         @media(max-width: 390px) { .task-card.has-photo:not(.is-expanded) { padding-right: 70px; } .task-photo-thumb { right: 11px; top: 12px; } }
     </style>
-    <link rel="stylesheet" href="./styles/architecture.css?v=15">
+    <link rel="stylesheet" href="./styles/architecture.css?v=16">
 </head>
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
@@ -2052,6 +2052,7 @@
             <button class="view-tab" id="tab-backlog" data-view="backlog" onclick="setView('backlog')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M230.91,172A8,8,0,0,1,228,182.91l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,36,169.09l92,53.65,92-53.65A8,8,0,0,1,230.91,172ZM220,121.09l-92,53.65L36,121.09A8,8,0,0,0,28,134.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,121.09ZM24,80a8,8,0,0,1,4-6.91l96-56a8,8,0,0,1,8.06,0l96,56a8,8,0,0,1,0,13.82l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,24,80Zm23.88,0L128,126.74,208.12,80,128,33.26Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M220,169.09l-92,53.65L36,169.09A8,8,0,0,0,28,182.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,169.09Z"/><path d="M220,121.09l-92,53.65L36,121.09A8,8,0,0,0,28,134.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,121.09Z"/><path d="M28,86.91l96,56a8,8,0,0,0,8.06,0l96-56a8,8,0,0,0,0-13.82l-96-56a8,8,0,0,0-8.06,0l-96,56a8,8,0,0,0,0,13.82Z"/></svg></span><span class="nav-label">Backlog</span><span class="nav-label-short" aria-hidden="true">Backlog</span><span class="nav-badge" id="nav-count-backlog">0</span></button>
             <button class="view-tab" id="tab-schedule" data-view="schedule" onclick="setView('schedule')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-38.34-85.66a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L116,164.69l42.34-42.35A8,8,0,0,1,169.66,122.34Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM169.66,133.66l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L116,164.69l42.34-42.35a8,8,0,0,1,11.32,11.32ZM48,80V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80Z"/></svg></span><span class="nav-label">Weekly Schedule</span><span class="nav-label-short" aria-hidden="true">Schedule</span></button>
             <button class="view-tab" id="tab-calendar" data-view="calendar" onclick="setView('calendar')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208ZM96,128a8,8,0,0,1-8,8H72a8,8,0,0,1,0-16H88A8,8,0,0,1,96,128Zm48,0a8,8,0,0,1-8,8H120a8,8,0,0,1,0-16h16A8,8,0,0,1,144,128Zm48,0a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h16A8,8,0,0,1,192,128ZM96,168a8,8,0,0,1-8,8H72a8,8,0,0,1,0-16H88A8,8,0,0,1,96,168Zm48,0a8,8,0,0,1-8,8H120a8,8,0,0,1,0-16h16A8,8,0,0,1,144,168Zm48,0a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h16A8,8,0,0,1,192,168Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM88,176H72a8,8,0,0,1,0-16H88a8,8,0,0,1,0,16Zm0-40H72a8,8,0,0,1,0-16H88a8,8,0,0,1,0,16Zm48,40H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-40H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm48,40H168a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-40H168a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm24-56H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z"/></svg></span><span class="nav-label">Month Calendar</span><span class="nav-label-short" aria-hidden="true">Month</span></button>
+            <button class="view-tab" id="tab-events" data-view="events" onclick="setView('events')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208ZM128,112L138.58,139.44L167.94,141.02L145.12,159.56L152.69,187.98L128,172L103.31,187.98L110.88,159.56L88.06,141.02L117.42,139.44Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM48,80V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80ZM128,112L138.58,139.44L167.94,141.02L145.12,159.56L152.69,187.98L128,172L103.31,187.98L110.88,159.56L88.06,141.02L117.42,139.44Z"/></svg></span><span class="nav-label">Events</span><span class="nav-label-short" aria-hidden="true">Events</span><span class="nav-badge" id="nav-count-events">0</span></button>
             <button class="view-tab" id="tab-productivity" data-view="productivity" onclick="setView('productivity')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,144a15.78,15.78,0,0,1-10.42,14.94L146,178l-19,51.62a15.92,15.92,0,0,1-29.88,0L78,178l-51.62-19a15.92,15.92,0,0,1,0-29.88L78,110l19-51.62a15.92,15.92,0,0,1,29.88,0L146,110l51.62,19A15.78,15.78,0,0,1,208,144ZM152,48h16V64a8,8,0,0,0,16,0V48h16a8,8,0,0,0,0-16H184V16a8,8,0,0,0-16,0V32H152a8,8,0,0,0,0,16Zm88,32h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z"/></svg></span><span class="nav-label">Productivity Hub</span><span class="nav-label-short" aria-hidden="true">Progress</span></button>
             <button class="view-tab" id="tab-finance" data-view="finance" onclick="setView('finance')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M216,64H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,56V184a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64Zm0,128H56a8,8,0,0,1-8-8V78.63A23.84,23.84,0,0,0,56,80H216Zm-48-60a12,12,0,1,1,12,12A12,12,0,0,1,168,132Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M216,64H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,56V184a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64Zm-36,80a12,12,0,1,1,12-12A12,12,0,0,1,180,144Z"/></svg></span><span class="nav-label">Finance Tracker</span><span class="nav-label-short" aria-hidden="true">Finance</span><span class="nav-badge" id="nav-count-finance">0</span></button>
         </nav>
@@ -2406,6 +2407,23 @@
             <div id="calendar-grid" class="calendar-grid"></div>
         </div>
 
+        <!-- Events Container: the add form and list are rendered by modules/events.js -->
+        <div id="events-container" class="events-container" style="display: none;">
+            <form id="eventForm" class="form-card event-form" novalidate aria-label="Add an event"></form>
+            <div class="events-toolbar">
+                <div class="events-filter" role="group" aria-label="Which events to show">
+                    <button type="button" class="events-filter-button active" data-event-filter="upcoming" aria-pressed="true">Upcoming <span class="events-filter-count" data-event-count="upcoming"></span></button>
+                    <button type="button" class="events-filter-button" data-event-filter="past" aria-pressed="false">Past <span class="events-filter-count" data-event-count="past"></span></button>
+                    <button type="button" class="events-filter-button" data-event-filter="all" aria-pressed="false">All <span class="events-filter-count" data-event-count="all"></span></button>
+                </div>
+                <label class="sr-only" for="eventSearch">Search events</label>
+                <input type="search" id="eventSearch" class="events-search" placeholder="Search events…" autocomplete="off">
+                <button type="button" class="btn-small" id="eventsExport" title="Download the events shown as a calendar (.ics) file">Export .ics</button>
+                <button type="button" class="btn-small btn-danger" id="eventsClearPast" hidden>Clear past</button>
+            </div>
+            <div id="events-list" class="events-list"></div>
+        </div>
+
         <!-- PRODUCTIVITY DASHBOARD CONTAINER -->
         <div id="productivity-container" class="productivity-container"></div>
         
@@ -2661,20 +2679,6 @@
                 <div id="done-list"></div>
             </div>
         </div>
-
-        <!-- EVENTS SECTION -->
-        <hr class="section-divider">
-        <h2>Upcoming Events</h2>
-        <div class="form-card">
-            <div class="form-row">
-                <input type="text" id="eventTitle" placeholder="Event Title" required>
-                <input type="date" id="eventDate" required>
-                <input type="time" id="eventTime">
-                <input type="url" id="eventLink" class="flex-grow" placeholder="Link (e.g., Zoom link, Maps location)">
-                <button onclick="addEvent()">Add Event</button>
-            </div>
-        </div>
-        <div id="events-list"></div>
 
     </div>
 
@@ -3279,7 +3283,7 @@
                     if (JSON.stringify(cloudEvents) !== JSON.stringify(window.events)) {
                         window.events = cloudEvents;
                         localStorage.setItem('trackerEvents', JSON.stringify(window.events));
-                        window.renderEvents();
+                        window.renderEvents?.();
                     }
                 }
             }, (error) => console.error("Events Sync Error:", error));
@@ -3400,7 +3404,7 @@
 
         window.saveEvents = function() {
             localStorage.setItem('trackerEvents', JSON.stringify(window.events));
-            window.renderEvents();
+            window.renderEvents?.();
             if (userId) {
                 const payload = { data: structuredClone(window.events) };
                 const write = () => setDoc(getDocPath('trackerData', 'events'), payload);
@@ -3543,6 +3547,8 @@
         const taskSafeUrl = (value, allowImageData = false) => {
             try {
                 const input = String(value || '').trim();
+                // An empty string would otherwise resolve to this page's own URL.
+                if (!input) return '';
                 if (allowImageData && /^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(input)) return input;
                 const parsed = new URL(input, location.href);
                 return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
@@ -3983,62 +3989,9 @@
         };
 
         // --- EVENTS LOGIC ---
-        window.addEvent = function() {
-            const title = document.getElementById('eventTitle').value.trim();
-            const date = document.getElementById('eventDate').value;
-            const time = document.getElementById('eventTime').value;
-            const link = document.getElementById('eventLink').value.trim();
-            
-            if(!title || !date) return;
-            window.events.push({ id: Date.now().toString(), title, date, time, link });
-            
-            document.getElementById('eventTitle').value = '';
-            document.getElementById('eventDate').value = '';
-            document.getElementById('eventTime').value = '';
-            document.getElementById('eventLink').value = '';
-            window.saveEvents();
-        };
-
-        window.deleteEvent = function(id) {
-            window.events = window.events.filter(e => e.id !== id);
-            window.saveEvents();
-        };
-
-        window.renderEvents = function() {
-            const container = document.getElementById('events-list');
-            container.innerHTML = '';
-            
-            const sortedEvents = [...window.events].sort((a,b) => new Date(a.date) - new Date(b.date));
-            sortedEvents.forEach(ev => {
-                const eDate = new Date(ev.date);
-                const today = new Date();
-                eDate.setHours(0,0,0,0); today.setHours(0,0,0,0);
-                const diffDays = Math.ceil((eDate - today) / (1000 * 60 * 60 * 24));
-                
-                let timeStr = '';
-                if (diffDays === 0) timeStr = '<span style="color: var(--warning); font-weight: bold;">Today</span>';
-                else if (diffDays === 1) timeStr = 'Tomorrow';
-                else if (diffDays < 0) timeStr = `${Math.abs(diffDays)} days ago`;
-                else timeStr = `In ${diffDays} days`;
-                
-                const displayTime = ev.time ? ` at ${formatTime(ev.time)}` : '';
-                const safeEventLink = taskSafeUrl(ev.link);
-                const linkHtml = safeEventLink ? `<a href="${taskEscape(safeEventLink)}" target="_blank" rel="noopener noreferrer" class="task-link" style="margin: 0;">🔗 Open Link</a>` : '';
-                
-                container.innerHTML += `
-                    <div class="event-card">
-                        <div>
-                            <div style="font-weight: bold; font-size: 16px; color: var(--card-text);">${taskEscape(ev.title)}</div>
-                            <div style="font-size: 13px; color: var(--card-text); opacity: 0.8; margin-top: 3px;">📅 ${taskEscape(ev.date)}${taskEscape(displayTime)} &nbsp;|&nbsp; ${timeStr}</div>
-                        </div>
-                        <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
-                            ${linkHtml}
-                            <button class="btn-small btn-danger" onclick="deleteEvent('${ev.id}')">Delete</button>
-                        </div>
-                    </div>
-                `;
-            });
-        };
+        // The Events view (list, editing, repeats, export) lives in
+        // modules/events.js, which defines renderEvents, addEvent and deleteEvent.
+        // saveEvents above stays the persistence path.
 
         // --- INLINE EDIT & FORMATTING LOGIC ---
         window.formatText = function(command, value = null) {
@@ -4304,6 +4257,7 @@
             backlog:      { title: 'Backlog',           sub: 'Tasks with no due date yet.' },
             schedule:     { title: 'Weekly Schedule',   sub: 'Block out your week in 30-minute slots, with tasks and events overlaid.' },
             calendar:     { title: 'Month Calendar',    sub: 'Every task, event and blocked hour across the month.' },
+            events:       { title: 'Events',            sub: 'Meetings, deadlines and plans, including ones that repeat.' },
             productivity: { title: 'Productivity Hub',  sub: 'What you are finishing, and what needs attention.' },
             finance:      { title: 'Finance Tracker',   sub: 'Log what you spend and earn, and track your budget.' }
         };
@@ -4323,6 +4277,7 @@
             if (view === 'all') label = `${open.length} open`;
             else if (view === 'today') label = `${open.filter(task => task.dueDate && task.dueDate <= today).length} to do now`;
             else if (view === 'backlog') label = `${open.filter(task => !task.dueDate).length} unscheduled`;
+            else if (view === 'events') label = `${window.SoloFlowEvents?.upcomingCount() ?? 0} upcoming`;
             else if (view === 'finance') label = `${(window.financeTransactions || []).length} records`;
             countEl.textContent = label;
             countEl.hidden = !label;
@@ -4345,6 +4300,7 @@
             
             const scheduleContainer = document.getElementById('schedule-container');
             const calendarContainer = document.getElementById('calendar-container');
+            const eventsContainer = document.getElementById('events-container');
             const prodContainer = document.getElementById('productivity-container');
             const financeContainer = document.getElementById('finance-container');
             const kanbanControls = document.querySelector('.control-panel');
@@ -4353,6 +4309,7 @@
 
             scheduleContainer.style.display = 'none';
             if (calendarContainer) calendarContainer.style.display = 'none';
+            if (eventsContainer) eventsContainer.style.display = 'none';
             if (prodContainer) prodContainer.style.display = 'none';
             if (financeContainer) financeContainer.style.display = 'none';
             kanbanControls.style.display = 'none';
@@ -4366,6 +4323,11 @@
                 if (calendarContainer) {
                     calendarContainer.style.display = 'block';
                     window.renderMonthCalendar();
+                }
+            } else if (view === 'events') {
+                if (eventsContainer) {
+                    eventsContainer.style.display = 'block';
+                    window.renderEvents?.();
                 }
             } else if (view === 'productivity') {
                 if (prodContainer) {
@@ -5017,9 +4979,14 @@
                 if (task.status === 'done' || task.dueDate !== dateISO) return;
                 items.push({ kind: 'task', id: task.id, title: task.title, time: task.dueTime || '', priority: task.priority });
             });
+            // Repeating events land on every date they recur (modules/events.js).
+            const eventsApi = window.SoloFlowEvents;
             (window.events || []).forEach(event => {
-                if (event.date !== dateISO) return;
-                items.push({ kind: 'event', id: event.id, title: event.title, time: event.time || '', link: event.link });
+                if (eventsApi ? !eventsApi.occursOn(event, dateISO) : event.date !== dateISO) return;
+                items.push({
+                    kind: 'event', id: event.id, title: event.title, time: event.time || '', link: event.link,
+                    when: eventsApi?.timeRange(event) || '', location: event.location || '', color: eventsApi?.colorValue(event.color) || ''
+                });
             });
             return items.sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
         };
@@ -5029,10 +4996,11 @@
             chip.type = 'button';
             chip.className = `schedule-chip is-${item.kind}`;
             if (item.kind === 'task' && item.priority) chip.dataset.priority = item.priority;
+            if (item.color) chip.style.setProperty('--event-color', item.color);
             const when = item.time ? formatTime(item.time) : 'no time set';
             chip.title = item.kind === 'task'
                 ? `Task · ${item.title} · ${when} · click to focus`
-                : `Event · ${item.title} · ${when}`;
+                : `Event · ${item.title} · ${item.when || when}${item.location ? ` · ${item.location}` : ''}`;
             chip.innerHTML = `<span class="schedule-chip-dot" aria-hidden="true"></span><span class="schedule-chip-text"></span>`;
             chip.querySelector('.schedule-chip-text').textContent = item.title;
             chip.addEventListener('click', (clickEvent) => {
@@ -5040,6 +5008,7 @@
                 if (item.kind === 'task') { window.focusTaskInPomodoro?.(item.id); return; }
                 const link = taskSafeUrl(item.link);
                 if (link) window.open(link, '_blank', 'noopener');
+                else if (window.SoloFlowEvents) window.SoloFlowEvents.show(item.id);
                 else window.showToast?.(`${item.title} — ${when}`, 'info');
             });
             return chip;
@@ -5280,7 +5249,7 @@
                 const blocks = countScheduleBlocks(iso);
 
                 const chips = items.slice(0, 3).map(item => `
-                    <span class="calendar-chip is-${item.kind}" title="${taskEscape(`${item.kind === 'task' ? 'Task' : 'Event'} · ${item.title}${item.time ? ` · ${formatTime(item.time)}` : ''}`)}">
+                    <span class="calendar-chip is-${item.kind}"${item.color ? ` style="--event-color:${item.color}"` : ''} title="${taskEscape(`${item.kind === 'task' ? 'Task' : 'Event'} · ${item.title}${item.when ? ` · ${item.when}` : item.time ? ` · ${formatTime(item.time)}` : ''}${item.location ? ` · ${item.location}` : ''}`)}">
                         <span class="calendar-chip-dot" aria-hidden="true"></span><span class="calendar-chip-text">${taskEscape(item.title)}</span>
                     </span>`).join('');
                 const hidden = items.slice(3);
@@ -5671,9 +5640,8 @@
             renderFinanceProjects();
         };
 
-        // Initialize UI
+        // Initialize UI. Events render from modules/events.js once bootstrap installs it.
         window.renderTasks();
-        window.renderEvents();
         window.renderFinance();
     </script>
     <script type="module" src="./bootstrap.js"></script>

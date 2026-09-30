@@ -1,8 +1,8 @@
-const CACHE_NAME = 'soloflow-command-center-v16';
+const CACHE_NAME = 'soloflow-command-center-v17';
 const APP_SHELL = [
   './', './index.html', './bootstrap.js', './manifest.webmanifest', './styles/architecture.css',
   './core/state.js', './core/firebase.js',
-  './modules/tasks.js', './modules/timer.js', './modules/schedule.js', './modules/pomodoro.js',
+  './modules/tasks.js', './modules/timer.js', './modules/schedule.js', './modules/events.js', './modules/pomodoro.js',
   './modules/productivity.js', './modules/finance.js', './modules/theme.js',
   './modules/shortcuts.js', './modules/reports.js', './modules/icons.js',
   './assets/icon.svg', './assets/soloflow-logo.png'

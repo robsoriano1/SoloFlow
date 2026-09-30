@@ -48,7 +48,9 @@ export function installShortcutManager(taskModule) {
     { icon: '₱', title: '> Go to Finance', detail: 'Open the Financial Command Center', kind: 'Command', keywords: 'money ledger budget cash', run: () => window.setView('finance') },
     { icon: '◐', title: '> Toggle Theme', detail: 'Cycle through accessible colorways', kind: 'Command', keywords: 'appearance palette dark light', run: () => window.cycleSoloFlowTheme?.() },
     { icon: '⚙', title: '> Open Settings', detail: 'Customize appearance, accounts, and data', kind: 'Command', keywords: 'settings customize theme backup account', run: () => { const settings = document.getElementById('workspaceSettings'); if (settings) settings.open = true; } },
-    { icon: '▤', title: '> Go to Schedule', detail: 'Open the weekly schedule', kind: 'Command', keywords: 'week time blocks', run: () => window.setView('schedule') }
+    { icon: '▤', title: '> Go to Schedule', detail: 'Open the weekly schedule', kind: 'Command', keywords: 'week time blocks', run: () => window.setView('schedule') },
+    { icon: '+', title: '> New Event', detail: 'Add a meeting, deadline or plan', kind: 'Command', keywords: 'create add event meeting appointment', run: () => window.SoloFlowEvents?.focusNewEvent() },
+    { icon: '◫', title: '> Go to Events', detail: 'Open your upcoming and past events', kind: 'Command', keywords: 'events meetings upcoming calendar', run: () => window.setView('events') }
   ];
 
   function workspaceItems() {
@@ -62,7 +64,13 @@ export function installShortcutManager(taskModule) {
         requestAnimationFrame(() => document.querySelector(`.task-card[data-task-id="${CSS.escape(task.id)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
       }
     }));
-    const eventItems = (window.events || []).map((event) => ({ icon: '◫', title: event.title || 'Untitled event', detail: `${event.date || 'No date'} ${event.time || ''}`.trim(), kind: 'Event', keywords: event.link || '', run: () => { window.setView('all'); requestAnimationFrame(() => document.getElementById('events-list')?.scrollIntoView({ behavior: 'smooth', block: 'center' })); } }));
+    const eventsApi = window.SoloFlowEvents;
+    const eventItems = (window.events || []).map((event) => ({
+      icon: '◫', title: event.title || 'Untitled event', kind: 'Event',
+      detail: [eventsApi?.nextOccurrence(event) || event.date || 'No date', event.time || '', eventsApi?.describeRepeat(event) || ''].filter(Boolean).join(' · '),
+      keywords: `${event.location || ''} ${event.notes || ''} ${event.link || ''}`,
+      run: () => (eventsApi ? eventsApi.show(event.id) : window.setView('events'))
+    }));
     const financeItems = (window.financeTransactions || []).map((transaction) => ({
       icon: transaction.amountCents >= 0 ? '↗' : '↘', title: transaction.payee || 'Finance record', detail: `${transaction.category || 'Uncategorized'} · ${new Intl.NumberFormat(undefined, { style: 'currency', currency: 'PHP' }).format(Math.abs(transaction.amountCents || 0) / 100)}`, kind: 'Finance', keywords: `${transaction.date || ''} ${transaction.nature || ''}`, run: () => window.setView('finance')
     }));

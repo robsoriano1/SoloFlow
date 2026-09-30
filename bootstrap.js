@@ -4,6 +4,7 @@ import { installThemeModule } from './modules/theme.js';
 import { installTaskModule } from './modules/tasks.js';
 import { installTimerModule } from './modules/timer.js';
 import { installScheduleModule } from './modules/schedule.js';
+import { installEventsModule } from './modules/events.js';
 import { installPomodoroModule } from './modules/pomodoro.js';
 import { installProductivityModule } from './modules/productivity.js';
 import { installFinanceModule } from './modules/finance.js';
@@ -107,6 +108,7 @@ function installGlobalShell(store) {
       all: tasks.filter((task) => task.status !== 'done').length,
       today: tasks.filter((task) => task.status !== 'done' && task.dueDate && task.dueDate <= today).length,
       backlog: tasks.filter((task) => task.status !== 'done' && !task.dueDate).length,
+      events: window.SoloFlowEvents?.upcomingCount() || 0,
       finance: window.financeTransactions?.length || 0
     };
     Object.entries(values).forEach(([key, value]) => { const badge = document.getElementById(`nav-count-${key}`); if (badge) badge.textContent = value > 99 ? '99+' : String(value); });
@@ -148,6 +150,8 @@ function start() {
   bridgeLegacyPersistence(store);
   installToastDeck();
   installThemeModule(store);
+  // Before the shell, so its nav-counter wrapper wraps the module's renderEvents.
+  installEventsModule(store);
   installGlobalShell(store);
   const taskModule = installTaskModule(store);
   installTimerModule(store);
