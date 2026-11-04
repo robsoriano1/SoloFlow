@@ -24,7 +24,7 @@ function formatDuration(seconds) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainder = seconds % 60;
-  return `⏱ ${hours ? `${hours}h ` : ''}${minutes}m${remainder}s`;
+  return `${hours ? `${hours}h ` : ''}${minutes}m ${remainder}s`;
 }
 
 // A worker's interval keeps its pace in a background tab, where the page's own

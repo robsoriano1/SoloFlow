@@ -340,6 +340,7 @@ function formHTML(values, mode) {
         <input type="time" name="endTime" value="${escapeHTML(values.endTime)}"></label>
       ${editing ? '' : '<button type="submit" class="event-submit">Add event</button>'}
     </div>
+    ${editing ? '' : `<button type="button" class="event-form-close" data-action="close-add" aria-label="Close the new event form" title="Close">${ICONS.close}</button>`}
     <details class="event-more"${editing || hasDetails ? ' open' : ''}>
       <summary>More details <span>Location, link, notes, repeat, color</span></summary>
       <div class="event-more-grid">
@@ -431,6 +432,7 @@ export function installEventsModule(store) {
   const search = document.getElementById('eventSearch');
   const exportButton = document.getElementById('eventsExport');
   const clearPastButton = document.getElementById('eventsClearPast');
+  const newToggle = document.getElementById('eventsNewToggle');
   const state = { filter: 'upcoming', query: '', editingId: null, visible: [] };
 
   const allEvents = () => (Array.isArray(window.events) ? window.events : []);
@@ -498,7 +500,7 @@ export function installEventsModule(store) {
 
   function emptyHTML(query, counts) {
     const empty = window.emptyStateHTML || ((title, description) => `<div class="empty-state"><strong>${title}</strong><span>${description}</span></div>`);
-    const focusTitle = "document.getElementById('eventTitle')?.focus()";
+    const focusTitle = 'window.SoloFlowEvents?.focusNewEvent()';
     if (query) return empty('No events match that search', 'Try another word, or clear the search to see everything.');
     if (state.filter === 'past') return empty('No past events', 'Events move here once their day is over.');
     if (state.filter === 'upcoming' && counts.past) return empty('Nothing coming up', `You have ${counts.past} past event${counts.past === 1 ? '' : 's'}. Add what’s next above.`, 'Add an event', focusTitle);
@@ -560,6 +562,16 @@ export function installEventsModule(store) {
     window.showToast?.('Event updated', 'success');
   }
 
+  // The add form stays folded behind "New event" so the list leads the view.
+  function setAddFormOpen(open, { focus = false } = {}) {
+    if (!addForm) return;
+    addForm.hidden = !open;
+    container?.classList.toggle('is-adding', open);
+    newToggle?.setAttribute('aria-expanded', String(open));
+    if (open && focus) requestAnimationFrame(() => document.getElementById('eventTitle')?.focus());
+    if (!open && focus) newToggle?.focus();
+  }
+
   function addFromForm() {
     if (!addForm) return;
     const clean = validate(readForm(addForm), addForm);
@@ -571,6 +583,7 @@ export function installEventsModule(store) {
     addForm.querySelector('details.event-more')?.removeAttribute('open');
     syncRepeatField(addForm);
     window.saveEvents();
+    setAddFormOpen(false);
     show(event.id);
     window.showToast?.(`Added “${event.title}” for ${dateLabel(nextOccurrence(event) || event.date)}`, 'success');
   }
@@ -678,6 +691,13 @@ export function installEventsModule(store) {
   if (addForm) {
     addForm.innerHTML = formHTML(valuesOf(), 'add');
     addForm.addEventListener('submit', (submitEvent) => { submitEvent.preventDefault(); addFromForm(); });
+    addForm.addEventListener('click', (clickEvent) => {
+      if (clickEvent.target.closest('[data-action="close-add"]')) setAddFormOpen(false, { focus: true });
+    });
+    addForm.addEventListener('keydown', (keyEvent) => {
+      if (keyEvent.key === 'Escape') { keyEvent.stopPropagation(); setAddFormOpen(false, { focus: true }); }
+    });
+    newToggle?.addEventListener('click', () => setAddFormOpen(addForm.hidden, { focus: true }));
   }
 
   [addForm, list].forEach((root) => root?.addEventListener('change', (changeEvent) => {
@@ -743,6 +763,7 @@ export function installEventsModule(store) {
     show,
     focusNewEvent: () => {
       if (!isOpen()) window.setView?.('events');
+      setAddFormOpen(true);
       requestAnimationFrame(() => document.getElementById('eventTitle')?.focus());
     }
   };

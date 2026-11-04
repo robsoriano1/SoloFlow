@@ -1,10 +1,10 @@
-const CACHE_NAME = 'soloflow-command-center-v18';
+const CACHE_NAME = 'soloflow-command-center-v19';
 const APP_SHELL = [
   './', './index.html', './bootstrap.js', './manifest.webmanifest', './styles/architecture.css',
   './core/state.js', './core/firebase.js',
   './modules/tasks.js', './modules/timer.js', './modules/schedule.js', './modules/events.js', './modules/pomodoro.js',
   './modules/productivity.js', './modules/finance.js', './modules/theme.js',
-  './modules/shortcuts.js', './modules/reports.js', './modules/icons.js',
+  './modules/shortcuts.js', './modules/reports.js', './modules/icons.js', './modules/layout.js',
   './assets/icon.svg', './assets/soloflow-logo.png'
 ];
 const OPTIONAL_REMOTE_ASSETS = [

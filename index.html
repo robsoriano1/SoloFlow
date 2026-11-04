@@ -882,7 +882,7 @@
         }
         .search-input-wrapper input {
             width: 100%;
-            padding-left: 48px !important;
+            padding-left: 40px !important;
             box-sizing: border-box;
         }
         
@@ -1719,17 +1719,6 @@
 
         .form-card { padding: clamp(18px, 2.3vw, 30px); border-radius: var(--radius-xl); }
         #kanban-task-form { position: relative; overflow: hidden; }
-        #kanban-task-form::before {
-            content: "QUICK CAPTURE";
-            position: absolute;
-            top: 10px;
-            right: 18px;
-            color: var(--primary);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: .16em;
-            opacity: .65;
-        }
         .board { grid-template-columns: repeat(3, minmax(280px, 1fr)); gap: clamp(14px, 1.7vw, 24px); }
         .column { padding: 14px; min-height: 380px; border-radius: var(--radius-xl); }
         .column h3 { position: sticky; top: 150px; z-index: 2; padding: 5px 4px 13px; background: rgba(var(--surface-rgb), .82); backdrop-filter: blur(10px); }
@@ -2005,7 +1994,8 @@
         .subtask-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .subtask-chip button { min-height: 18px; width: 18px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--card-text); box-shadow: none; font-size: 11px; }
         #subtaskChipInput { flex: 1 1 150px; min-width: 110px; min-height: 28px; padding: 2px !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
-        .editable:focus, input:not([type="color"]):not([type="file"]):not([type="checkbox"]):focus, select:focus, textarea:focus, .control-panel select:focus {
+        /* #taskTitle sits inside the Quick Capture card, which draws the focus ring for it. */
+        .editable:focus, input:not([type="color"]):not([type="file"]):not([type="checkbox"]):not(#taskTitle):focus, select:focus, textarea:focus, .control-panel select:focus {
             box-shadow: 0 0 0 3px var(--focus-ring) !important; border-color: var(--primary) !important; outline: none !important;
         }
         .editable:focus { background: var(--surface) !important; color: var(--surface-contrast-text, var(--card-text)) !important; -webkit-text-fill-color: currentColor; }
@@ -2034,7 +2024,7 @@
         @media(max-width: 620px) { .task-quick-row { grid-template-columns: 1fr; } .task-quick-row > *, .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; } details.task-advanced-fields > summary { width: 100%; } .column h3 { top: 122px; } }
         @media(max-width: 390px) { .task-card.has-photo:not(.is-expanded) { padding-right: 70px; } .task-photo-thumb { right: 11px; top: 12px; } }
     </style>
-    <link rel="stylesheet" href="./styles/architecture.css?v=17">
+    <link rel="stylesheet" href="./styles/architecture.css?v=18">
 </head>
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
@@ -2055,6 +2045,8 @@
             <button class="view-tab" id="tab-events" data-view="events" onclick="setView('events')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208ZM128,112L138.58,139.44L167.94,141.02L145.12,159.56L152.69,187.98L128,172L103.31,187.98L110.88,159.56L88.06,141.02L117.42,139.44Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM48,80V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80ZM128,112L138.58,139.44L167.94,141.02L145.12,159.56L152.69,187.98L128,172L103.31,187.98L110.88,159.56L88.06,141.02L117.42,139.44Z"/></svg></span><span class="nav-label">Events</span><span class="nav-label-short" aria-hidden="true">Events</span><span class="nav-badge" id="nav-count-events">0</span></button>
             <button class="view-tab" id="tab-productivity" data-view="productivity" onclick="setView('productivity')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M208,144a15.78,15.78,0,0,1-10.42,14.94L146,178l-19,51.62a15.92,15.92,0,0,1-29.88,0L78,178l-51.62-19a15.92,15.92,0,0,1,0-29.88L78,110l19-51.62a15.92,15.92,0,0,1,29.88,0L146,110l51.62,19A15.78,15.78,0,0,1,208,144ZM152,48h16V64a8,8,0,0,0,16,0V48h16a8,8,0,0,0,0-16H184V16a8,8,0,0,0-16,0V32H152a8,8,0,0,0,0,16Zm88,32h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z"/></svg></span><span class="nav-label">Productivity Hub</span><span class="nav-label-short" aria-hidden="true">Progress</span></button>
             <button class="view-tab" id="tab-finance" data-view="finance" onclick="setView('finance')"><span class="nav-icon"><svg class="ph-icon ph-icon-regular" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M216,64H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,56V184a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64Zm0,128H56a8,8,0,0,1-8-8V78.63A23.84,23.84,0,0,0,56,80H216Zm-48-60a12,12,0,1,1,12,12A12,12,0,0,1,168,132Z"/></svg><svg class="ph-icon ph-icon-fill" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M216,64H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,56V184a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64Zm-36,80a12,12,0,1,1,12-12A12,12,0,0,1,180,144Z"/></svg></span><span class="nav-label">Finance Tracker</span><span class="nav-label-short" aria-hidden="true">Finance</span><span class="nav-badge" id="nav-count-finance">0</span></button>
+            <!-- Phone only: Backlog, Month and Progress live behind "More". -->
+            <button type="button" class="view-tab nav-more-tab" id="navMoreToggle" aria-haspopup="dialog" aria-expanded="false" aria-controls="navMoreSheet"><span class="nav-icon"><svg class="ph-icon" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128Zm56-12a12,12,0,1,0,12,12A12,12,0,0,0,196,116ZM60,116a12,12,0,1,0,12,12A12,12,0,0,0,60,116Z"/></svg></span><span class="nav-label">More</span><span class="nav-label-short" aria-hidden="true">More</span></button>
         </nav>
         <button id="settingsTrigger" class="sidebar-settings" type="button" aria-controls="workspaceSettings" onclick="document.querySelector('details.customize-menu').open = true">
             <span class="nav-icon"><svg class="ph-icon" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm109.94-52.79a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A112.1,112.1,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.62a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21Zm-15,34.91-28.57,16.25a8,8,0,0,0-3,3c-.58,1-1.19,2.06-1.81,3.06a7.94,7.94,0,0,0-1.22,4.21l-.15,32.25a95.89,95.89,0,0,1-25.37,14.3L134,199.13a8,8,0,0,0-3.91-1h-.19c-1.21,0-2.43,0-3.64,0a8.08,8.08,0,0,0-4.1,1l-28.84,16.1A96,96,0,0,1,67.88,201l-.11-32.2a8,8,0,0,0-1.22-4.22c-.62-1-1.23-2-1.8-3.06a8.09,8.09,0,0,0-3-3.06l-28.6-16.29a90.49,90.49,0,0,1,0-28.26L61.67,97.63a8,8,0,0,0,3-3c.58-1,1.19-2.06,1.81-3.06a7.94,7.94,0,0,0,1.22-4.21l.15-32.25a95.89,95.89,0,0,1,25.37-14.3L122,56.87a8,8,0,0,0,4.1,1c1.21,0,2.43,0,3.64,0a8.08,8.08,0,0,0,4.1-1l28.84-16.1A96,96,0,0,1,188.12,55l.11,32.2a8,8,0,0,0,1.22,4.22c.62,1,1.23,2,1.8,3.06a8.09,8.09,0,0,0,3,3.06l28.6,16.29A90.49,90.49,0,0,1,222.9,142.12Z"/></svg></span><span class="nav-label">Settings</span><span class="settings-key">⌘,</span>
@@ -2062,6 +2054,16 @@
         <div class="sidebar-footer"><span class="sync-orbit" aria-hidden="true"></span><span class="nav-label">Local-first sync</span></div>
     </aside>
 
+    <dialog id="navMoreSheet" class="sf-sheet nav-more-sheet" aria-labelledby="navMoreTitle">
+        <div class="sf-sheet-body">
+            <div class="sf-sheet-head"><h2 id="navMoreTitle" class="sf-sheet-title">More views</h2><button type="button" class="sf-sheet-close" data-action="close-sheet" aria-label="Close"><span data-icon="close"></span></button></div>
+            <div class="nav-more-list">
+                <button type="button" class="nav-more-item" data-sheet-view="backlog" data-icon-from="tab-backlog"><span class="nav-more-label">Backlog</span><span class="nav-more-count" data-count-from="nav-count-backlog"></span></button>
+                <button type="button" class="nav-more-item" data-sheet-view="calendar" data-icon-from="tab-calendar"><span class="nav-more-label">Month calendar</span></button>
+                <button type="button" class="nav-more-item" data-sheet-view="productivity" data-icon-from="tab-productivity"><span class="nav-more-label">Progress</span></button>
+            </div>
+        </div>
+    </dialog>
     <dialog id="commandPalette" class="command-palette" aria-labelledby="commandPaletteTitle">
         <div class="command-palette-shell">
             <div class="command-palette-head">
@@ -2084,7 +2086,7 @@
                     <img src="./assets/soloflow-logo.png" alt="SoloFlow logo" onerror="this.onerror=null;this.src='./assets/icon.svg'">
                 </div>
                 <div class="soloflow-title-group">
-                    <h1>SoloFlow</h1>
+                    <p class="soloflow-brand-name">SoloFlow</p>
                 </div>
             </div>
             <div class="shell-quick-actions">
@@ -2092,7 +2094,7 @@
                     <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true" focusable="false"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg>
                 </button>
                 <button type="button" class="shell-quick-action" onclick="openWorkspaceSettings()" aria-label="Workspace settings">
-                    <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true" focusable="false"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm109.94-52.79a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A112.1,112.1,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.62a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21Z"/></svg>
+                    <svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true" focusable="false"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm109.94-52.79a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A112.1,112.1,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.62a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21Zm-15,34.91-28.57,16.25a8,8,0,0,0-3,3c-.58,1-1.19,2.06-1.81,3.06a7.94,7.94,0,0,0-1.22,4.21l-.15,32.25a95.89,95.89,0,0,1-25.37,14.3L134,199.13a8,8,0,0,0-3.91-1h-.19c-1.21,0-2.43,0-3.64,0a8.08,8.08,0,0,0-4.1,1l-28.84,16.1A96,96,0,0,1,67.88,201l-.11-32.2a8,8,0,0,0-1.22-4.22c-.62-1-1.23-2-1.8-3.06a8.09,8.09,0,0,0-3-3.06l-28.6-16.29a90.49,90.49,0,0,1,0-28.26L61.67,97.63a8,8,0,0,0,3-3c.58-1,1.19-2.06,1.81-3.06a7.94,7.94,0,0,0,1.22-4.21l.15-32.25a95.89,95.89,0,0,1,25.37-14.3L122,56.87a8,8,0,0,0,4.1,1c1.21,0,2.43,0,3.64,0a8.08,8.08,0,0,0,4.1-1l28.84-16.1A96,96,0,0,1,188.12,55l.11,32.2a8,8,0,0,0,1.22,4.22c.62,1,1.23,2,1.8,3.06a8.09,8.09,0,0,0,3,3.06l28.6,16.29A90.49,90.49,0,0,1,222.9,142.12Z"/></svg>
                 </button>
             </div>
         </header>
@@ -2100,8 +2102,14 @@
         <!-- Dynamic Banner Image -->
         <div id="bannerImage"></div>
 
-        <!-- Editable Workspace Subtitle/Title -->
-        <h2 id="pageTitle" contenteditable="true" role="textbox" aria-label="Editable dashboard title" aria-multiline="false" spellcheck="false" title="Click to edit workspace name">My Workspace</h2>
+        <!-- ACTIVE VIEW HEADER -->
+        <div id="viewHeader" class="view-header">
+            <div class="view-header-copy">
+                <h1 id="viewHeaderTitle" class="view-header-title">Kanban Board</h1>
+                <p id="viewHeaderSub" class="view-header-sub">Every task, grouped by status.</p>
+            </div>
+            <span id="viewHeaderCount" class="view-header-count" hidden></span>
+        </div>
 
         <!-- Floating Rich Text Toolbar -->
         <div id="formatToolbar" class="format-toolbar" role="toolbar" aria-label="Inline text formatting" style="display: none;">
@@ -2111,16 +2119,16 @@
             
             <div style="display: flex; align-items: center; gap: 4px; border-left: 1px solid var(--surface-border); padding-left: 4px; margin-left: 2px;">
                 <input type="color" id="highlightColor" value="#ffff00" style="width: 20px; height: 20px; padding: 0; border: none; cursor: pointer; background: transparent;" title="Pick Text Highlight Color">
-                <button type="button" onmousedown="event.preventDefault(); applyHighlight()" title="Highlight Text (Ctrl+Shift+H)" aria-label="Apply highlight">🖌️</button>
+                <button type="button" onmousedown="event.preventDefault(); applyHighlight()" title="Highlight Text (Ctrl+Shift+H)" aria-label="Apply highlight"><span data-icon="highlight"></span></button>
             </div>
             
-            <button type="button" onmousedown="event.preventDefault(); formatText('removeFormat')" title="Clear Format" aria-label="Clear formatting">✕</button>
+            <button type="button" onmousedown="event.preventDefault(); formatText('removeFormat')" title="Clear Format" aria-label="Clear formatting"><span data-icon="close"></span></button>
 
             <!-- SCHEDULE TOOLS -->
             <div id="scheduleTools" style="display: none; align-items: center; gap: 4px; border-left: 1px solid var(--surface-border); padding-left: 4px; margin-left: 2px;">
                 <input type="color" id="cellBgColor" value="#ffffff" style="width: 20px; height: 20px; padding: 0; border: none; cursor: pointer; background: transparent;" title="Fill Cell Color" oninput="applyCellColor(this.value)">
-                <button onmousedown="event.preventDefault(); mergeScheduleCells()" title="Merge Down">⬇️</button>
-                <button onmousedown="event.preventDefault(); unmergeScheduleCells()" title="Unmerge">⏏️</button>
+                <button onmousedown="event.preventDefault(); mergeScheduleCells()" title="Merge Down" aria-label="Merge down"><span data-icon="mergeDown"></span></button>
+                <button onmousedown="event.preventDefault(); unmergeScheduleCells()" title="Unmerge" aria-label="Unmerge"><span data-icon="split"></span></button>
             </div>
             
             <div style="border-left: 1px solid var(--surface-border); margin-left: 2px; padding-left: 4px;">
@@ -2131,20 +2139,28 @@
         <!-- CUSTOMIZE & DATA MANAGEMENT DASHBOARD PANEL -->
         <details id="workspaceSettings" class="customize-menu">
             <summary>
-                <span><span aria-hidden="true">⚙</span> Workspace Settings</span>
+                <span><span data-icon="gear"></span> Workspace settings</span>
                 <span class="settings-close" aria-hidden="true">×</span>
             </summary>
 
+            <!-- 0. WORKSPACE NAME (was the large page heading) -->
+            <div class="settings-group settings-workspace">
+                <h4><span data-icon="edit"></span> Workspace</h4>
+                <span class="settings-field-label" id="pageTitleLabel">Workspace name</span>
+                <h2 id="pageTitle" contenteditable="true" role="textbox" aria-labelledby="pageTitleLabel" aria-multiline="false" spellcheck="false" title="Click to edit workspace name">My Workspace</h2>
+                <p class="settings-hint">Shown under SoloFlow in the sidebar.</p>
+            </div>
+
             <!-- 1. CLOUD & AUTH -->
             <div class="settings-group">
-                <h4>☁️ Cloud &amp; Auth</h4>
+                <h4><span data-icon="cloud"></span> Cloud &amp; sync</h4>
                 <div class="auth-status" id="auth-status-container" data-cloud-state="connecting">
                     <div>
-                        <span id="auth-status-text" style="font-weight: 600;">☁️ Connecting to cloud sync…</span><br>
+                        <span id="auth-status-text" style="font-weight: 600;">Connecting to cloud sync…</span><br>
                         <span id="auth-status-detail" class="auth-status-detail">Your work is always saved on this device first.</span><br>
                         <span style="font-size: 11px; opacity: 0.65; font-family: monospace;" id="auth-uid"></span>
                     </div>
-                    <button id="btn-cloud-retry" class="btn-alt" type="button" style="display: none;" onclick="retryCloudConnection()">↻ Retry connection</button>
+                    <button id="btn-cloud-retry" class="btn-alt" type="button" style="display: none;" onclick="retryCloudConnection()"><span data-icon="refresh"></span> <span class="btn-label">Retry connection</span></button>
                     <button id="btn-google-login" class="btn-google" style="display: none;">
                         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                         Sign in to Sync
@@ -2156,7 +2172,7 @@
 
             <!-- 2. THEMES & CANVAS -->
             <div class="settings-group">
-                <h4>🎨 Themes &amp; Canvas</h4>
+                <h4><span data-icon="palette"></span> Themes &amp; canvas</h4>
 
                 <div class="theme-live-layout">
                     <div class="theme-controls-col">
@@ -2241,7 +2257,7 @@
 
             <!-- 3. BANNER & HERO -->
             <div class="settings-group">
-                <h4>🖼️ Banner &amp; Hero</h4>
+                <h4><span data-icon="image"></span> Banner</h4>
                 <div class="settings-grid">
                     <div class="setting-item" style="grid-column: span 2;">
                         <label>Banner Image URL</label>
@@ -2285,57 +2301,57 @@
 
             <!-- 4. PRODUCTIVITY ANALYTICS -->
             <div class="settings-group">
-                <h4>📊 Productivity Analytics</h4>
+                <h4><span data-icon="chart"></span> Productivity</h4>
                 <div class="analytics-grid-elevated">
                     <div class="metric-card-elevated card-profit">
                         <div class="metric-header">
                             <span class="metric-label">Total Profit Earned</span>
                             <span class="status-dot dot-success"></span>
                         </div>
-                        <div id="stat-value" class="metric-value-display" style="color: var(--success);">₱0.00</div>
+                        <div id="stat-value" class="metric-value-display is-good">₱0.00</div>
                     </div>
                     <div class="metric-card-elevated card-budget">
                         <div class="metric-header">
                             <span class="metric-label">Total Budget Allocated</span>
                             <span class="status-dot dot-warning"></span>
                         </div>
-                        <div id="stat-budget" class="metric-value-display" style="color: var(--primary);">₱0.00</div>
+                        <div id="stat-budget" class="metric-value-display">₱0.00</div>
                     </div>
                     <div class="metric-card-elevated card-finished">
                         <div class="metric-header">
                             <span class="metric-label">Tasks Finished</span>
                             <span class="status-dot dot-primary"></span>
                         </div>
-                        <div id="stat-finished" class="metric-value-display" style="color: var(--primary);">0</div>
+                        <div id="stat-finished" class="metric-value-display">0</div>
                     </div>
                     <div class="metric-card-elevated card-overdue">
                         <div class="metric-header">
                             <span class="metric-label">Tasks Overdue</span>
                             <span class="status-dot dot-danger"></span>
                         </div>
-                        <div id="stat-overdue" class="metric-value-display" style="color: var(--danger);">0</div>
+                        <div id="stat-overdue" class="metric-value-display is-bad">0</div>
                     </div>
                     <div class="metric-card-elevated card-velocity">
                         <div class="metric-header">
                             <span class="metric-label">Tasks Finished Per Day</span>
                             <span class="status-dot dot-warning"></span>
                         </div>
-                        <div id="stat-velocity" class="metric-value-display" style="color: var(--warning);">0 / day</div>
+                        <div id="stat-velocity" class="metric-value-display">0 / day</div>
                     </div>
                     <div class="metric-card-elevated card-time">
                         <div class="metric-header">
                             <span class="metric-label">Total Time Tracked</span>
                             <span class="status-dot dot-purple"></span>
                         </div>
-                        <div id="stat-time" class="metric-value-display" style="color: var(--purple);">0h 0m</div>
+                        <div id="stat-time" class="metric-value-display">0h 0m</div>
                     </div>
                     <div class="metric-card-elevated card-finished">
                         <div class="metric-header"><span class="metric-label">Daily Focus Goal</span><span class="status-dot dot-primary"></span></div>
-                        <div id="stat-focus-quota" class="metric-value-display" style="color: var(--primary);">0%</div>
+                        <div id="stat-focus-quota" class="metric-value-display">0%</div>
                     </div>
                     <div class="metric-card-elevated card-velocity">
                         <div class="metric-header"><span class="metric-label">Day Streak</span><span class="status-dot dot-warning"></span></div>
-                        <div id="stat-focus-streak" class="metric-value-display" style="color: var(--warning);">0 days</div>
+                        <div id="stat-focus-streak" class="metric-value-display">0 days</div>
                     </div>
                 </div>
                 <div class="quota-settings" style="margin-top:16px;">
@@ -2349,10 +2365,10 @@
 
             <!-- 5. DATA BACKUP -->
             <div class="settings-group">
-                <h4>💾 Data Backup</h4>
+                <h4><span data-icon="archive"></span> Data backup</h4>
                 <div class="data-buttons">
-                    <button class="btn-alt" onclick="exportTasks()">⬇️ Export JSON</button>
-                    <button class="btn-alt" onclick="document.getElementById('importFile').click()">⬆️ Import JSON</button>
+                    <button class="btn-alt" onclick="exportTasks()"><span data-icon="download"></span> Export JSON</button>
+                    <button class="btn-alt" onclick="document.getElementById('importFile').click()"><span data-icon="upload"></span> Import JSON</button>
                     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importTasks(event)">
                 </div>
             </div>
@@ -2409,7 +2425,7 @@
 
         <!-- Events Container: the add form and list are rendered by modules/events.js -->
         <div id="events-container" class="events-container" style="display: none;">
-            <form id="eventForm" class="form-card event-form" novalidate aria-label="Add an event"></form>
+            <form id="eventForm" class="form-card event-form" novalidate aria-label="Add an event" hidden></form>
             <div class="events-toolbar">
                 <div class="events-filter" role="group" aria-label="Which events to show">
                     <button type="button" class="events-filter-button active" data-event-filter="upcoming" aria-pressed="true">Upcoming <span class="events-filter-count" data-event-count="upcoming"></span></button>
@@ -2420,6 +2436,7 @@
                 <input type="search" id="eventSearch" class="events-search" placeholder="Search events…" autocomplete="off">
                 <button type="button" class="btn-small" id="eventsExport" title="Download the events shown as a calendar (.ics) file">Export .ics</button>
                 <button type="button" class="btn-small btn-danger" id="eventsClearPast" hidden>Clear past</button>
+                <button type="button" class="events-new-button" id="eventsNewToggle" aria-expanded="false" aria-controls="eventForm"><span data-icon="plus"></span> New event</button>
             </div>
             <div id="events-list" class="events-list"></div>
         </div>
@@ -2430,31 +2447,61 @@
         <!-- FINANCE TRACKER CONTAINER -->
         <div id="finance-container" class="finance-container" style="display: none; margin-bottom: 24px;">
             <div class="finance-command-shell">
-                <div class="finance-toolbar" aria-label="Financial analytics filters">
+                <!-- Recording a transaction is the main action, so it leads the page. -->
+                <section class="finance-panel finance-quick-entry" aria-labelledby="financeQuickEntryTitle">
+                    <div class="finance-panel-header"><div><h3 id="financeQuickEntryTitle">Record a transaction</h3></div></div>
+                    <div class="finance-form-grid finance-capture-grid">
+                        <input type="text" id="financePayee" class="wide" placeholder="Merchant or payee" required>
+                        <label class="finance-amount-field wide" for="financeAmount"><span aria-hidden="true">₱</span><input type="number" id="financeAmount" placeholder="0.00" step="0.01" required><small>Transaction amount</small></label>
+                        <input type="date" id="financeDate">
+                        <div class="finance-segment-field wide"><span>Flow</span><div class="finance-segments" role="group" aria-label="Transaction flow"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeType','expense',this)">Expense</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeType','income',this)">Income</button></div><select id="financeType" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="expense">Expense (-)</option><option value="income">Income (+)</option></select></div>
+                        <input type="text" id="financeCategory" list="financeCategoryList" placeholder="Category" required>
+                        <datalist id="financeCategoryList"><option value="Food & Dining"><option value="PC Parts & Electronics"><option value="Vehicle & Transport"><option value="Living & Utilities"><option value="Server Hosting & Cloud"><option value="Subscriptions"><option value="Savings & Investments"><option value="Debt Paydown"><option value="Musical Instruments"><option value="Real Estate & Properties"><option value="Vehicle Mods"></datalist>
+                        <details class="task-advanced-fields finance-advanced-fields">
+                            <summary>More details</summary>
+                            <div class="task-advanced-drawer"><div class="task-advanced-inner">
+                                <div class="finance-form-grid">
+                                    <div class="finance-segment-field wide"><span>Cost profile</span><div class="finance-segments" role="group" aria-label="Cost profile"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeSpendingType','Discretionary',this)">Discretionary</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeSpendingType','Fixed',this)">Fixed</button></div><select id="financeSpendingType" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="Discretionary">Discretionary</option><option value="Fixed">Fixed Cost</option></select></div>
+                                    <div class="finance-segment-field wide"><span>50 / 30 / 20 allocation</span><div class="finance-segments finance-segments-three" role="group" aria-label="Allocation class"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeAllocationClass','needs',this)">Needs 50%</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeAllocationClass','wants',this)">Wants 30%</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeAllocationClass','savings',this)">Savings 20%</button></div><select id="financeAllocationClass" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="needs">Needs (50%)</option><option value="wants">Wants (30%)</option><option value="savings">Savings &amp; Assets (20%)</option></select></div>
+                                    <div class="finance-segment-field wide"><span>Transaction nature</span><div class="finance-segments" role="group" aria-label="Transaction nature"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeTransactionNature','expense',this)">Consumer expense</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeTransactionNature','asset',this)">Asset acquisition</button></div><select id="financeTransactionNature" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="expense">Consumer Expense</option><option value="asset">Asset Acquisition</option></select></div>
+                                    <div class="finance-segment-field wide"><span>Frequency</span><div class="finance-segments" role="group" aria-label="Transaction frequency"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeFrequency','one-time',this)">One-time</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeFrequency','recurring',this)">Recurring</button></div><select id="financeFrequency" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="one-time">One-Time</option><option value="recurring">Recurring</option></select></div>
+                                </div>
+                            </div></div>
+                        </details>
+                        <button class="wide finance-record-button" onclick="addFinanceTransaction()">Record transaction</button>
+                    </div>
+                </section>
+
+                <div class="finance-filter-bar">
+                    <button type="button" class="finance-filters-button" id="financeFiltersToggle" aria-expanded="false" aria-controls="financeFilterSheet"><span data-icon="filter"></span> Filters</button>
+                    <span class="finance-filter-summary" id="financeFilterSummary"></span>
+                </div>
+                <div class="finance-toolbar" id="financeFilterSheet" role="group" aria-label="Financial analytics filters">
+                    <div class="sf-sheet-head finance-sheet-head"><h2 class="sf-sheet-title">Filters</h2><button type="button" class="finance-sheet-done" data-action="close-filters">Done</button></div>
                     <div class="finance-control">
                         <label for="financeRangePreset">Reporting period</label>
                         <select id="financeRangePreset" onchange="updateFinanceFilters()">
-                            <option value="month">This Month</option>
-                            <option value="30d">Last 30 Days</option>
-                            <option value="qtd">Quarter-to-Date (QTD)</option>
-                            <option value="ytd">Year-to-Date (YTD)</option>
-                            <option value="custom">Custom Range</option>
+                            <option value="month">This month</option>
+                            <option value="30d">Last 30 days</option>
+                            <option value="qtd">Quarter to date</option>
+                            <option value="ytd">Year to date</option>
+                            <option value="custom">Custom range</option>
                         </select>
                     </div>
                     <div class="finance-control">
-                        <label for="financeNatureFilter">Expense / asset</label>
+                        <label for="financeNatureFilter">Type</label>
                         <select id="financeNatureFilter" onchange="updateFinanceFilters()">
-                            <option value="all">All Activity</option>
-                            <option value="expense">Consumer Expenses</option>
-                            <option value="asset">Asset Acquisitions</option>
+                            <option value="all">All activity</option>
+                            <option value="expense">Expenses</option>
+                            <option value="asset">Asset purchases</option>
                         </select>
                     </div>
                     <div class="finance-control">
                         <label for="financeFrequencyFilter">Frequency</label>
                         <select id="financeFrequencyFilter" onchange="updateFinanceFilters()">
-                            <option value="all">Recurring + One-Time</option>
-                            <option value="recurring">Recurring Only</option>
-                            <option value="one-time">One-Time Only</option>
+                            <option value="all">All frequencies</option>
+                            <option value="recurring">Recurring only</option>
+                            <option value="one-time">One-time only</option>
                         </select>
                     </div>
                     <div class="finance-control">
@@ -2481,21 +2528,21 @@
 
                 <div class="finance-panel-grid">
                     <section class="finance-panel">
-                        <div class="finance-panel-header"><div><span class="finance-section-kicker">Allocation analytics</span><h3>Top spending categories</h3></div><span id="finance-period-label" class="badge">This Month</span></div>
+                        <div class="finance-panel-header"><div><h3>Spending by category</h3></div><span id="finance-period-label" class="badge">This Month</span></div>
                         <div id="finance-category-bars" class="finance-bar-list"></div>
                     </section>
                     <section class="finance-panel">
-                        <div class="finance-panel-header"><div><span class="finance-section-kicker">Merchant intelligence</span><h3>Top 5 merchants</h3></div></div>
+                        <div class="finance-panel-header"><div><h3>Top merchants</h3></div></div>
                         <div id="finance-merchant-rank" class="rank-list"></div>
                     </section>
                     <section class="finance-panel">
-                        <div class="finance-panel-header"><div><span class="finance-section-kicker">50 / 30 / 20 health</span><h3>Allocation balance</h3></div></div>
+                        <div class="finance-panel-header"><div><h3>Needs, wants &amp; savings</h3><p class="finance-panel-sub">Against a 50 / 30 / 20 split</p></div></div>
                         <div id="finance-rule-health" class="rule-list"></div>
                     </section>
-                    <section class="finance-panel">
-                        <div class="finance-panel-header"><div><span class="finance-section-kicker">Budget intelligence</span><h3>Spend, pace &amp; forecast</h3></div></div>
+                    <section class="finance-panel finance-budgets-panel">
+                        <div class="finance-panel-header"><div><h3>Budgets</h3><p class="finance-panel-sub">Spend, pace and forecast by category</p></div></div>
                         <div id="finance-budget-progress" class="budget-list"></div>
-                        <div class="finance-form-grid" style="grid-template-columns: 1fr 1fr auto; margin-top: 14px;">
+                        <div class="finance-form-grid finance-budget-form">
                             <input id="budgetCategory" list="financeCategoryList" placeholder="Category">
                             <input id="budgetAmount" type="number" min="0" step="100" placeholder="Monthly allocation (₱)">
                             <button onclick="upsertFinanceBudget()">Set Budget</button>
@@ -2511,44 +2558,19 @@
                     </div>
 
                     <div id="finance-view-transactions" class="command-view active">
-                        <div class="finance-panel-grid" style="margin-top: 18px; grid-template-columns: .9fr 1.1fr;">
-                            <div>
-                                <div class="finance-panel-header"><div><span class="finance-section-kicker">Quick capture</span><h3>Record transaction</h3></div></div>
-                                <div class="finance-form-grid finance-capture-grid">
-                                    <input type="text" id="financePayee" class="wide" placeholder="Merchant or payee" required>
-                                    <label class="finance-amount-field wide" for="financeAmount"><span aria-hidden="true">₱</span><input type="number" id="financeAmount" placeholder="0.00" step="0.01" required><small>Transaction amount</small></label>
-                                    <input type="date" id="financeDate">
-                                    <div class="finance-segment-field wide"><span>Flow</span><div class="finance-segments" role="group" aria-label="Transaction flow"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeType','expense',this)">Expense</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeType','income',this)">Income</button></div><select id="financeType" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="expense">Expense (-)</option><option value="income">Income (+)</option></select></div>
-                                    <input type="text" id="financeCategory" list="financeCategoryList" placeholder="Category" required>
-                                    <datalist id="financeCategoryList"><option value="Food & Dining"><option value="PC Parts & Electronics"><option value="Vehicle & Transport"><option value="Living & Utilities"><option value="Server Hosting & Cloud"><option value="Subscriptions"><option value="Savings & Investments"><option value="Debt Paydown"><option value="Musical Instruments"><option value="Real Estate & Properties"><option value="Vehicle Mods"></datalist>
-                                    <details class="task-advanced-fields finance-advanced-fields">
-                                        <summary>More details</summary>
-                                        <div class="task-advanced-drawer"><div class="task-advanced-inner">
-                                            <div class="finance-form-grid">
-                                                <div class="finance-segment-field wide"><span>Cost profile</span><div class="finance-segments" role="group" aria-label="Cost profile"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeSpendingType','Discretionary',this)">Discretionary</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeSpendingType','Fixed',this)">Fixed</button></div><select id="financeSpendingType" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="Discretionary">Discretionary</option><option value="Fixed">Fixed Cost</option></select></div>
-                                                <div class="finance-segment-field wide"><span>50 / 30 / 20 allocation</span><div class="finance-segments finance-segments-three" role="group" aria-label="Allocation class"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeAllocationClass','needs',this)">Needs 50%</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeAllocationClass','wants',this)">Wants 30%</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeAllocationClass','savings',this)">Savings 20%</button></div><select id="financeAllocationClass" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="needs">Needs (50%)</option><option value="wants">Wants (30%)</option><option value="savings">Savings &amp; Assets (20%)</option></select></div>
-                                                <div class="finance-segment-field wide"><span>Transaction nature</span><div class="finance-segments" role="group" aria-label="Transaction nature"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeTransactionNature','expense',this)">Consumer expense</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeTransactionNature','asset',this)">Asset acquisition</button></div><select id="financeTransactionNature" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="expense">Consumer Expense</option><option value="asset">Asset Acquisition</option></select></div>
-                                                <div class="finance-segment-field wide"><span>Frequency</span><div class="finance-segments" role="group" aria-label="Transaction frequency"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeFrequency','one-time',this)">One-time</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeFrequency','recurring',this)">Recurring</button></div><select id="financeFrequency" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="one-time">One-Time</option><option value="recurring">Recurring</option></select></div>
-                                            </div>
-                                        </div></div>
-                                    </details>
-                                    <button class="wide" onclick="addFinanceTransaction()">Record Transaction</button>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="finance-panel-header finance-ledger-titlebar"><div><span class="finance-section-kicker">Filtered ledger</span><h3>Transactions</h3></div><div class="finance-ledger-title-actions"><span id="finance-tx-count" class="badge">0 Records</span><button id="financeLedgerToggle" type="button" class="finance-ledger-toggle" aria-controls="financeLedgerCollapsible" aria-expanded="true" onclick="toggleFinanceLedger()"><span id="financeLedgerToggleIcon" aria-hidden="true">⌃</span><span class="sr-only">Collapse transaction ledger</span></button></div></div>
-                                <div id="financeLedgerCollapsible" class="finance-ledger-collapsible">
-                                    <div class="finance-ledger-shell">
-                                        <div class="finance-ledger-head" aria-hidden="true"><span>Transaction</span><span>Classification</span><span>Amount</span><span></span></div>
-                                        <div id="finance-list" class="finance-ledger-list"></div>
-                                    </div>
+                        <div class="finance-ledger-block">
+                            <div class="finance-panel-header finance-ledger-titlebar"><div><h3>Transactions</h3></div><div class="finance-ledger-title-actions"><span id="finance-tx-count" class="badge">0 Records</span><button id="financeLedgerToggle" type="button" class="finance-ledger-toggle" aria-controls="financeLedgerCollapsible" aria-expanded="true" onclick="toggleFinanceLedger()"><span id="financeLedgerToggleIcon" aria-hidden="true">⌃</span><span class="sr-only">Collapse transaction ledger</span></button></div></div>
+                            <div id="financeLedgerCollapsible" class="finance-ledger-collapsible">
+                                <div class="finance-ledger-shell">
+                                    <div class="finance-ledger-head" aria-hidden="true"><span>Transaction</span><span>Classification</span><span>Amount</span><span></span></div>
+                                    <div id="finance-list" class="finance-ledger-list"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div id="finance-view-assets" class="command-view">
-                        <div class="finance-panel-header" style="margin-top:18px;"><div><span class="finance-section-kicker">Net-position tracking</span><h3>Capital &amp; asset ledger</h3></div></div>
+                        <div class="finance-panel-header" style="margin-top:18px;"><div><h3>Capital &amp; assets</h3></div></div>
                         <div class="finance-form-grid">
                             <input id="assetName" class="wide" placeholder="Asset / vehicle / gear name">
                             <input id="assetCategory" placeholder="Category">
@@ -2563,7 +2585,7 @@
                     </div>
 
                     <div id="finance-view-projects" class="command-view">
-                        <div class="finance-panel-header" style="margin-top:18px;"><div><span class="finance-section-kicker">Isolated capital plans</span><h3>One-off project budgets</h3></div></div>
+                        <div class="finance-panel-header" style="margin-top:18px;"><div><h3>Project budgets</h3></div></div>
                         <div class="finance-form-grid">
                             <input id="projectName" class="wide" placeholder="Project name">
                             <input id="projectMilestone" placeholder="Current milestone">
@@ -2578,59 +2600,57 @@
             </div>
         </div>
 
-        <!-- ACTIVE VIEW HEADER -->
-        <div id="viewHeader" class="view-header">
-            <div class="view-header-copy">
-                <h2 id="viewHeaderTitle" class="view-header-title">Kanban Board</h2>
-                <p id="viewHeaderSub" class="view-header-sub">Every task, grouped by status.</p>
-            </div>
-            <span id="viewHeaderCount" class="view-header-count" hidden></span>
-        </div>
-
-        <!-- SEARCH BAR -->
-        <div class="control-panel">
+        <!-- BOARD TOOLBAR: search, filters, view options -->
+        <div class="control-panel" aria-label="Find and filter tasks">
             <div class="search-input-wrapper">
-                <div class="search-logo-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22">
-                        <path d="M15 65 C 15 35, 45 30, 80 35" stroke="#ff2e2e" stroke-width="8" fill="none" stroke-linecap="round"/>
-                        <path d="M22 75 C 22 45, 48 40, 75 43" stroke="#ff2e2e" stroke-width="5" fill="none" stroke-linecap="round"/>
-                        <path d="M75 20 Q 80 35 95 40 Q 80 45 75 60 Q 70 45 55 40 Q 70 35 75 20 Z" fill="#ff2e2e"/>
-                        <path d="M30 65 Q 33 75 43 78 Q 33 81 30 91 Q 27 81 17 78 Q 27 75 30 65 Z" fill="#ffb82e"/>
-                    </svg>
-                </div>
-                <input type="text" id="searchInput" placeholder="Search SoloFlow tasks & events..." oninput="renderTasks()">
+                <span class="search-logo-icon" data-icon="search"></span>
+                <label class="sr-only" for="searchInput">Search tasks and events</label>
+                <input type="text" id="searchInput" placeholder="Search tasks and events…" oninput="renderTasks()" autocomplete="off">
             </div>
+            <label class="sr-only" for="categoryFilter">Category</label>
             <select id="categoryFilter" onchange="renderTasks()">
                 <option value="All">All Categories</option>
             </select>
+            <label class="sr-only" for="assigneeFilter">Assignee</label>
             <select id="assigneeFilter" onchange="renderTasks()">
                 <option value="All">All Assignees</option>
             </select>
-            <div id="densitySwitcher" class="density-switcher" role="group" aria-label="Task card density">
-                <button type="button" class="density-button active" data-density="comfortable" aria-pressed="true">Comfortable</button>
-                <button type="button" class="density-button" data-density="compact" aria-pressed="false">Compact</button>
+            <!-- On phones the density switch and "Generate summary" (added by
+                 modules/reports.js) fold into this menu; on desktop they sit inline. -->
+            <div class="toolbar-overflow">
+                <button type="button" class="toolbar-more-toggle" id="boardToolbarMoreToggle" aria-expanded="false" aria-controls="boardToolbarMenu" aria-label="View options"><span data-icon="more"></span></button>
+                <div class="toolbar-more-menu" id="boardToolbarMenu">
+                    <div id="densitySwitcher" class="density-switcher" role="group" aria-label="Task card density">
+                        <button type="button" class="density-button active" data-density="comfortable" aria-pressed="true">Comfortable</button>
+                        <button type="button" class="density-button" data-density="compact" aria-pressed="false">Compact</button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Add Task Form -->
         <div class="form-card" id="kanban-task-form">
             <div class="task-quick-row">
+                <span class="quick-capture-icon" data-icon="plus"></span>
                 <label class="sr-only" for="taskTitle">Task title</label>
-                <input type="text" id="taskTitle" class="flex-grow" placeholder="What needs to be done?" required>
-                <button type="button" class="btn-email btn-alt" onclick="parseEmailToTask()" title="Paste text copied from any email client">📧 Paste Email to Task</button>
+                <input type="text" id="taskTitle" class="flex-grow" placeholder="Add a task…" required autocomplete="off">
+                <button type="button" class="quick-capture-details-toggle" id="quickCaptureDetailsToggle" aria-expanded="false" aria-controls="quickCaptureExtras">Add details</button>
+                <button class="quick-add-submit" onclick="addTask()">Add</button>
+            </div>
+            <div class="task-quick-extras" id="quickCaptureExtras">
                 <label class="sr-only" for="taskPriority">Priority</label>
                 <select id="taskPriority">
-                    <option value="Low">Low Priority</option>
-                    <option value="Medium" selected>Medium Priority</option>
-                    <option value="High">High Priority</option>
+                    <option value="Low">Low priority</option>
+                    <option value="Medium" selected>Medium priority</option>
+                    <option value="High">High priority</option>
                 </select>
                 <label class="sr-only" for="taskDueDate">Due date</label>
                 <input type="date" id="taskDueDate" title="Due date">
-                <button class="quick-add-submit" onclick="addTask()">Add Task</button>
+                <button type="button" class="btn-email btn-alt" onclick="parseEmailToTask()" title="Paste text copied from any email client"><span data-icon="mail"></span> Paste from email</button>
             </div>
 
             <details class="task-advanced-fields">
-                <summary>Add Details / Options</summary>
+                <summary>More options</summary>
                 <div class="task-advanced-drawer"><div class="task-advanced-inner">
                     <div class="form-row">
                         <input type="text" id="taskCategory" class="flex-grow" placeholder="Category">
@@ -2649,7 +2669,7 @@
                     <div class="form-row">
                         <input type="url" id="taskPhotoUrl" class="flex-grow" placeholder="Photo URL (https://...) or upload a file">
                         <input type="file" id="taskPhotoFile" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
-                        <button type="button" class="btn-alt" onclick="document.getElementById('taskPhotoFile').click()">📁 Upload Photo</button>
+                        <button type="button" class="btn-alt" onclick="document.getElementById('taskPhotoFile').click()"><span data-icon="upload"></span> Upload photo</button>
                         <input type="url" id="taskLinkUrl" class="flex-grow" placeholder="Reference link">
                         <input type="url" id="taskWorkspaceUrl" class="flex-grow" placeholder="Workspace / document link">
                     </div>
@@ -2664,6 +2684,13 @@
             </details>
         </div>
 
+        <!-- Phones: one column at a time. Desktop keeps all three. -->
+        <div class="board-segments" id="boardSegments" role="group" aria-label="Board column">
+            <button type="button" class="board-segment" data-column="todo" aria-pressed="true" aria-controls="col-todo">To Do <span class="board-segment-count" data-count="todo"></span></button>
+            <button type="button" class="board-segment" data-column="inprogress" aria-pressed="false" aria-controls="col-inprogress">In Progress <span class="board-segment-count" data-count="inprogress"></span></button>
+            <button type="button" class="board-segment" data-column="done" aria-pressed="false" aria-controls="col-done">Done <span class="board-segment-count" data-count="done"></span></button>
+        </div>
+
         <!-- Kanban Board -->
         <div class="board">
             <div class="column" id="col-todo" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event, 'todo')">
@@ -2675,7 +2702,7 @@
                 <div id="inprogress-list"></div>
             </div>
             <div class="column" id="col-done" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event, 'done')">
-                <h3><span class="column-title-wrap"><span>Done <span class="col-total" id="total-done"></span></span><button id="btn-clear-done" class="btn-small btn-danger" onclick="clearCompletedTasks()" aria-label="Clear all completed tasks">🗑️ Clear Done</button></span></h3>
+                <h3><span class="column-title-wrap"><span>Done <span class="col-total" id="total-done"></span></span><button id="btn-clear-done" class="btn-small btn-danger" onclick="clearCompletedTasks()" aria-label="Clear all completed tasks"><span data-icon="trash"></span> Clear done</button></span></h3>
                 <div id="done-list"></div>
             </div>
         </div>
@@ -2792,11 +2819,11 @@
         // only then mirrors to Firestore. Losing cloud sync therefore never loses data on
         // this device, so the copy below distinguishes "not syncing" from "not saving".
         const CLOUD_COPY = {
-            connecting: { text: '☁️ Connecting to cloud sync…', detail: 'Your work is always saved on this device first.', retry: false },
-            synced:     { text: '☁️ Cloud sync on', detail: 'Changes are saved on this device and mirrored to the cloud.', retry: false },
-            local:      { text: '💾 Saved on this device', detail: 'Automatic cloud backup is off for this project. Sign in with Google to sync across your devices.', retry: true },
-            offline:    { text: '📶 Working offline', detail: 'Changes are saved on this device and will sync when you reconnect.', retry: true },
-            error:      { text: '⚠️ Cloud sync unavailable', detail: 'Changes are saved on this device. Nothing is lost — only cross-device sync is paused.', retry: true }
+            connecting: { text: 'Connecting to cloud sync…', detail: 'Your work is always saved on this device first.', retry: false },
+            synced:     { text: 'Cloud sync on', detail: 'Changes are saved on this device and mirrored to the cloud.', retry: false },
+            local:      { text: 'Saved on this device', detail: 'Automatic cloud backup is off for this project. Sign in with Google to sync across your devices.', retry: true },
+            offline:    { text: 'Working offline', detail: 'Changes are saved on this device and will sync when you reconnect.', retry: true },
+            error:      { text: 'Cloud sync unavailable', detail: 'Changes are saved on this device. Nothing is lost — only cross-device sync is paused.', retry: true }
         };
 
         // Firebase codes meaning "this project cannot sign this user in": a console
@@ -2840,13 +2867,13 @@
             if (cloudRetryInFlight) return;
             cloudRetryInFlight = true;
             const retryButton = document.getElementById('btn-cloud-retry');
-            if (retryButton) { retryButton.disabled = true; retryButton.innerText = '↻ Retrying…'; }
+            if (retryButton) { retryButton.disabled = true; retryButton.innerHTML = `${ICONS.refresh} <span class="btn-label">Retrying…</span>`; }
             window.applyCloudStatus('connecting');
             try {
                 await initAuth({ silent: false });
             } finally {
                 cloudRetryInFlight = false;
-                if (retryButton) { retryButton.disabled = false; retryButton.innerText = '↻ Retry connection'; }
+                if (retryButton) { retryButton.disabled = false; retryButton.innerHTML = `${ICONS.refresh} <span class="btn-label">Retry connection</span>`; }
             }
         };
 
@@ -2940,14 +2967,14 @@
 
                 if (user.isAnonymous) {
                     window.applyCloudStatus('synced', {
-                        text: '☁️ Cloud sync on (this device)',
+                        text: 'Cloud sync on (this device)',
                         detail: 'Saved here and mirrored to the cloud. Sign in with Google to sync across devices.'
                     });
                     btnLogin.style.display = 'flex';
                     btnLogout.style.display = 'none';
                 } else {
                     window.applyCloudStatus('synced', {
-                        text: `☁️ Synced to Google Account (${user.email})`,
+                        text: `Synced to Google Account (${user.email})`,
                         detail: 'Saved here and synced to every device signed into this account.'
                     });
                     btnLogin.style.display = 'none';
@@ -3838,12 +3865,22 @@
                 window.expandedCards.delete(taskId);
                 expandArea.classList.remove('expanded');
                 if (card) card.classList.remove('is-expanded');
-                if (btn) btn.innerHTML = `${ICONS.chevronDown} See More`;
+                if (btn) {
+                    btn.innerHTML = ICONS.chevronDown;
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.setAttribute('aria-label', 'Show details and actions');
+                    btn.title = 'Details and more actions';
+                }
             } else {
                 window.expandedCards.add(taskId);
                 expandArea.classList.add('expanded');
                 if (card) card.classList.add('is-expanded');
-                if (btn) btn.innerHTML = `${ICONS.chevronUp} See Less`;
+                if (btn) {
+                    btn.innerHTML = ICONS.chevronUp;
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.setAttribute('aria-label', 'Hide details and actions');
+                    btn.title = 'Hide details and actions';
+                }
             }
         };
 
@@ -4210,22 +4247,22 @@
                     <div class="performance-hero">
                         <section class="performance-panel">
                             <span class="finance-section-kicker">Focus time today</span>
-                            <div class="focus-quota-value" style="color:${metrics.quotaPercent >= 100 ? 'var(--success)' : 'var(--primary)'}">${formatFocusDuration(metrics.dailyFocusSeconds)}</div>
+                            <div class="focus-quota-value${metrics.quotaPercent >= 100 ? ' is-good' : ''}">${formatFocusDuration(metrics.dailyFocusSeconds)}</div>
                             <div class="focus-quota-copy">Goal ${goalHours.toFixed(goalHours % 1 ? 1 : 0)}h · ${metrics.quotaPercent.toFixed(0)}% done · ${metrics.streak}-day streak</div>
                             <div class="prod-progress-bar-bg"><div class="prod-progress-bar-fill" style="width:${metrics.quotaPercent}%"></div></div>
                             <div class="quota-settings" style="margin-top:14px"><label style="font-size:11px;font-weight:700">Daily goal <input id="productivityHubGoal" type="number" min=".25" max="24" step=".25" value="${goalHours}" style="width:90px;margin-left:6px" onchange="document.getElementById('productivityDailyGoalHours').value=this.value;updateProductivityGoal()"></label></div>
                         </section>
                         <section class="active-task-hero">
-                            <div><div class="active-task-badge">⚡ Next up</div><h3 style="margin:12px 0 6px;font:700 20px var(--font-display)">${activeTask ? productivityEscape(activeTask.title) : 'Nothing waiting — take a break.'}</h3><p style="margin:0;opacity:.75;font-size:12px">${activeTask ? productivityEscape(activeTask.description || `${activeTask.category || 'General'} · ${activeTask.priority || 'Normal'} priority`) : 'You have no tasks that need doing right now.'}</p></div>
-                            ${activeTask ? `<div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn-timer ${window.activeTaskId === activeTask.id ? 'active' : ''}" onclick="toggleTimer('${activeTask.id}');renderProductivityDashboard()">${window.activeTaskId === activeTask.id ? `${ICONS.stop} Stop Focus` : `${ICONS.play} Start Focus`}</button><button class="btn-alt" onclick="moveTask('${activeTask.id}','done');renderProductivityDashboard()">✓ Complete</button></div>` : ''}
+                            <div><div class="active-task-badge">${ICONS.bolt} Next up</div><h3 style="margin:12px 0 6px;font:700 20px var(--font-display)">${activeTask ? productivityEscape(activeTask.title) : 'Nothing waiting — take a break.'}</h3><p style="margin:0;opacity:.75;font-size:12px">${activeTask ? productivityEscape(activeTask.description || `${activeTask.category || 'General'} · ${activeTask.priority || 'Normal'} priority`) : 'You have no tasks that need doing right now.'}</p></div>
+                            ${activeTask ? `<div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn-timer ${window.activeTaskId === activeTask.id ? 'active' : ''}" onclick="toggleTimer('${activeTask.id}');renderProductivityDashboard()">${window.activeTaskId === activeTask.id ? `${ICONS.stop} Stop Focus` : `${ICONS.play} Start Focus`}</button><button class="btn-alt" onclick="moveTask('${activeTask.id}','done');renderProductivityDashboard()">${ICONS.check} Complete</button></div>` : ''}
                         </section>
                     </div>
 
                     <div class="performance-kpis">
-                        <article class="performance-kpi"><span class="finance-section-kicker">Finished this week</span><div class="performance-kpi-value" style="color:var(--success)">${metrics.recentCompleted.length}</div><div class="performance-kpi-meta">${metrics.throughputRate.toFixed(0)}% of what you took on this week</div></article>
-                        <article class="performance-kpi"><span class="finance-section-kicker">Tasks finished per day</span><div class="performance-kpi-value" style="color:var(--primary)">${metrics.velocity.toFixed(2)}/day</div><div class="performance-kpi-meta">Daily average over the last week</div></article>
-                        <article class="performance-kpi"><span class="finance-section-kicker">Avg. time to finish a task</span><div class="performance-kpi-value" style="color:var(--warning)">${metrics.averageCycleDays.toFixed(1)}d</div><div class="performance-kpi-meta">From the day you start it to the day it is done</div></article>
-                        <article class="performance-kpi"><span class="finance-section-kicker">Focused hours per task</span><div class="performance-kpi-value" style="color:#8b5cf6">${metrics.focusOutputHours.toFixed(1)}h</div><div class="performance-kpi-meta">Timer hours logged per finished task</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Finished this week</span><div class="performance-kpi-value">${metrics.recentCompleted.length}</div><div class="performance-kpi-meta">${metrics.throughputRate.toFixed(0)}% of what you took on this week</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Tasks finished per day</span><div class="performance-kpi-value">${metrics.velocity.toFixed(2)}<small>/day</small></div><div class="performance-kpi-meta">Daily average over the last week</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Avg. time to finish a task</span><div class="performance-kpi-value">${metrics.averageCycleDays.toFixed(1)}<small>days</small></div><div class="performance-kpi-meta">From the day you start it to the day it is done</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Focused hours per task</span><div class="performance-kpi-value">${metrics.focusOutputHours.toFixed(1)}<small>h</small></div><div class="performance-kpi-meta">Timer hours logged per finished task</div></article>
                     </div>
 
                     <div class="performance-grid">
@@ -4233,7 +4270,7 @@
                         <section class="performance-panel"><span class="finance-section-kicker">Needs attention</span><h3>${diagnostics.length} task${diagnostics.length === 1 ? '' : 's'} stuck or overdue</h3><div class="diagnostic-list">${diagnostics.length ? diagnostics.slice(0,8).map(item => `<div class="diagnostic-item"><span class="diagnostic-dot ${item.type === 'overdue' ? 'overdue' : ''}"></span><div><div class="diagnostic-title">${productivityEscape(item.task.title)}</div><div class="diagnostic-meta">${productivityEscape(item.label)}</div></div><button class="btn-small" onclick="setView('all')">Open</button></div>`).join('') : '<div class="empty-state">Nothing blocked or overdue. You are all caught up.</div>'}</div></section>
                     </div>
 
-                    <div class="deep-dive-portal deep-dive-cta"><div><strong style="display:block;font-size:16px">Focus settings</strong><div style="font-size:12px;opacity:.72;margin-top:4px">Change your daily focus goal and see your all-time totals.</div></div><button class="btn-alt" onclick="navigateToCustomizeAnalytics()">📊 Open focus settings ${ICONS.arrowRight}</button></div>
+                    <div class="deep-dive-portal deep-dive-cta"><div><strong style="display:block;font-size:16px">Focus settings</strong><div style="font-size:12px;opacity:.72;margin-top:4px">Change your daily focus goal and see your all-time totals.</div></div><button class="btn-alt" onclick="navigateToCustomizeAnalytics()">${ICONS.chart} Open focus settings ${ICONS.arrowRight}</button></div>
                 </div>`;
         };
 
@@ -4507,53 +4544,49 @@
                     const blockingTask = window.tasks.find(t => t.id === task.blockedBy);
                     if (blockingTask && blockingTask.status !== 'done') {
                         isBlocked = true;
-                        blockedBadgeHtml = `<div style="background: rgba(231, 76, 60, 0.1); color: var(--danger); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px dashed var(--danger);">🔒 Blocked by: ${taskEscape(blockingTask.title)}</div>`;
+                        blockedBadgeHtml = `<div class="task-blocked-note">${ICONS.lock}<span>Blocked by ${taskEscape(blockingTask.title)}</span></div>`;
                     }
                 }
 
                 card.draggable = !isBlocked;
-                if (isBlocked) card.style.opacity = '0.65';
+                if (isBlocked) card.classList.add('is-blocked');
                 card.ondragstart = (e) => window.handleDragStart(e, task.id);
-                
-                let actionBtns = '';
+
+                // One main action per card; everything else lives behind the chevron.
+                let mainAction = '';
+                let backAction = '';
                 if (isBlocked) {
-                    actionBtns = `<span style="font-size: 12px; color: var(--danger); font-weight: bold; padding: 5px 0;">🔒 Locked</span>`;
+                    mainAction = `<span class="task-locked">${ICONS.lock} Blocked</span>`;
+                } else if (task.status === 'todo') {
+                    mainAction = `<button type="button" class="task-main-action" onclick="moveTask('${task.id}', 'inprogress')">Start ${ICONS.arrowRight}</button>`;
+                } else if (task.status === 'inprogress') {
+                    mainAction = `<button type="button" class="task-main-action" onclick="moveTask('${task.id}', 'done')">${ICONS.check} Complete</button>`;
+                    backAction = `<button type="button" class="task-card-action" onclick="moveTask('${task.id}', 'todo')">${ICONS.arrowLeft} Back to To Do</button>`;
                 } else {
-                    if (task.status === 'todo') {
-                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">Start ${ICONS.arrowRight}</button>`;
-                    } else if (task.status === 'inprogress') {
-                        actionBtns = `
-                            <button class="btn-small" onclick="moveTask('${task.id}', 'todo')">${ICONS.arrowLeft} Back</button>
-                            <button class="btn-small" onclick="moveTask('${task.id}', 'done')">Complete ${ICONS.arrowRight}</button>
-                        `;
-                    } else {
-                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">${ICONS.arrowLeft} Reopen</button>`;
-                    }
+                    mainAction = `<button type="button" class="task-main-action" onclick="moveTask('${task.id}', 'inprogress')">${ICONS.refresh} Reopen</button>`;
                 }
 
                 const safePhotoUrl = taskSafeUrl(task.photoUrl, true);
                 const photoHtml = safePhotoUrl ? `<img src="${taskEscape(safePhotoUrl)}" class="task-photo" alt="Attached photo" onerror="this.style.display='none'">` : '';
                 const photoThumbHtml = safePhotoUrl ? `<img src="${taskEscape(safePhotoUrl)}" class="task-photo-thumb" alt="Task attachment thumbnail" onerror="this.style.display='none'">` : '';
-                
+
                 let linksContainerHtml = '';
-                if (task.linkUrl || task.workspaceUrl) {
+                const safeLink = taskSafeUrl(task.linkUrl);
+                const safeWorkspace = taskSafeUrl(task.workspaceUrl);
+                if (safeLink || safeWorkspace) {
                     linksContainerHtml = `<div class="task-links-container">`;
-                    if (taskSafeUrl(task.linkUrl)) {
-                        linksContainerHtml += `<a href="${taskEscape(taskSafeUrl(task.linkUrl))}" target="_blank" rel="noopener noreferrer" class="task-link">🔗 Reference Link</a>`;
-                    }
-                    if (taskSafeUrl(task.workspaceUrl)) {
-                        linksContainerHtml += `<a href="${taskEscape(taskSafeUrl(task.workspaceUrl))}" target="_blank" rel="noopener noreferrer" class="task-link doc-link">📄 Workspace / Doc</a>`;
-                    }
+                    if (safeLink) linksContainerHtml += `<a href="${taskEscape(safeLink)}" target="_blank" rel="noopener noreferrer" class="task-link">${ICONS.link} Reference link</a>`;
+                    if (safeWorkspace) linksContainerHtml += `<a href="${taskEscape(safeWorkspace)}" target="_blank" rel="noopener noreferrer" class="task-link doc-link">${ICONS.file} Workspace doc</a>`;
                     linksContainerHtml += `</div>`;
                 }
 
                 const financeTypeLabel = task.financeType || 'Profit';
                 const financeClass = financeTypeLabel === 'Budget' ? 'metric-budget' : 'metric-profit';
                 const budgetHtml = task.budget ? `<div class="task-metric ${financeClass}">${financeTypeLabel}: ₱${parseFloat(task.budget).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>` : '';
-                
+
                 const descText = task.description || '';
-                const descHtml = `<div class="task-desc editable" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${taskSanitizeRichText(descText)}</div>`;
-                
+                const descHtml = `<div class="task-desc editable${descText ? '' : ' is-empty'}" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${taskSanitizeRichText(descText)}</div>`;
+
                 let subtasksHtml = '<div class="subtasks-list">';
                 if(task.subtasks && task.subtasks.length > 0) {
                     task.subtasks.forEach((st, idx) => {
@@ -4561,7 +4594,7 @@
                         const strikeClass = st.completed ? 'completed' : '';
                         subtasksHtml += `
                             <div class="subtask-item ${strikeClass}">
-                                <input type="checkbox" ${checked} onchange="toggleSubtask('${task.id}', ${idx})">
+                                <input type="checkbox" ${checked} onchange="toggleSubtask('${task.id}', ${idx})" aria-label="Subtask done">
                                 <div class="subtask-text-container editable" contenteditable="true" spellcheck="false" 
                                     onkeydown="preventEnter(event)" 
                                     onblur="updateTaskField('${task.id}', 'subtasks', this, ${idx})">${taskSanitizeRichText(st.text)}</div>
@@ -4569,42 +4602,45 @@
                         `;
                     });
                 }
-                subtasksHtml += `<button class="btn-small" style="margin-top: 4px; align-self: flex-start; color: var(--primary); border-color: rgba(var(--primary-rgb, 217, 119, 6), 0.4); font-weight: bold;" onclick="addSubtask('${task.id}')">+ Add Subtask</button>`;
+                subtasksHtml += `<button type="button" class="task-add-subtask" onclick="addSubtask('${task.id}')">${ICONS.plus} Add subtask</button>`;
                 subtasksHtml += '</div>';
 
-                let dueBadgeHtml = '';
+                // Due date as one quiet line. Colour only marks today and overdue.
+                let dueLineHtml = '';
                 if (task.dueDate && task.status !== 'done') {
-                    const due = new Date(task.dueDate);
+                    const due = new Date(`${task.dueDate}T00:00:00`);
                     const today = new Date();
-                    due.setHours(0,0,0,0); today.setHours(0,0,0,0); 
-                    
-                    const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-                    
-                    if (diffDays < 0) {
-                        dueBadgeHtml = `<p style="color: var(--danger); font-weight: bold; width: 100%;">⚠️ Overdue by ${Math.abs(diffDays)} days</p>`;
-                    } else if (diffDays === 0) {
-                        dueBadgeHtml = `<p style="color: var(--warning); font-weight: bold; width: 100%;">⏰ Due Today</p>`;
-                    } else {
-                        dueBadgeHtml = `<p style="opacity: 0.8; width: 100%;">⏳ ${diffDays} days left</p>`;
+                    today.setHours(0,0,0,0);
+                    const diffDays = Math.round((due - today) / (1000 * 60 * 60 * 24));
+                    const timeLabel = task.dueTime && window.formatTime ? `, ${window.formatTime(task.dueTime)}` : '';
+                    const plural = (n) => `${n} day${n === 1 ? '' : 's'}`;
+                    let dueText = '';
+                    let dueState = '';
+                    if (Number.isNaN(diffDays)) dueText = '';
+                    else if (diffDays < 0) { dueText = `Overdue by ${plural(Math.abs(diffDays))}`; dueState = 'is-overdue'; }
+                    else if (diffDays === 0) { dueText = `Due today${timeLabel}`; dueState = 'is-today'; }
+                    else if (diffDays === 1) dueText = `Due tomorrow${timeLabel}`;
+                    else {
+                        const options = { weekday: 'short', month: 'short', day: 'numeric' };
+                        if (due.getFullYear() !== today.getFullYear()) options.year = 'numeric';
+                        dueText = `Due ${due.toLocaleDateString('en-US', options)}${timeLabel}`;
                     }
+                    if (dueText) dueLineHtml = `<span class="task-due ${dueState}">${dueState === 'is-overdue' ? ICONS.alert : ICONS.clock}<span>${dueText}</span></span>`;
                 }
 
                 let metaHtml = `<div class="task-meta">`;
-                if (task.assignee) metaHtml += `<p><strong>Assigned to:</strong> ${taskEscape(task.assignee)}</p>`;
-                
+                if (task.assignee) metaHtml += `<p><strong>Assigned to</strong> <span>${taskEscape(task.assignee)}</span></p>`;
                 metaHtml += `
                     <p>
-                        <strong>Assigned:</strong> 
-                        <input type="date" class="meta-input-date" value="${task.dateAssigned || ''}" onchange="updateTaskDate('${task.id}', 'dateAssigned', this.value)" title="Change assigned date">
+                        <strong>Assigned</strong>
+                        <input type="date" class="meta-input-date" value="${task.dateAssigned || ''}" onchange="updateTaskDate('${task.id}', 'dateAssigned', this.value)" title="Change assigned date" aria-label="Assigned date">
                     </p>
                     <p>
-                        <strong>Due:</strong> 
-                        <input type="date" class="meta-input-date" value="${task.dueDate || ''}" onchange="updateTaskDate('${task.id}', 'dueDate', this.value)" title="Change due date">
-                        <input type="time" class="meta-input-time" value="${task.dueTime || ''}" onchange="updateTaskDate('${task.id}', 'dueTime', this.value)" title="Change due time">
+                        <strong>Due</strong>
+                        <input type="date" class="meta-input-date" value="${task.dueDate || ''}" onchange="updateTaskDate('${task.id}', 'dueDate', this.value)" title="Change due date" aria-label="Due date">
+                        <input type="time" class="meta-input-time" value="${task.dueTime || ''}" onchange="updateTaskDate('${task.id}', 'dueTime', this.value)" title="Change due time" aria-label="Due time">
                     </p>
                 `;
-                
-                if (dueBadgeHtml) metaHtml += dueBadgeHtml;
                 metaHtml += `</div>`;
 
                 const totalSeconds = task.timeSpent || 0;
@@ -4612,7 +4648,7 @@
                 const mins = Math.floor((totalSeconds % 3600) / 60);
                 const secs = totalSeconds % 60;
                 const timeString = `${hrs > 0 ? hrs + 'h ' : ''}${mins}m ${secs}s`;
-                
+
                 const isTimerActive = (window.activeTaskId === task.id);
                 const timerBtnClass = isTimerActive ? 'btn-timer active' : 'btn-timer';
                 const timerBtnText = isTimerActive ? `${ICONS.stop} Stop` : `${ICONS.play} Pomodoro`;
@@ -4622,36 +4658,34 @@
                     timerHtml = `
                         <div class="timer-container">
                             <button class="${timerBtnClass}" onclick="toggleTimer('${task.id}')" id="btn-timer-${task.id}">${timerBtnText}</button>
-                            <span class="timer-display" id="display-timer-${task.id}">⏱ ${timeString}</span>
+                            <span class="timer-time">${ICONS.timer}<span class="timer-display" id="display-timer-${task.id}">${timeString}</span></span>
                         </div>
                     `;
                 }
 
                 const isExpanded = window.expandedCards.has(task.id);
-                const expandBtnText = isExpanded ? `${ICONS.chevronUp} See Less` : `${ICONS.chevronDown} See More`;
                 const expandClass = isExpanded ? "task-expand-area expanded" : "task-expand-area";
                 if (isExpanded) card.classList.add('is-expanded');
                 if (task.photoUrl) card.classList.add('has-photo');
 
+                // .badges keeps priority first and category second: tasks.js edits them by position.
                 card.innerHTML = `
                     ${photoThumbHtml}
                     <div class="task-title editable" contenteditable="true" spellcheck="false" 
                         onkeydown="preventEnter(event)" 
                         onblur="updateTaskField('${task.id}', 'title', this)">${taskEscape(task.title)}</div>
                     ${budgetHtml}
-                    ${dueBadgeHtml && !isExpanded ? `<div style="font-size: 11px; margin-bottom: 8px;">${dueBadgeHtml}</div>` : ''}
                     <div class="badges">
                         <span class="badge ${taskEscape(task.priority.toLowerCase())}">${taskEscape(task.priority)}</span>
-                        <span class="badge">${taskEscape(task.category)}</span>
-                        ${task.financeSynced ? `<span class="badge" style="border-color: var(--success); color: var(--success);">✓ Finance Logged</span>` : ''}
+                        <span class="badge category-chip">${taskEscape(task.category)}</span>
+                        ${task.financeSynced ? `<span class="badge finance-logged-chip">${ICONS.check} Finance logged</span>` : ''}
+                        ${dueLineHtml}
                     </div>
                     ${descHtml}
 
-                    <div class="actions" style="margin-top: 8px;">
-                        <div style="display: flex; gap: 5px;">
-                            ${actionBtns}
-                        </div>
-                        <button class="btn-small btn-expand" id="btn-expand-${task.id}" onclick="toggleCardExpand('${task.id}')">${expandBtnText}</button>
+                    <div class="actions task-card-footer">
+                        <div class="task-main-action-slot">${mainAction}</div>
+                        <button type="button" class="btn-expand task-expand-toggle" id="btn-expand-${task.id}" onclick="toggleCardExpand('${task.id}')" aria-controls="expand-${task.id}" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Hide details and actions' : 'Show details and actions'}" title="${isExpanded ? 'Hide details and actions' : 'Details and more actions'}">${isExpanded ? ICONS.chevronUp : ICONS.chevronDown}</button>
                     </div>
 
                     <div class="${expandClass}" id="expand-${task.id}">
@@ -4662,11 +4696,12 @@
                         ${metaHtml}
                         ${timerHtml}
                         <div class="actions task-card-action-strip">
-                           <button class="btn-small task-card-action" title="Upload or link a photo" onclick="editTaskPhoto('${task.id}')"><span aria-hidden="true">▧</span> Photo</button>
-                           <button class="btn-small task-card-action" title="Edit reference or workspace links" onclick="editTaskLinks('${task.id}')">${ICONS.arrowUpRight} Links</button>
-                           <button class="btn-small task-card-action task-action-email" title="Send a progress update to the assignee or target email" onclick="emailTaskUpdate('${task.id}')"><span aria-hidden="true">✉</span> Email Update</button>
-                           <button class="btn-small task-card-action" title="${task.dueDate ? 'Export an iCalendar file' : 'Add a due date to export an iCalendar file'}" onclick="syncTaskToCalendarFile('${task.id}')"><span aria-hidden="true">⇩</span> .ics</button>
-                           <button class="btn-small btn-danger task-card-action task-action-delete" onclick="deleteTask('${task.id}')"><span aria-hidden="true">×</span> Delete</button>
+                           ${backAction}
+                           <button type="button" class="task-card-action" title="Upload or link a photo" onclick="editTaskPhoto('${task.id}')">${ICONS.image} Photo</button>
+                           <button type="button" class="task-card-action" title="Edit reference or workspace links" onclick="editTaskLinks('${task.id}')">${ICONS.link} Links</button>
+                           <button type="button" class="task-card-action task-action-email" title="Send a progress update to the assignee or target email" onclick="emailTaskUpdate('${task.id}')">${ICONS.mail} Email update</button>
+                           <button type="button" class="task-card-action" title="${task.dueDate ? 'Export an iCalendar file' : 'Add a due date to export an iCalendar file'}" onclick="syncTaskToCalendarFile('${task.id}')">${ICONS.calendar} .ics</button>
+                           <button type="button" class="task-card-action task-action-delete" onclick="deleteTask('${task.id}')">${ICONS.trash} Delete</button>
                         </div>
                     </div>
                 `;
@@ -4739,7 +4774,7 @@
             const newBtn = document.getElementById(`btn-timer-${taskId}`);
             if (newBtn) {
                 newBtn.className = 'btn-timer active';
-                newBtn.innerText = '⏹ Stop';
+                newBtn.innerHTML = `${ICONS.stop} Stop`;
             }
 
             window.timerInterval = setInterval(() => {
@@ -4752,7 +4787,7 @@
                     const hrs = Math.floor(task.timeSpent / 3600);
                     const mins = Math.floor((task.timeSpent % 3600) / 60);
                     const secs = task.timeSpent % 60;
-                    display.innerText = `⏱ ${hrs > 0 ? hrs + 'h ' : ''}${mins}m${secs}s`;
+                    display.innerText = `${hrs > 0 ? hrs + 'h ' : ''}${mins}m ${secs}s`;
                 }
                 
                 if (task.timeSpent % 10 === 0) {
@@ -5360,7 +5395,7 @@
                 const overflow = hidden.length
                     ? `<span class="calendar-more" title="${taskEscape(hidden.map(item => item.title).join('\n'))}">+${hidden.length}</span>`
                     : '';
-                const blockBadge = blocks ? `<span class="calendar-blocks" title="${blocks} scheduled block${blocks === 1 ? '' : 's'}">${blocks}▦</span>` : '';
+                const blockBadge = blocks ? `<span class="calendar-blocks" title="${blocks} scheduled block${blocks === 1 ? '' : 's'}" aria-label="${blocks} scheduled block${blocks === 1 ? '' : 's'}">${ICONS.grid}${blocks}</span>` : '';
 
                 html += `<button type="button" class="calendar-day${outside ? ' is-outside' : ''}${iso === todayISO ? ' is-today' : ''}"
                     onclick="goToScheduleDate('${iso}')"
@@ -5699,7 +5734,7 @@
             document.getElementById('finance-period-label').innerText = analytics.range.label;
             const balance = document.getElementById('finance-balance');
             balance.innerText = `${analytics.net < 0 ? '-' : ''}${financeMoney(analytics.net)}`;
-            balance.style.color = analytics.net >= 0 ? 'var(--success)' : 'var(--danger)';
+            balance.style.color = analytics.net > 0 ? 'var(--success-text)' : analytics.net < 0 ? 'var(--danger-text)' : '';
             document.getElementById('finance-income').innerText = financeMoney(analytics.inflow);
             document.getElementById('finance-expenses').innerText = financeMoney(analytics.outflow);
             document.getElementById('finance-net-meta').innerText = `${financeMoney(analytics.inflow)} in · ${financeMoney(analytics.outflow)} out`;
@@ -5707,13 +5742,13 @@
             burn.innerText = `${financeMoney(analytics.dailyBurn)} / day`;
             const target = preferences.dailyTargetCents || 0;
             const burnDelta = target ? analytics.dailyBurn - target : 0;
-            burn.style.color = target && burnDelta > 0 ? 'var(--danger)' : 'var(--warning)';
+            burn.style.color = target ? (burnDelta > 0 ? 'var(--danger-text)' : 'var(--success-text)') : '';
             document.getElementById('finance-burn-meta').innerText = target ? `${burnDelta > 0 ? financeMoney(burnDelta) + ' above' : financeMoney(Math.abs(burnDelta)) + ' below'} ${financeMoney(target)} target` : `${analytics.daysElapsed} elapsed day${analytics.daysElapsed === 1 ? '' : 's'} · set a daily target`;
             document.getElementById('finance-runway').innerText = `${analytics.runway.toFixed(1)} mo`;
-            document.getElementById('finance-runway').style.color = analytics.runway >= 6 ? 'var(--success)' : analytics.runway >= 3 ? 'var(--warning)' : 'var(--danger)';
+            document.getElementById('finance-runway').style.color = !preferences.liquidCashCents ? '' : analytics.runway >= 6 ? 'var(--success-text)' : analytics.runway >= 3 ? 'var(--warning-text)' : 'var(--danger-text)';
             document.getElementById('finance-runway-meta').innerText = `${financeMoney(preferences.liquidCashCents)} liquid · ${financeMoney(analytics.monthlyOutflow)}/mo avg`;
             document.getElementById('finance-savings-rate').innerText = `${analytics.savingsRate.toFixed(1)}%`;
-            document.getElementById('finance-savings-rate').style.color = analytics.savingsRate >= 20 ? 'var(--success)' : analytics.savingsRate >= 0 ? 'var(--warning)' : 'var(--danger)';
+            document.getElementById('finance-savings-rate').style.color = !analytics.inflow ? '' : analytics.savingsRate >= 20 ? 'var(--success-text)' : analytics.savingsRate >= 0 ? 'var(--warning-text)' : 'var(--danger-text)';
             document.getElementById('finance-savings-meta').innerText = analytics.inflow ? `${financeMoney(analytics.net)} retained in period` : 'Add inflow to calculate rate';
 
             const categoryEntries = Object.entries(analytics.categories).sort((a,b) => b[1] - a[1]);
@@ -5737,7 +5772,9 @@
                 const classification = classifyFinanceTransaction(tx);
                 const income = tx.amountCents > 0;
                 return `<div class="finance-ledger-row"><div class="finance-ledger-payee"><strong>${financeEscape(tx.payee)}</strong><time>${new Date(tx.date).toLocaleDateString()}</time></div><div class="finance-ledger-tags"><span class="badge">${financeEscape(tx.category)}</span><span>${financeEscape(classification.allocationClass)}</span><span>${financeEscape(classification.nature)}</span><span>${financeEscape(classification.frequency)}</span></div><strong class="finance-ledger-amount ${income ? 'income' : 'expense'}">${income ? '+' : '-'}${financeMoney(tx.amountCents)}</strong><button class="btn-small btn-danger finance-row-action" onclick="deleteFinanceTransaction('${tx.id}')" aria-label="Delete ${financeEscape(tx.payee)} transaction">✕</button></div>`;
-            }).join('') : window.emptyStateHTML('No matching transactions', 'Change the reporting filters or capture the first record for this view.', 'Log your first transaction', "setFinanceCommandView('transactions');document.getElementById('financePayee').focus()");
+            }).join('') : (window.financeTransactions || []).length
+                ? window.emptyStateHTML('No matching transactions', 'Change the reporting filters to see more.', '', '')
+                : window.emptyStateHTML('No transactions yet', 'Record your first one above. Cash flow, spending by category, top merchants and budgets will appear here.', 'Record a transaction', "document.getElementById('financePayee').focus()");
 
             renderFinanceBudgets(analytics);
             renderFinanceAssets();

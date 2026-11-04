@@ -331,23 +331,23 @@ body[data-density="compact"] .task-card .task-expand-area { grid-column: 1 / -1;
   gap: 6px;
   min-height: 32px;
   padding: 7px 10px;
-  color: var(--text-muted) !important;
-  background: color-mix(in srgb, var(--surface) 76%, transparent) !important;
-  border-color: var(--surface-border) !important;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+  border-color: var(--surface-border);
   border-radius: var(--radius-sm);
   font: 600 11px/1 var(--font-body);
   box-shadow: none;
 }
 .task-card-action > span { color: currentColor; font: 700 13px/1 var(--font-metric); }
 .task-card-action:hover {
-  color: var(--card-text) !important;
-  background: color-mix(in srgb, var(--primary) 9%, var(--surface)) !important;
-  border-color: color-mix(in srgb, var(--primary) 34%, var(--surface-border)) !important;
+  color: var(--card-text);
+  background: color-mix(in srgb, var(--primary) 9%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 34%, var(--surface-border));
 }
-.task-card-action.task-action-email { color: var(--purple) !important; }
-.task-card-action.task-action-sync { color: var(--primary) !important; }
-.task-card-action.task-action-sync.is-synced { color: var(--success) !important; border-color: rgba(var(--success-rgb), .32) !important; }
-.task-card-action.task-action-delete { margin-left: auto; color: var(--danger) !important; }
+.task-card-action.task-action-email { color: var(--purple); }
+.task-card-action.task-action-sync { color: var(--primary); }
+.task-card-action.task-action-sync.is-synced { color: var(--success); border-color: rgba(var(--success-rgb), .32); }
+.task-card-action.task-action-delete { margin-left: auto; color: var(--danger); }
 
 .app-shell .editable:focus,
 .app-shell input:focus,
@@ -1568,8 +1568,9 @@ details.customize-menu[open] {
    header on mobile so they do not compete for tab width.
    ========================================================================== */
 @media (max-width: 900px) {
+  /* Bottom space clears the tab bar and the docked Pomodoro pill (v10). */
   body.app-shell,
-  body.app-shell.sidebar-collapsed { padding: 14px 14px 104px !important; }
+  body.app-shell.sidebar-collapsed { padding: 14px 14px var(--content-bottom-space) !important; }
 
   .app-sidebar,
   body.sidebar-collapsed .app-sidebar {
@@ -1640,20 +1641,21 @@ details.customize-menu[open] {
   .app-shell .app-sidebar .view-tab::before,
   .app-shell .app-sidebar .view-tab.active::before { display: none; }
 
-  /* Active destination reads as selected rather than as a faint tint.
-     !important answers the deliberate !important at the desktop rule above
-     (search "contrast hotfix"), whose quiet-rail intent is desktop-only. */
+  /* The active destination is marked by a tinted pill behind its icon (v10);
+     the tab itself carries no fill or border. !important answers the
+     deliberate !important at the desktop rule above (search "contrast
+     hotfix"). */
   .app-sidebar .view-tab.active,
   body.sidebar-collapsed .app-sidebar .view-tab.active,
   .app-shell .app-sidebar .view-tab.active {
-    color: var(--primary-contrast-text) !important;
-    background: var(--primary) !important;
-    border-color: var(--primary) !important;
-    -webkit-text-fill-color: var(--primary-contrast-text);
-    box-shadow: 0 7px 18px -9px var(--primary);
+    color: var(--card-text) !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    -webkit-text-fill-color: var(--card-text);
+    box-shadow: none;
     transform: none;
   }
-  .app-shell .app-sidebar .view-tab.active .nav-icon { color: var(--primary-contrast-text); }
+  .app-shell .app-sidebar .view-tab.active .nav-icon { color: var(--primary-text); }
   .app-sidebar .view-tab.active .nav-label-short { font-weight: 700; }
 
   .app-sidebar .view-tab:hover,
@@ -1915,14 +1917,18 @@ html[data-theme-mode="light"] { color-scheme: light; }
     overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
 
-  /* The contrast hotfix boxes every .view-tab with a surface fill and strong
-     border, which undoes the quiet sidebar list above (rail + tint marks the
-     active row). Inactive rows go back to bare text; hover is a wash of the
-     user's own text colour so it reads on light and dark canvases alike. */
-  .app-shell .app-sidebar .view-tab:not(.active) {
-    background: transparent !important;
-    border-color: transparent !important;
-  }
+}
+
+/* The contrast hotfix boxes every .view-tab with a surface fill and strong
+   border, which undoes the quiet sidebar list above (rail + tint marks the
+   active row) and boxed every phone tab. Inactive rows go back to bare text
+   at every width; hover is a wash of the user's own text colour so it reads
+   on light and dark canvases alike. */
+.app-shell .app-sidebar .view-tab:not(.active) {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+@media (hover: hover) {
   .app-shell .app-sidebar .view-tab:not(.active):hover {
     background: color-mix(in srgb, var(--card-text) 7%, transparent) !important;
   }
@@ -2276,3 +2282,985 @@ body.sidebar-collapsed .sidebar-toggle svg { rotate: 180deg; }
   margin-left: calc(2px + (100% - 12px) * var(--lane, 0) / var(--lanes, 1));
   padding-inline: 0;
 }
+
+/* ============================================================================
+   v10 — Desktop and phone UI pass
+   ----------------------------------------------------------------------------
+   Layout and presentation only. IDs, handlers, window.* functions and storage
+   keys are untouched; colours come from the theme tokens so every preset,
+   custom palette and font pairing keeps working. Appended last so it wins on
+   source order; !important appears only where it answers an earlier one.
+   ========================================================================== */
+
+:root {
+  /* Phone shell geometry. The tab bar, the docked Pomodoro pill and the main
+     content's bottom space are all derived from these, so they cannot drift. */
+  --bottom-nav-h: 66px;
+  --fab-pill-h: 44px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --content-bottom-space: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--fab-pill-h) + 28px);
+  --tap-min: 44px;
+  /* Semantic hues are fixed (--danger #C0392B, --warning #C08A1E, ...), which
+     is too dim as small text on dark themes and too pale on light ones.
+     Mixing toward the theme's own text colour keeps the hue and clears 4.5:1
+     on both. */
+  --danger-text: color-mix(in srgb, var(--danger) 62%, var(--card-text));
+  --warning-text: color-mix(in srgb, var(--warning) 52%, var(--card-text));
+  --success-text: color-mix(in srgb, var(--success) 62%, var(--card-text));
+  --primary-text: color-mix(in srgb, var(--primary) 75%, var(--card-text));
+}
+body.pomodoro-fab-hidden { --content-bottom-space: calc(var(--bottom-nav-h) + var(--safe-bottom) + 20px); }
+
+/* --- Phase 1 · Finance budget row ------------------------------------------
+   It used an inline 1fr 1fr auto grid that ignored every breakpoint, so on a
+   phone the amount field and Set Budget ran ~220px off screen. */
+.finance-form-grid.finance-budget-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 14px;
+}
+.finance-budget-form > input { flex: 1 1 150px; min-width: 0; }
+.finance-budget-form > button { flex: 0 0 auto; }
+@media (max-width: 560px) {
+  .finance-budget-form > * { flex-basis: 100%; }
+}
+
+/* --- Phase 1 · Pomodoro button on phones ------------------------------------
+   An 68px disc sat over Quick Capture, calendar cells and card buttons. On the
+   phone shell it becomes a compact pill docked just above the tab bar. */
+@media (max-width: 900px) {
+  .pomodoro-fab,
+  .app-shell .pomodoro-fab {
+    right: 12px;
+    bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 10px);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    height: var(--fab-pill-h);
+    min-height: var(--fab-pill-h);
+    padding: 0 14px 0 11px;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px -12px var(--primary), 0 2px 8px -4px rgba(0, 0, 0, .45);
+  }
+  .pomodoro-fab:hover { transform: translateY(-1px); }
+  .pomodoro-fab-ring { position: static; flex: none; width: 20px; height: 20px; }
+  .pomodoro-fab-ring circle { stroke-width: 12; }
+  .pomodoro-fab-face { flex-direction: row; align-items: baseline; gap: 6px; }
+  .pomodoro-fab-time { font-size: 15px; }
+  .pomodoro-fab-phase { font-size: 11px; letter-spacing: .02em; text-transform: none; }
+  .toast-deck,
+  .offline-banner { bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--fab-pill-h) + 20px); }
+  body.pomodoro-fab-hidden .toast-deck,
+  body.pomodoro-fab-hidden .offline-banner { bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 12px); }
+}
+
+/* The pre-boot toast (index.html's first showToast) sat at bottom: 24px, on
+   top of the Pomodoro button and, on phones, the tab bar. It now shares the
+   toast stack's position. */
+.toast { right: 18px; bottom: 122px; max-width: min(370px, calc(100vw - 28px)); }
+body.pomodoro-fab-hidden .toast { bottom: 22px; }
+@media (max-width: 900px) {
+  .toast { right: 14px; bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--fab-pill-h) + 20px); }
+  body.pomodoro-fab-hidden .toast { bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 12px); }
+}
+
+/* --- Phase 1 · Tap targets on phones ----------------------------------------
+   Every control a finger has to hit is at least 44px in both directions.
+   Grid geometry that encodes time (event blocks and chips inside schedule
+   rows) is exempt; the cell underneath is the larger target there. */
+@media (max-width: 900px) {
+  .app-shell :is(button, .btn-small, .btn-alt, a.btn-small, summary, select):not(:where(.schedule-event-block, .schedule-chip-stack .schedule-chip, .calendar-day)) {
+    min-height: var(--tap-min);
+  }
+  .app-shell :is(button, .btn-small, a.btn-small, summary.btn-small):not(:where(.schedule-event-block, .schedule-chip, .calendar-day, .view-tab)) {
+    min-width: var(--tap-min);
+  }
+  .app-shell input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]):not([type="hidden"]) { min-height: var(--tap-min); }
+  .app-shell :is(.btn-small, a.btn-small, summary.btn-small) { display: inline-flex; align-items: center; justify-content: center; }
+  .app-shell .shell-quick-action { width: var(--tap-min); height: var(--tap-min); }
+  .app-shell .event-location { min-height: var(--tap-min); }
+  .app-shell .finance-row-action { width: var(--tap-min); opacity: 1; transform: none; }
+  .app-shell #btn-clear-done { min-height: var(--tap-min); padding-inline: 12px; }
+  .app-shell .schedule-header-chips .schedule-chip { min-height: var(--tap-min); }
+}
+@media (max-width: 680px) {
+  .app-shell .finance-ledger-row { grid-template-columns: minmax(0, 1fr) auto var(--tap-min); }
+}
+
+/* --- Phase 2 · Icons --------------------------------------------------------
+   One icon system: Phosphor in the nav, modules/icons.js everywhere else.
+   Static markup marks a slot with [data-icon]; the slot keeps its size before
+   the module fills it so nothing shifts. */
+[data-icon] { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 14px; height: 14px; }
+[data-icon] .btn-icon { width: 100%; height: 100%; }
+/* Buttons are flex boxes, where the space between an icon and its label
+   collapses. Zero specificity: any component that sets its own gap wins. */
+:where(.app-shell) :where(button, .btn-small, .btn-alt, a.btn-small, .active-task-badge, .badge) { gap: 6px; }
+.btn-icon { flex: none; }
+
+/* --- Phase 2 · Page heading --------------------------------------------------
+   "My Workspace" no longer repeats above every view; the view title is the
+   page's h1. The brand stays in the sidebar and the phone top bar. */
+.soloflow-title-group .soloflow-brand-name {
+  margin: 0;
+  color: var(--card-text);
+  font: 700 16px/1.15 var(--font-display);
+  letter-spacing: -.02em;
+  font-synthesis-weight: none;
+}
+.app-shell .view-header {
+  align-items: flex-end;
+  gap: 16px;
+  margin: 6px 0 18px;
+  padding: 0 2px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+}
+.app-shell .view-header-title {
+  margin: 0;
+  color: var(--text);
+  font: 700 clamp(24px, 2.3vw, 32px)/1.1 var(--font-display);
+  letter-spacing: -.03em;
+  font-synthesis-weight: none;
+}
+.app-shell .view-header-sub { margin-top: 6px; color: color-mix(in srgb, var(--text) 70%, transparent); font-size: 13px; opacity: 1; }
+.app-shell .view-header-count {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font: 600 12px/1 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* The workspace name now lives in Settings as an ordinary text field. */
+.settings-field-label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 12px; font-weight: 600; }
+.settings-hint { margin: 8px 0 0; color: var(--text-muted); font-size: 12px; }
+.app-shell .settings-workspace #pageTitle,
+.app-shell .settings-workspace #pageTitle:hover,
+.app-shell .settings-workspace #pageTitle:focus {
+  display: block;
+  width: min(100%, 460px);
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 13px;
+  color: var(--card-text);
+  -webkit-text-fill-color: currentColor;
+  background: var(--surface-sunken);
+  background-clip: border-box;
+  -webkit-background-clip: border-box;
+  border: 1px solid color-mix(in srgb, var(--card-text) 14%, transparent);
+  border-radius: var(--radius-sm);
+  font: 600 15px/1.4 var(--font-body);
+  letter-spacing: 0;
+  text-wrap: nowrap;
+  overflow: hidden;
+}
+.app-shell .settings-workspace #pageTitle:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--focus-ring); }
+.app-shell .settings-workspace #pageTitle::before { display: none; }
+.app-shell .settings-group h4 { display: flex; align-items: center; gap: 8px; }
+.app-shell .settings-group h4 [data-icon] { color: var(--primary); width: 15px; height: 15px; }
+.app-shell details.customize-menu > summary > span:first-child { display: inline-flex; align-items: center; gap: 9px; }
+
+/* --- Phase 2 · Board toolbar ------------------------------------------------
+   Search, filters and view options on one line, without a panel around them.
+   setView() shows this row with an inline display:flex, so it is laid out as
+   a wrapping flex row. */
+.app-shell .control-panel {
+  position: relative;
+  z-index: 30; /* its menu opens over Quick Capture and the board */
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.app-shell .control-panel .search-input-wrapper { flex: 1 1 260px; min-width: 0; }
+.app-shell .control-panel .search-logo-icon { left: 13px; width: 16px; height: 16px; color: var(--text-muted); }
+.app-shell .control-panel select { flex: 0 1 180px; min-width: 0; }
+.app-shell .control-panel :is(input, select) { min-height: 42px; }
+.toolbar-overflow { display: contents; }
+.toolbar-more-toggle { display: none; }
+.toolbar-more-menu { display: contents; }
+.app-shell .control-panel .density-switcher { flex: none; align-self: stretch; align-items: stretch; }
+.app-shell .control-panel .density-button { min-height: 34px; padding: 6px 12px; font-size: 12px; }
+.app-shell .control-panel .report-launcher {
+  flex: none;
+  align-self: stretch;
+  margin: 0;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+/* --- Phase 2 · Quick Capture --------------------------------------------------
+   One line: the field and Add. Priority, due date and paste-from-email appear
+   while the card has focus (or once something is set); "Add details" opens the
+   full drawer, which replaces the old "Add Details / Options" toggle. */
+.app-shell #kanban-task-form {
+  gap: 0;
+  margin-bottom: 18px;
+  padding: 5px 5px 5px 14px;
+  border-radius: var(--radius-md);
+  overflow: visible;
+  transition: border-color var(--motion-fast, .15s) ease, box-shadow var(--motion-fast, .15s) ease;
+}
+.app-shell #kanban-task-form:focus-within {
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  box-shadow: 0 0 0 3px var(--focus-ring), var(--shadow-card);
+}
+#kanban-task-form .task-quick-row { display: flex; align-items: center; gap: 8px; }
+#kanban-task-form .task-quick-row > * { width: auto; grid-column: auto; }
+#kanban-task-form .quick-capture-icon { width: 18px; height: 18px; color: var(--primary); }
+#kanban-task-form #taskTitle {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 4px;
+  color: var(--card-text);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-size: 15px;
+}
+#kanban-task-form #taskTitle:focus { background: transparent; border: 0; box-shadow: none; }
+.app-shell .quick-capture-details-toggle {
+  flex: none;
+  min-height: 36px;
+  padding: 0 10px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.app-shell .quick-capture-details-toggle:hover,
+.app-shell .quick-capture-details-toggle[aria-expanded="true"] { color: var(--primary); background: color-mix(in srgb, var(--primary) 9%, transparent); transform: none; }
+.app-shell #kanban-task-form .quick-add-submit { flex: none; min-height: 36px; padding: 0 18px; border-radius: var(--radius-sm); }
+.task-quick-extras { display: none; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 9px 9px 26px; }
+#kanban-task-form.is-expanded .task-quick-extras { display: flex; }
+.task-quick-extras select,
+.task-quick-extras input[type="date"] { flex: 0 1 170px; min-width: 0; min-height: 38px; padding-block: 6px; font-size: 13px; }
+.app-shell .task-quick-extras .btn-email { min-height: 38px; padding: 0 12px; font-size: 13px; }
+#kanban-task-form details.task-advanced-fields { display: none; margin: 0 9px 9px 26px; padding-top: 0; border-top: 0; }
+#kanban-task-form.is-expanded details.task-advanced-fields[open] { display: block; }
+#kanban-task-form details.task-advanced-fields > summary { display: none; }
+#kanban-task-form details.task-advanced-fields[open] .task-advanced-inner { padding-top: 4px; }
+
+/* --- Phase 2 · Case and type --------------------------------------------------
+   Uppercase, letter-spaced text is kept for section labels (finance and
+   settings kickers, column titles). Form labels, badges and stat labels read
+   in normal case, and counts use the body face with tabular figures. */
+.app-shell .finance-control label,
+.app-shell .finance-segment-field > span,
+.app-shell .finance-amount-field small,
+.app-shell .event-field-label,
+.app-shell .pomodoro-task label,
+.app-shell .batch-field,
+.app-shell .micro-label,
+.app-shell .metric-label,
+.app-shell .sidebar-brand-copy small,
+.app-shell .finance-ledger-head,
+.app-shell .finance-table th,
+.app-shell .finance-kpi .finance-section-kicker,
+.app-shell .performance-kpi .finance-section-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.app-shell .badge,
+.app-shell .task-card .badge,
+.app-shell .badge.high,
+.app-shell .badge.medium,
+.app-shell .badge.low,
+.app-shell .active-task-badge,
+.app-shell .project-epic-badge {
+  letter-spacing: 0;
+  text-transform: none;
+}
+.app-shell .nav-badge,
+.app-shell .col-total,
+.app-shell .subtask-progress-pill,
+.app-shell .events-filter-count,
+.app-shell .events-group-title span,
+.app-shell .calendar-blocks {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.app-shell .calendar-blocks { display: inline-flex; align-items: center; gap: 3px; }
+.app-shell .calendar-blocks .btn-icon { width: 11px; height: 11px; }
+.app-shell .active-task-badge { display: inline-flex; align-items: center; }
+
+@media (max-width: 900px) {
+  /* Phone top bar: brand on the left, search and settings on the right. */
+  .app-shell .soloflow-header { padding: 6px 6px 6px 8px; margin-bottom: 12px; }
+  .app-shell .soloflow-logo-badge { width: 34px; height: 34px; }
+  .app-shell .shell-quick-action { border-radius: var(--radius-sm); }
+  .app-shell .view-header { margin-top: 2px; }
+
+  /* Board toolbar: search and a "⋯" menu on one line, filters on the next.
+     The density switch and Generate summary move into the menu. */
+  .app-shell .control-panel .search-input-wrapper { order: 0; flex: 1 1 calc(100% - 52px); }
+  .app-shell .control-panel .toolbar-overflow { order: 1; position: relative; display: block; flex: none; }
+  .app-shell .control-panel select { order: 2; flex: 1 1 calc(50% - 4px); }
+  .toolbar-more-toggle {
+    display: inline-flex;
+    width: var(--tap-min);
+    color: var(--card-text);
+    background: var(--surface-sunken);
+    border: 1px solid color-mix(in srgb, var(--card-text) 12%, transparent);
+    box-shadow: none;
+  }
+  .toolbar-overflow.is-open .toolbar-more-toggle { border-color: var(--primary); color: var(--primary); }
+  .toolbar-more-toggle [data-icon] { width: 18px; height: 18px; }
+  .toolbar-more-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 70;
+    display: none;
+    width: min(280px, calc(100vw - 28px));
+    padding: 10px;
+    background: var(--surface);
+    border: 1px solid var(--surface-border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-overlay, 0 24px 60px -24px rgba(0, 0, 0, .7));
+  }
+  .toolbar-overflow.is-open .toolbar-more-menu { display: grid; gap: 8px; }
+  .app-shell .control-panel .toolbar-more-menu .density-switcher { width: 100%; }
+  .app-shell .control-panel .toolbar-more-menu .report-launcher { width: 100%; min-height: var(--tap-min); }
+
+  #kanban-task-form .task-quick-row { gap: 4px; }
+  .app-shell #kanban-task-form .quick-add-submit,
+  .app-shell .quick-capture-details-toggle { min-height: var(--tap-min); }
+  .app-shell .quick-capture-details-toggle { padding: 0 8px; }
+  #kanban-task-form #taskTitle { min-height: var(--tap-min); font-size: 16px; }
+  .task-quick-extras { padding-left: 0; }
+  .task-quick-extras select,
+  .task-quick-extras input[type="date"] { flex: 1 1 calc(50% - 4px); min-height: var(--tap-min); }
+  .app-shell .task-quick-extras .btn-email { flex: 1 1 100%; min-height: var(--tap-min); }
+  #kanban-task-form details.task-advanced-fields { margin-left: 0; }
+}
+
+/* --- Phase 3 · Task cards ------------------------------------------------------
+   Title, one row of chips with the due date, the description when there is
+   one, and a footer with one main action plus a chevron. Everything else
+   (subtasks, dates, timer, links, photo, delete) sits behind the chevron.
+   Empty fields render nothing instead of placeholder pills. */
+.app-shell .task-card { padding: 14px 14px 10px; }
+.app-shell .task-card .task-title { margin: 0 0 8px -6px; font-size: 15px; }
+/* Editable text keeps its hover padding but hangs it outside the text edge,
+   so title, description, chips and the main action share one left edge. */
+body[data-density="compact"].app-shell .task-card .task-title { grid-column: 1; margin: 0 0 0 -6px; width: calc(100% + 6px); font-size: 13px; }
+.app-shell .task-card > .badges > * { flex-shrink: 0; }
+.app-shell .task-card > .badges > .task-due { flex-shrink: 1; }
+.app-shell .task-card > .badges .badge.inline-editable { margin-left: 0; }
+.app-shell .task-card > .badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 0 0 8px;
+  font-size: 12px;
+}
+.app-shell .task-card > .badges .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 22px;
+  padding: 1px 8px;
+  border: 0;
+  font: 600 12px/1.4 var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+}
+/* Priority: a tinted pill led by a dot, coloured by level. */
+.app-shell .task-card > .badges .badge:is(.high, .medium, .low) { border-radius: 999px; }
+.app-shell .task-card > .badges .badge:is(.high, .medium, .low)::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.app-shell .task-card > .badges .badge.high { color: var(--danger-text); background: rgba(var(--danger-rgb), .13); }
+.app-shell .task-card > .badges .badge.medium { color: var(--warning-text); background: rgba(var(--warning-rgb), .13); }
+.app-shell .task-card > .badges .badge.low { color: var(--success-text); background: rgba(var(--success-rgb), .13); }
+/* Category, epic and other labels: neutral, squarer tags in the text colour. */
+.app-shell .task-card > .badges .badge:not(.high):not(.medium):not(.low) {
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--card-text) 8%, transparent);
+  border-radius: 6px;
+}
+.app-shell .task-card > .badges .finance-logged-chip { color: var(--success-text); }
+.app-shell .task-card > .badges .finance-logged-chip .btn-icon { width: 12px; height: 12px; }
+.app-shell .task-card > .badges .project-epic-badge { margin: 0; max-width: 100%; }
+.app-shell .task-card > .badges .subtask-progress-pill { margin: 0; padding: 0 2px; color: var(--text-muted); background: none; border: 0; font: 600 12px/1 var(--font-body); }
+
+/* Due date: one quiet line; only today and overdue get a colour. */
+.task-due { display: inline-flex; align-items: center; gap: 5px; min-width: 0; color: var(--text-muted); font-size: 12px; font-weight: 500; white-space: nowrap; }
+.task-due .btn-icon { width: 12px; height: 12px; }
+.task-due.is-today { color: var(--warning-text); font-weight: 600; }
+.task-due.is-overdue { color: var(--danger-text); font-weight: 600; }
+
+.app-shell .task-card .task-desc { min-height: 0; margin: 0 0 8px -6px; font-size: 13px; }
+.app-shell .task-card:not(.is-expanded) .task-desc.is-empty:not(:focus) { display: none; }
+
+/* Footer: the main action and the chevron. No outlines. */
+.app-shell .task-card > .task-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 2px 0 0;
+}
+.task-main-action-slot { display: flex; min-width: 0; }
+.app-shell .task-card .task-main-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  color: var(--primary-text);
+  background: color-mix(in srgb, var(--primary) 13%, transparent);
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.app-shell .task-card .task-main-action:hover { background: color-mix(in srgb, var(--primary) 21%, transparent); }
+.app-shell .task-card .task-locked { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; color: var(--danger-text); font-size: 13px; font-weight: 600; }
+.app-shell .task-card .task-expand-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  margin-left: auto;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+.app-shell .task-card .task-expand-toggle:hover,
+.app-shell .task-card .task-expand-toggle[aria-expanded="true"] { color: var(--card-text); background: color-mix(in srgb, var(--card-text) 9%, transparent); }
+.app-shell .task-card .task-expand-toggle .btn-icon { width: 16px; height: 16px; }
+.app-shell .task-card.is-blocked { opacity: .72; }
+
+/* Details behind the chevron. Solid hairlines replace the dashed rules. */
+.app-shell .task-card .task-expand-area {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+}
+.app-shell .task-card .subtasks-list { gap: 4px; margin-bottom: 12px; padding-top: 0; border-top: 0; }
+.app-shell .task-card .task-add-subtask {
+  align-self: flex-start;
+  min-height: 30px;
+  margin-top: 2px;
+  padding: 0 8px;
+  color: var(--primary-text);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+.app-shell .task-card .task-add-subtask:hover { background: color-mix(in srgb, var(--primary) 10%, transparent); }
+.app-shell .task-card .task-meta {
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--card-text) 5%, transparent);
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+.app-shell .task-card .task-meta p { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 12px; }
+.app-shell .task-card .task-meta strong { min-width: 64px; color: var(--text-muted); font-weight: 600; }
+.app-shell .task-card .task-meta :is(.meta-input-date, .meta-input-time) { min-height: 34px; padding: 4px 8px; font-size: 12px; }
+.app-shell .task-card .timer-container { gap: 10px; margin-bottom: 12px; padding: 0; background: none; border: 0; }
+.app-shell .task-card .btn-timer {
+  min-height: 32px;
+  padding: 0 12px;
+  color: var(--card-text);
+  background: color-mix(in srgb, var(--card-text) 8%, transparent);
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  font-size: 12px;
+}
+.app-shell .task-card .btn-timer.active { color: var(--primary-contrast-text); background: var(--primary); }
+.timer-time { display: inline-flex; align-items: center; gap: 5px; color: var(--text-muted); }
+.app-shell .timer-time .timer-display { color: var(--text-muted); font: 600 12px/1 var(--font-body); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.app-shell .task-card .task-card-action-strip { gap: 2px 4px; margin-top: 0; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent); }
+.app-shell .task-card .task-card-action {
+  min-height: 32px;
+  padding: 0 8px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  font: 600 12px/1 var(--font-body);
+}
+.app-shell .task-card .task-card-action:hover { color: var(--card-text); background: color-mix(in srgb, var(--card-text) 8%, transparent); border: 0; transform: none; }
+.app-shell .task-card .task-card-action.task-action-email { color: var(--text-muted); }
+.app-shell .task-card .task-card-action.task-action-delete { color: var(--danger-text); }
+.app-shell .task-card .task-card-action.task-action-delete:hover { background: rgba(var(--danger-rgb), .1); }
+.app-shell .task-card .task-blocked-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  color: var(--danger-text);
+  background: rgba(var(--danger-rgb), .09);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+}
+.app-shell .task-card .task-links-container { gap: 6px; }
+.app-shell .task-card .task-link {
+  min-height: 30px;
+  padding: 0 10px;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border: 0;
+}
+.app-shell .task-card .task-link:hover { color: var(--primary-contrast-text); background: var(--primary); }
+.app-shell .task-card .task-metric { margin-bottom: 8px; padding: 2px 8px; background: color-mix(in srgb, var(--card-text) 7%, transparent); border: 0; font-size: 12px; }
+
+/* Compact density: title, then chips and the actions on one line. */
+body[data-density="compact"].app-shell .task-card { grid-template-columns: minmax(0, 1fr) auto; padding: 9px 10px; }
+body[data-density="compact"].app-shell .task-card > .badges { grid-column: 1; grid-row: 2; flex-wrap: wrap; gap: 4px 6px; min-width: 0; margin: 0; }
+body[data-density="compact"].app-shell .task-card > .actions.task-card-footer {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  width: auto;
+  padding-top: 0;
+  border-top: 0;
+  flex-wrap: nowrap;
+}
+body[data-density="compact"].app-shell .task-card .task-main-action { min-height: 28px; padding: 0 9px; font-size: 12px; }
+body[data-density="compact"].app-shell .task-card .task-expand-toggle { width: 28px; min-width: 28px; min-height: 28px; }
+body[data-density="compact"].app-shell .task-card .task-expand-area { grid-column: 1 / -1; grid-row: 3; }
+
+@media (max-width: 900px) {
+  .app-shell .task-card .task-main-action,
+  .app-shell .task-card .task-locked,
+  .app-shell .task-card .task-add-subtask,
+  .app-shell .task-card .btn-timer,
+  .app-shell .task-card .task-card-action,
+  .app-shell .task-card .task-link,
+  .app-shell .task-card .task-meta :is(.meta-input-date, .meta-input-time),
+  body[data-density="compact"].app-shell .task-card .task-main-action { min-height: var(--tap-min); }
+  .app-shell .task-card .task-expand-toggle,
+  body[data-density="compact"].app-shell .task-card .task-expand-toggle { width: var(--tap-min); min-width: var(--tap-min); min-height: var(--tap-min); }
+  .app-shell .task-card .task-card-action { justify-content: flex-start; }
+}
+
+/* --- Phase 4 · Weekly Schedule ------------------------------------------------
+   Every cell inherited .editable's 1px dashed border, which the contrast
+   hotfix painted strong, on top of a 1px grid gap: a heavy dashed mesh every
+   30 minutes. Lines are now drawn once: a faint solid rule on the hour, a
+   fainter one on the half hour, and quiet column rules. */
+.app-shell .schedule-grid {
+  --sched-hour-line: color-mix(in srgb, var(--card-text) 11%, transparent);
+  --sched-half-line: color-mix(in srgb, var(--card-text) 4%, transparent);
+  --sched-col-line: color-mix(in srgb, var(--card-text) 8%, transparent);
+  gap: 0;
+  background: var(--surface);
+  border-color: var(--sched-hour-line);
+}
+.app-shell .schedule-grid > :is(.schedule-cell, .schedule-time, .schedule-header),
+.app-shell .schedule-grid > .schedule-cell.editable:hover {
+  border-style: solid;
+  border-width: 1px 0 0 1px;
+  border-color: var(--sched-hour-line) transparent transparent var(--sched-col-line);
+}
+.app-shell .schedule-grid > .schedule-header { border-top-color: transparent; border-bottom: 1px solid var(--sched-hour-line); }
+.app-shell .schedule-grid > .schedule-time { border-left-color: transparent; box-shadow: none; }
+.app-shell .schedule-grid > .schedule-cell[data-time*=":30"],
+.app-shell .schedule-grid > .schedule-cell.editable[data-time*=":30"]:hover { border-top-color: var(--sched-half-line); }
+.app-shell .schedule-grid > .schedule-time:has(+ .schedule-cell[data-time*=":30"]) { border-top-color: var(--sched-half-line); color: var(--text-muted); font-weight: 500; }
+.app-shell .schedule-grid > .schedule-cell.editable:focus { border-color: var(--sched-hour-line) transparent transparent var(--sched-col-line); box-shadow: inset 0 0 0 2px var(--primary); }
+
+/* Day-header chips wrap to two lines and open fully on hover or keyboard
+   focus; the full title is also each chip's tooltip. */
+.app-shell .schedule-header-chips .schedule-chip { align-items: flex-start; padding-block: 3px; border-radius: 8px; }
+.app-shell .schedule-header-chips .schedule-chip-dot { margin-top: 5px; }
+.app-shell .schedule-header-chips .schedule-chip-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+.app-shell .schedule-header-chips .schedule-chip:is(:hover, :focus-visible) .schedule-chip-text { display: block; -webkit-line-clamp: unset; }
+
+/* --- Phase 4 · Month Calendar -------------------------------------------------
+   Outside days used opacity, which let the lighter grid lines show through
+   and made them brighter than the month on dark themes. They now sit on a
+   recessed surface with dimmed contents on every theme. */
+.app-shell .calendar-day.is-outside { opacity: 1; background: color-mix(in srgb, var(--surface) 45%, var(--bg)); }
+.app-shell .calendar-day.is-outside > * { opacity: .42; }
+.app-shell .calendar-day.is-outside:hover { background: color-mix(in srgb, var(--primary) 6%, color-mix(in srgb, var(--surface) 45%, var(--bg))); }
+
+/* --- Phase 4 · Productivity -----------------------------------------------------
+   Stat numbers use the display face with tabular figures and the text colour.
+   The one accent is today's focus time; green and red only mean good or bad. */
+.app-shell :is(.performance-kpi-value, .focus-quota-value, .finance-kpi-value, .metric-value-display) {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -.025em;
+  color: var(--card-text);
+}
+.app-shell .performance-kpi-value small { margin-left: 3px; color: var(--text-muted); font-size: .5em; font-weight: 600; letter-spacing: 0; }
+.app-shell .focus-quota-value { color: var(--primary-text); }
+.app-shell :is(.focus-quota-value, .metric-value-display).is-good { color: var(--success-text); }
+.app-shell .metric-value-display.is-bad { color: var(--danger-text); }
+.app-shell .analytics-grid-elevated .metric-card-elevated { border-color: color-mix(in srgb, var(--card-text) 10%, transparent); background: color-mix(in srgb, var(--card-text) 3%, var(--surface)); }
+.app-shell .analytics-grid-elevated .status-dot { display: none; }
+
+/* --- Phase 4 · Finance ------------------------------------------------------------ */
+.app-shell .finance-panel-sub { margin: 3px 0 0; color: var(--text-muted); font-size: 12px; }
+.app-shell .finance-toolbar { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.app-shell .finance-ledger-block { margin-top: 16px; }
+
+/* Quick entry leads the page: one compact block instead of a tall column. */
+.finance-quick-entry { container: finance-entry / inline-size; }
+.app-shell .finance-quick-entry .finance-panel-header { min-height: 0; margin-bottom: 12px; }
+.app-shell .finance-quick-entry .finance-capture-grid { grid-template-columns: 1fr; gap: 10px; }
+.app-shell .finance-quick-entry .finance-amount-field { min-height: 44px; padding: 0 12px; grid-template-columns: auto minmax(0, 1fr); }
+.app-shell .finance-quick-entry .finance-amount-field > span { font: 600 17px/1 var(--font-display); }
+.app-shell .finance-quick-entry .finance-amount-field input { min-height: 42px; font: 600 18px/1 var(--font-display) !important; }
+.app-shell .finance-quick-entry .finance-amount-field small {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.app-shell .finance-quick-entry .finance-segment-field > span { display: none; }
+.app-shell .finance-quick-entry .finance-segments button { min-height: 36px; }
+.app-shell .finance-quick-entry details.finance-advanced-fields { border-top: 0; padding-top: 0; }
+@container finance-entry (min-width: 760px) {
+  .app-shell .finance-quick-entry .finance-capture-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1.4fr); align-items: center; }
+  .app-shell .finance-quick-entry #financePayee { grid-column: 1; grid-row: 1; }
+  .app-shell .finance-quick-entry .finance-amount-field { grid-column: 2; grid-row: 1; }
+  .app-shell .finance-quick-entry #financeDate { grid-column: 3; grid-row: 1; }
+  .app-shell .finance-quick-entry #financeCategory { grid-column: 4; grid-row: 1; }
+  .app-shell .finance-quick-entry .finance-segment-field { grid-column: 1; grid-row: 2; }
+  .app-shell .finance-quick-entry details.finance-advanced-fields { grid-column: 2 / 4; grid-row: 2; align-self: center; }
+  .app-shell .finance-quick-entry details.finance-advanced-fields[open] { grid-column: 1 / -1; grid-row: 3; }
+  .app-shell .finance-quick-entry .finance-record-button { grid-column: 4; grid-row: 2; }
+}
+@container finance-entry (max-width: 759px) {
+  .app-shell .finance-quick-entry .finance-capture-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app-shell .finance-quick-entry :is(#financePayee, .finance-segment-field, #financeCategory, details.finance-advanced-fields, .finance-record-button) { grid-column: 1 / -1; }
+  .app-shell .finance-quick-entry :is(.finance-amount-field, #financeDate) { grid-column: auto; min-width: 0; }
+}
+
+/* The active ledger tab inherited the contrast hotfix's text-fill colour,
+   meant for a solid accent fill, and became invisible on its light tint. */
+.app-shell .command-tab.active { -webkit-text-fill-color: currentColor; }
+/* Column headings only make sense above rows. */
+.app-shell .finance-ledger-shell:has(.empty-state) .finance-ledger-head { display: none; }
+/* Amounts use the body face with tabular figures, like the stats above. */
+.app-shell :is(.rank-amount, .finance-ledger-amount, .finance-table td.numeric) { font-family: var(--font-body); font-variant-numeric: tabular-nums; letter-spacing: 0; font-feature-settings: "tnum" 1; }
+
+/* Desktop: room at the end of every view for the 88px Pomodoro button. */
+@media (min-width: 901px) {
+  .app-shell .container { padding-bottom: 96px; }
+  body.pomodoro-fab-hidden.app-shell .container { padding-bottom: 0; }
+}
+
+/* With no transactions at all the page shows one empty state (in the ledger)
+   instead of five: filters, totals, analysis panels and charts wait for data.
+   Budgets keep their form so they can be set up in advance. */
+#finance-container.is-empty :is(.finance-toolbar, .finance-kpi-grid, .command-visual-grid, .finance-filter-bar) { display: none; }
+#finance-container.is-empty .finance-panel-grid { order: 2; grid-template-columns: 1fr; }
+#finance-container.is-empty .finance-panel-grid > .finance-panel:not(.finance-budgets-panel) { display: none; }
+#finance-container.is-empty .finance-budgets-panel .empty-state { display: none; }
+#finance-container.is-empty .finance-command-shell > .finance-panel:has(.command-tabs) { order: 1; }
+
+/* --- Phase 4 · Events -------------------------------------------------------------
+   The add form waits behind "New event" and opens above the toolbar, where
+   the button was; while it is open its own close button takes over. */
+.app-shell .events-new-button { margin-left: auto; min-height: 36px; padding: 0 14px; border-radius: var(--radius-sm); font-size: 13px; }
+.app-shell .events-container.is-adding .events-new-button { display: none; }
+.app-shell #eventForm { position: relative; margin: 0 0 14px; padding-right: 52px; }
+.app-shell .event-form-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  min-height: 34px;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.app-shell .event-form-close:hover { color: var(--card-text); background: color-mix(in srgb, var(--card-text) 8%, transparent); }
+.app-shell .event-form-close .btn-icon { width: 16px; height: 16px; }
+
+@media (max-width: 900px) {
+  .app-shell .control-panel :is(input, select) { min-height: var(--tap-min); }
+  .app-shell .finance-quick-entry .finance-segments button { min-height: var(--tap-min); }
+  .app-shell .events-new-button { order: -1; flex: 1 1 100%; min-height: var(--tap-min); margin-left: 0; }
+  .app-shell .event-form-close { width: var(--tap-min); min-height: var(--tap-min); top: 6px; right: 6px; }
+  .app-shell #eventForm { padding-right: 16px; padding-top: 52px; }
+}
+
+/* --- Phase 5 · Sheets -----------------------------------------------------------
+   Bottom sheets are <dialog>s in the top layer: focus stays inside, Escape and
+   the backdrop close them, and nothing in the page can stack above them. */
+.sf-sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: min(85vh, 640px);
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  color: var(--card-text);
+  background: var(--surface);
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--card-text) 12%, transparent);
+  border-radius: 18px 18px 0 0;
+  box-shadow: var(--shadow-overlay, 0 -24px 60px -24px rgba(0, 0, 0, .6));
+  animation: sfSheetIn var(--motion-base, .24s) var(--ease-out-expo, ease-out) both;
+}
+.sf-sheet::backdrop {
+  background: color-mix(in srgb, color-mix(in srgb, rgb(var(--bg-rgb)) 60%, black) 62%, transparent);
+  backdrop-filter: blur(4px);
+}
+@keyframes sfSheetIn { from { transform: translateY(24px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sf-sheet { animation: none; } }
+.sf-sheet-body { padding: 10px 16px calc(16px + var(--safe-bottom)); }
+.sf-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; margin-bottom: 4px; }
+.sf-sheet-title { margin: 0; color: var(--card-text); font: 700 17px/1.2 var(--font-display); letter-spacing: -.01em; }
+.app-shell .sf-sheet-close {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.app-shell .sf-sheet-close [data-icon] { width: 18px; height: 18px; }
+
+/* --- Phase 5 · Phone tab bar ------------------------------------------------------
+   Board, Today, Schedule, Events, Finance and More; Backlog, Month and
+   Progress open from More. No box per tab: the active one gets a pill. */
+.app-shell .app-sidebar .nav-more-tab { display: none; }
+.nav-more-list { display: grid; gap: 4px; padding-bottom: 4px; }
+.app-shell .nav-more-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 12px;
+  color: var(--card-text);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+}
+.app-shell .nav-more-item:hover { background: color-mix(in srgb, var(--card-text) 7%, transparent); transform: none; }
+.app-shell .nav-more-item .nav-icon { width: 24px; height: 24px; color: var(--text-muted); }
+.app-shell .nav-more-item .nav-icon .ph-icon { width: 22px; height: 22px; }
+.app-shell .nav-more-item.is-active { color: var(--primary-text); background: color-mix(in srgb, var(--primary) 12%, transparent); }
+.app-shell .nav-more-item.is-active .nav-icon { color: var(--primary-text); }
+.nav-more-count { margin-left: auto; color: var(--text-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 900px) {
+  :root { --bottom-nav-h: 64px; }
+  .app-shell .app-sidebar,
+  body.sidebar-collapsed.app-shell .app-sidebar {
+    padding: 4px 4px calc(4px + var(--safe-bottom));
+    background: color-mix(in srgb, var(--surface) 97%, var(--bg));
+    border-top: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+    border-radius: 0;
+    box-shadow: 0 -10px 30px -24px rgba(0, 0, 0, .7);
+  }
+  .app-shell .app-sidebar :is(#tab-backlog, #tab-calendar, #tab-productivity) { display: none; }
+  .app-shell .app-sidebar .nav-more-tab { display: flex; }
+  .app-shell .app-sidebar .view-tabs { gap: 0; }
+  .app-shell .app-sidebar .view-tab,
+  body.sidebar-collapsed.app-shell .app-sidebar .view-tab {
+    flex: 1 1 0;
+    gap: 3px;
+    min-width: 0;
+    min-height: 56px;
+    padding: 4px 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+  }
+  .app-shell .app-sidebar .nav-icon {
+    width: 52px;
+    height: 30px;
+    border-radius: 999px;
+    transition: background-color var(--motion-fast, .15s) ease;
+  }
+  .app-shell .app-sidebar .nav-icon .ph-icon { width: 21px; height: 21px; }
+  .app-shell .app-sidebar :is(.view-tab.active, .nav-more-tab.is-current) .nav-icon {
+    color: var(--primary-text);
+    background: color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+  .app-shell .app-sidebar .nav-more-tab.is-current .nav-label-short { font-weight: 700; }
+  .app-shell .app-sidebar .nav-label-short { font: 600 11px/1.1 var(--font-body); letter-spacing: 0; }
+}
+
+/* --- Phase 5 · Board: one column at a time on phones ------------------------------ */
+.board-segments { display: none; }
+@media (max-width: 900px) {
+  .board-segments:not([hidden]) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3px;
+    margin: 0 0 12px;
+    padding: 3px;
+    background: color-mix(in srgb, var(--card-text) 7%, transparent);
+    border-radius: var(--radius-md);
+  }
+  .app-shell .board-segment {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: var(--tap-min);
+    padding: 0 6px;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    border-radius: calc(var(--radius-md) - 3px);
+    box-shadow: none;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .app-shell .board-segment:hover { transform: none; color: var(--card-text); }
+  .app-shell .board-segment[aria-pressed="true"] {
+    color: var(--card-text);
+    background: var(--surface);
+    box-shadow: 0 1px 3px color-mix(in srgb, black 22%, transparent);
+  }
+  .board-segment-count {
+    min-width: 20px;
+    padding: 1px 6px;
+    color: var(--text-muted);
+    background: color-mix(in srgb, var(--card-text) 9%, transparent);
+    border-radius: 999px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .app-shell .board[data-active-column="todo"] > .column:not(#col-todo),
+  .app-shell .board[data-active-column="inprogress"] > .column:not(#col-inprogress),
+  .app-shell .board[data-active-column="done"] > .column:not(#col-done) { display: none; }
+  /* With one column showing, its panel and title repeat the control above. */
+  .app-shell .board > .column { min-height: 0; padding: 0; background: none; border: 0; box-shadow: none; }
+  .app-shell #col-todo > h3,
+  .app-shell #col-inprogress > h3 { display: none; }
+  .app-shell #col-done > h3 {
+    position: static;
+    min-height: 0;
+    margin: 0 0 10px;
+    padding: 0;
+    background: none;
+    border: 0;
+    backdrop-filter: none;
+  }
+  .app-shell #col-done > h3 .column-title-wrap { justify-content: flex-end; }
+  .app-shell #col-done > h3 .column-title-wrap > span:first-child {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+}
+
+/* --- Phase 5 · Schedule: one header and a strip of seven days ---------------------- */
+.schedule-day-strip[hidden] { display: none; }
+.schedule-day-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; margin: -4px 0 12px; }
+.app-shell .schedule-day-chip {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  min-width: 0;
+  min-height: 54px;
+  padding: 4px 0;
+  color: var(--card-text);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+.app-shell .schedule-day-chip:hover { transform: none; background: color-mix(in srgb, var(--card-text) 7%, transparent); }
+.schedule-day-chip-weekday { color: var(--text-muted); font-size: 11px; font-weight: 600; }
+.schedule-day-chip-date { font: 700 16px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.schedule-day-chip.is-today .schedule-day-chip-date { color: var(--primary-text); }
+.app-shell .schedule-day-chip[aria-pressed="true"] { color: var(--primary-contrast-text); background: var(--primary); }
+.app-shell .schedule-day-chip[aria-pressed="true"] :is(.schedule-day-chip-weekday, .schedule-day-chip-date) { color: inherit; }
+.schedule-container.has-day-strip #schedule-day-nav { display: none; }
+
+/* --- Phase 5 · Finance filters: a button and summary on phones ---------------------- */
+.finance-filter-bar,
+.finance-sheet-head { display: none; }
+.finance-filter-dialog .finance-sheet-head { display: flex; grid-column: 1 / -1; }
+.app-shell .finance-filter-dialog .finance-toolbar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 10px 16px calc(18px + var(--safe-bottom));
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.app-shell .finance-filter-dialog .finance-control:first-of-type { grid-column: 1 / -1; }
+.app-shell .finance-sheet-done { min-height: var(--tap-min); padding: 0 18px; }
+
+@media (max-width: 900px) {
+  .finance-filter-bar { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .app-shell .finance-filters-button {
+    flex: none;
+    min-height: var(--tap-min);
+    padding: 0 14px;
+    color: var(--card-text);
+    background: var(--surface-sunken);
+    border: 1px solid color-mix(in srgb, var(--card-text) 12%, transparent);
+    box-shadow: none;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .finance-filters-button [data-icon] { width: 16px; height: 16px; }
+  .finance-filter-summary { flex: 1 1 auto; min-width: 0; overflow: hidden; color: var(--text-muted); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+  .finance-command-shell > .finance-toolbar { display: none; }
+
+  /* On a phone the outer Finance panel only adds a second frame. */
+  .app-shell .finance-container { padding: 0; background: none; border: 0; box-shadow: none; }
+  .app-shell .schedule-container,
+  .app-shell .schedule-container:has(.schedule-grid.is-day-view) { padding: 0; background: none; border: 0; box-shadow: none; }
+}
+@media (max-width: 900px) {
+  .app-shell .finance-kpi { min-height: 0; padding: 14px 16px; }
+  .app-shell .finance-kpi-value { margin: 8px 0 4px; }
+}
+/* Day cells are buttons, so they took the global button radius and left
+   little diamonds of grid colour where four cells meet. */
+.app-shell .calendar-grid > .calendar-day { border-radius: 0; }

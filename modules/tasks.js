@@ -130,9 +130,9 @@ export function installTaskModule(store) {
     const task = window.tasks.find((item) => item.id === taskId);
     if (!task) return;
     contextMenu.replaceChildren();
-    addContextAction('✓', 'Move to Done', () => window.moveTask(taskId, 'done'));
+    addContextAction(ICONS.check, 'Move to Done', () => window.moveTask(taskId, 'done'));
     addContextAction(ICONS.play, 'Start Focus Timer', () => window.toggleTimer?.(taskId));
-    addContextAction('⧉', 'Duplicate Task', () => {
+    addContextAction(ICONS.copy, 'Duplicate Task', () => {
       const copy = clone(task);
       copy.id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       copy.title = `${task.title} (Copy)`;
@@ -159,7 +159,7 @@ export function installTaskModule(store) {
       try { await navigator.clipboard.writeText(url.href); window.showToast?.('Task link copied', 'success'); }
       catch { window.showToast?.('Clipboard permission was unavailable', 'error'); }
     });
-    addContextAction('⌫', 'Delete Task', () => window.deleteTask(taskId), true);
+    addContextAction(ICONS.trash, 'Delete Task', () => window.deleteTask(taskId), true);
     contextMenu.hidden = false;
     const bounds = contextMenu.getBoundingClientRect();
     contextMenu.style.left = `${Math.min(x, innerWidth - bounds.width - 10)}px`;
@@ -194,28 +194,12 @@ export function installTaskModule(store) {
     });
   }
 
-  function decorateDates(card, task) {
-    if (card.querySelector('.inline-date-cluster')) return;
-    const meta = card.querySelector('.task-meta');
-    if (!meta) return;
-    const dueParagraph = [...meta.querySelectorAll('p')].find((paragraph) => paragraph.textContent.includes('Due:'));
-    if (dueParagraph) dueParagraph.hidden = true;
-    const cluster = document.createElement('div');
-    cluster.className = 'inline-date-cluster';
-    const label = document.createElement('span');
-    label.textContent = 'Due';
-    label.className = 'badge';
-    const date = document.createElement('time');
-    date.className = 'inline-date-value';
-    date.textContent = task.dueDate || '';
-    const time = document.createElement('time');
-    time.className = 'inline-date-value';
-    time.textContent = task.dueTime || '';
-    decorateInlineField(date, task, 'dueDate', 'YYYY-MM-DD');
-    decorateInlineField(time, task, 'dueTime', 'HH:MM');
-    cluster.append(label, date, time);
-    const topActions = card.querySelector(':scope > .actions');
-    if (topActions) topActions.before(cluster); else card.append(cluster);
+  // The card header shows the due date as one line ("Due Thu, Nov 5", "Due
+  // today", "Overdue by 2 days") and the card's details hold the date and time
+  // fields, so there is no separate inline date cluster with empty
+  // YYYY-MM-DD / HH:MM placeholders any more.
+  function decorateDates(card) {
+    card.querySelector('.inline-date-cluster')?.remove();
   }
 
   function decorateProgress(card, task) {
@@ -231,8 +215,8 @@ export function installTaskModule(store) {
     const text = document.createElement('span');
     text.textContent = `${completed}/${task.subtasks.length}`;
     pill.append(ring, text);
-    const actions = card.querySelector(':scope > .actions');
-    actions?.before(pill);
+    const chips = card.querySelector(':scope > .badges');
+    if (chips) chips.append(pill); else card.querySelector(':scope > .actions')?.before(pill);
   }
 
   function decorateCards() {
@@ -263,7 +247,8 @@ export function installTaskModule(store) {
           const badge = document.createElement('span');
           badge.className = 'badge project-epic-badge';
           badge.textContent = `Epic · ${project.name}`;
-          title?.after(badge);
+          const chips = card.querySelector(':scope > .badges');
+          if (chips) chips.append(badge); else title?.after(badge);
         }
       }
     });
