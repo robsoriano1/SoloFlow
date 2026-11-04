@@ -2857,3 +2857,157 @@ body[data-density="compact"].app-shell .task-card .task-expand-area { grid-colum
   body[data-density="compact"].app-shell .task-card .task-expand-toggle { width: var(--tap-min); min-width: var(--tap-min); min-height: var(--tap-min); }
   .app-shell .task-card .task-card-action { justify-content: flex-start; }
 }
+
+/* --- Phase 4 · Weekly Schedule ------------------------------------------------
+   Every cell inherited .editable's 1px dashed border, which the contrast
+   hotfix painted strong, on top of a 1px grid gap: a heavy dashed mesh every
+   30 minutes. Lines are now drawn once: a faint solid rule on the hour, a
+   fainter one on the half hour, and quiet column rules. */
+.app-shell .schedule-grid {
+  --sched-hour-line: color-mix(in srgb, var(--card-text) 11%, transparent);
+  --sched-half-line: color-mix(in srgb, var(--card-text) 4%, transparent);
+  --sched-col-line: color-mix(in srgb, var(--card-text) 8%, transparent);
+  gap: 0;
+  background: var(--surface);
+  border-color: var(--sched-hour-line);
+}
+.app-shell .schedule-grid > :is(.schedule-cell, .schedule-time, .schedule-header),
+.app-shell .schedule-grid > .schedule-cell.editable:hover {
+  border-style: solid;
+  border-width: 1px 0 0 1px;
+  border-color: var(--sched-hour-line) transparent transparent var(--sched-col-line);
+}
+.app-shell .schedule-grid > .schedule-header { border-top-color: transparent; border-bottom: 1px solid var(--sched-hour-line); }
+.app-shell .schedule-grid > .schedule-time { border-left-color: transparent; box-shadow: none; }
+.app-shell .schedule-grid > .schedule-cell[data-time*=":30"],
+.app-shell .schedule-grid > .schedule-cell.editable[data-time*=":30"]:hover { border-top-color: var(--sched-half-line); }
+.app-shell .schedule-grid > .schedule-time:has(+ .schedule-cell[data-time*=":30"]) { border-top-color: var(--sched-half-line); color: var(--text-muted); font-weight: 500; }
+.app-shell .schedule-grid > .schedule-cell.editable:focus { border-color: var(--sched-hour-line) transparent transparent var(--sched-col-line); box-shadow: inset 0 0 0 2px var(--primary); }
+
+/* Day-header chips wrap to two lines and open fully on hover or keyboard
+   focus; the full title is also each chip's tooltip. */
+.app-shell .schedule-header-chips .schedule-chip { align-items: flex-start; padding-block: 3px; border-radius: 8px; }
+.app-shell .schedule-header-chips .schedule-chip-dot { margin-top: 5px; }
+.app-shell .schedule-header-chips .schedule-chip-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+.app-shell .schedule-header-chips .schedule-chip:is(:hover, :focus-visible) .schedule-chip-text { display: block; -webkit-line-clamp: unset; }
+
+/* --- Phase 4 · Month Calendar -------------------------------------------------
+   Outside days used opacity, which let the lighter grid lines show through
+   and made them brighter than the month on dark themes. They now sit on a
+   recessed surface with dimmed contents on every theme. */
+.app-shell .calendar-day.is-outside { opacity: 1; background: color-mix(in srgb, var(--surface) 45%, var(--bg)); }
+.app-shell .calendar-day.is-outside > * { opacity: .42; }
+.app-shell .calendar-day.is-outside:hover { background: color-mix(in srgb, var(--primary) 6%, color-mix(in srgb, var(--surface) 45%, var(--bg))); }
+
+/* --- Phase 4 · Productivity -----------------------------------------------------
+   Stat numbers use the display face with tabular figures and the text colour.
+   The one accent is today's focus time; green and red only mean good or bad. */
+.app-shell :is(.performance-kpi-value, .focus-quota-value, .finance-kpi-value, .metric-value-display) {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -.025em;
+  color: var(--card-text);
+}
+.app-shell .performance-kpi-value small { margin-left: 3px; color: var(--text-muted); font-size: .5em; font-weight: 600; letter-spacing: 0; }
+.app-shell .focus-quota-value { color: var(--primary-text); }
+.app-shell :is(.focus-quota-value, .metric-value-display).is-good { color: var(--success-text); }
+.app-shell .metric-value-display.is-bad { color: var(--danger-text); }
+.app-shell .analytics-grid-elevated .metric-card-elevated { border-color: color-mix(in srgb, var(--card-text) 10%, transparent); background: color-mix(in srgb, var(--card-text) 3%, var(--surface)); }
+.app-shell .analytics-grid-elevated .status-dot { display: none; }
+
+/* --- Phase 4 · Finance ------------------------------------------------------------ */
+.app-shell .finance-panel-sub { margin: 3px 0 0; color: var(--text-muted); font-size: 12px; }
+.app-shell .finance-toolbar { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.app-shell .finance-ledger-block { margin-top: 16px; }
+
+/* Quick entry leads the page: one compact block instead of a tall column. */
+.finance-quick-entry { container: finance-entry / inline-size; }
+.app-shell .finance-quick-entry .finance-panel-header { min-height: 0; margin-bottom: 12px; }
+.app-shell .finance-quick-entry .finance-capture-grid { grid-template-columns: 1fr; gap: 10px; }
+.app-shell .finance-quick-entry .finance-amount-field { min-height: 44px; padding: 0 12px; grid-template-columns: auto minmax(0, 1fr); }
+.app-shell .finance-quick-entry .finance-amount-field > span { font: 600 17px/1 var(--font-display); }
+.app-shell .finance-quick-entry .finance-amount-field input { min-height: 42px; font: 600 18px/1 var(--font-display) !important; }
+.app-shell .finance-quick-entry .finance-amount-field small {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.app-shell .finance-quick-entry .finance-segment-field > span { display: none; }
+.app-shell .finance-quick-entry .finance-segments button { min-height: 36px; }
+.app-shell .finance-quick-entry details.finance-advanced-fields { border-top: 0; padding-top: 0; }
+@container finance-entry (min-width: 760px) {
+  .app-shell .finance-quick-entry .finance-capture-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1.4fr); align-items: center; }
+  .app-shell .finance-quick-entry #financePayee { grid-column: 1; grid-row: 1; }
+  .app-shell .finance-quick-entry .finance-amount-field { grid-column: 2; grid-row: 1; }
+  .app-shell .finance-quick-entry #financeDate { grid-column: 3; grid-row: 1; }
+  .app-shell .finance-quick-entry #financeCategory { grid-column: 4; grid-row: 1; }
+  .app-shell .finance-quick-entry .finance-segment-field { grid-column: 1; grid-row: 2; }
+  .app-shell .finance-quick-entry details.finance-advanced-fields { grid-column: 2 / 4; grid-row: 2; align-self: center; }
+  .app-shell .finance-quick-entry details.finance-advanced-fields[open] { grid-column: 1 / -1; grid-row: 3; }
+  .app-shell .finance-quick-entry .finance-record-button { grid-column: 4; grid-row: 2; }
+}
+@container finance-entry (max-width: 759px) {
+  .app-shell .finance-quick-entry .finance-capture-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app-shell .finance-quick-entry :is(#financePayee, .finance-segment-field, #financeCategory, details.finance-advanced-fields, .finance-record-button) { grid-column: 1 / -1; }
+  .app-shell .finance-quick-entry :is(.finance-amount-field, #financeDate) { grid-column: auto; min-width: 0; }
+}
+
+/* The active ledger tab inherited the contrast hotfix's text-fill colour,
+   meant for a solid accent fill, and became invisible on its light tint. */
+.app-shell .command-tab.active { -webkit-text-fill-color: currentColor; }
+/* Column headings only make sense above rows. */
+.app-shell .finance-ledger-shell:has(.empty-state) .finance-ledger-head { display: none; }
+/* Amounts use the body face with tabular figures, like the stats above. */
+.app-shell :is(.rank-amount, .finance-ledger-amount, .finance-table td.numeric) { font-family: var(--font-body); font-variant-numeric: tabular-nums; letter-spacing: 0; font-feature-settings: "tnum" 1; }
+
+/* Desktop: room at the end of every view for the 88px Pomodoro button. */
+@media (min-width: 901px) {
+  .app-shell .container { padding-bottom: 96px; }
+  body.pomodoro-fab-hidden.app-shell .container { padding-bottom: 0; }
+}
+
+/* With no transactions at all the page shows one empty state (in the ledger)
+   instead of five: filters, totals, analysis panels and charts wait for data.
+   Budgets keep their form so they can be set up in advance. */
+#finance-container.is-empty :is(.finance-toolbar, .finance-kpi-grid, .command-visual-grid, .finance-filter-bar) { display: none; }
+#finance-container.is-empty .finance-panel-grid { order: 2; grid-template-columns: 1fr; }
+#finance-container.is-empty .finance-panel-grid > .finance-panel:not(.finance-budgets-panel) { display: none; }
+#finance-container.is-empty .finance-budgets-panel .empty-state { display: none; }
+#finance-container.is-empty .finance-command-shell > .finance-panel:has(.command-tabs) { order: 1; }
+
+/* --- Phase 4 · Events -------------------------------------------------------------
+   The add form waits behind "New event" and opens above the toolbar, where
+   the button was; while it is open its own close button takes over. */
+.app-shell .events-new-button { margin-left: auto; min-height: 36px; padding: 0 14px; border-radius: var(--radius-sm); font-size: 13px; }
+.app-shell .events-container.is-adding .events-new-button { display: none; }
+.app-shell #eventForm { position: relative; margin: 0 0 14px; padding-right: 52px; }
+.app-shell .event-form-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  min-height: 34px;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.app-shell .event-form-close:hover { color: var(--card-text); background: color-mix(in srgb, var(--card-text) 8%, transparent); }
+.app-shell .event-form-close .btn-icon { width: 16px; height: 16px; }
+
+@media (max-width: 900px) {
+  .app-shell .control-panel :is(input, select) { min-height: var(--tap-min); }
+  .app-shell .finance-quick-entry .finance-segments button { min-height: var(--tap-min); }
+  .app-shell .events-new-button { order: -1; flex: 1 1 100%; min-height: var(--tap-min); margin-left: 0; }
+  .app-shell .event-form-close { width: var(--tap-min); min-height: var(--tap-min); top: 6px; right: 6px; }
+  .app-shell #eventForm { padding-right: 16px; padding-top: 52px; }
+}

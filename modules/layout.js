@@ -105,8 +105,23 @@ function installWorkspaceName() {
   new MutationObserver(sync).observe(source, { childList: true, characterData: true, subtree: true });
 }
 
+// Finance shows one page-level empty state when there are no transactions.
+function installFinanceEmptyState() {
+  const container = document.getElementById('finance-container');
+  const render = window.renderFinance;
+  if (!container || typeof render !== 'function') return;
+  const paint = () => container.classList.toggle('is-empty', !(window.financeTransactions || []).length);
+  window.renderFinance = function renderFinanceWithEmptyState(...args) {
+    const result = render.apply(this, args);
+    paint();
+    return result;
+  };
+  paint();
+}
+
 export function installLayoutModule() {
   hydrateIcons();
+  installFinanceEmptyState();
   installBoardToolbar();
   installQuickCapture();
   installWorkspaceName();

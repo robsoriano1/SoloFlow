@@ -2296,50 +2296,50 @@
                             <span class="metric-label">Total Profit Earned</span>
                             <span class="status-dot dot-success"></span>
                         </div>
-                        <div id="stat-value" class="metric-value-display" style="color: var(--success);">₱0.00</div>
+                        <div id="stat-value" class="metric-value-display is-good">₱0.00</div>
                     </div>
                     <div class="metric-card-elevated card-budget">
                         <div class="metric-header">
                             <span class="metric-label">Total Budget Allocated</span>
                             <span class="status-dot dot-warning"></span>
                         </div>
-                        <div id="stat-budget" class="metric-value-display" style="color: var(--primary);">₱0.00</div>
+                        <div id="stat-budget" class="metric-value-display">₱0.00</div>
                     </div>
                     <div class="metric-card-elevated card-finished">
                         <div class="metric-header">
                             <span class="metric-label">Tasks Finished</span>
                             <span class="status-dot dot-primary"></span>
                         </div>
-                        <div id="stat-finished" class="metric-value-display" style="color: var(--primary);">0</div>
+                        <div id="stat-finished" class="metric-value-display">0</div>
                     </div>
                     <div class="metric-card-elevated card-overdue">
                         <div class="metric-header">
                             <span class="metric-label">Tasks Overdue</span>
                             <span class="status-dot dot-danger"></span>
                         </div>
-                        <div id="stat-overdue" class="metric-value-display" style="color: var(--danger);">0</div>
+                        <div id="stat-overdue" class="metric-value-display is-bad">0</div>
                     </div>
                     <div class="metric-card-elevated card-velocity">
                         <div class="metric-header">
                             <span class="metric-label">Tasks Finished Per Day</span>
                             <span class="status-dot dot-warning"></span>
                         </div>
-                        <div id="stat-velocity" class="metric-value-display" style="color: var(--warning);">0 / day</div>
+                        <div id="stat-velocity" class="metric-value-display">0 / day</div>
                     </div>
                     <div class="metric-card-elevated card-time">
                         <div class="metric-header">
                             <span class="metric-label">Total Time Tracked</span>
                             <span class="status-dot dot-purple"></span>
                         </div>
-                        <div id="stat-time" class="metric-value-display" style="color: var(--purple);">0h 0m</div>
+                        <div id="stat-time" class="metric-value-display">0h 0m</div>
                     </div>
                     <div class="metric-card-elevated card-finished">
                         <div class="metric-header"><span class="metric-label">Daily Focus Goal</span><span class="status-dot dot-primary"></span></div>
-                        <div id="stat-focus-quota" class="metric-value-display" style="color: var(--primary);">0%</div>
+                        <div id="stat-focus-quota" class="metric-value-display">0%</div>
                     </div>
                     <div class="metric-card-elevated card-velocity">
                         <div class="metric-header"><span class="metric-label">Day Streak</span><span class="status-dot dot-warning"></span></div>
-                        <div id="stat-focus-streak" class="metric-value-display" style="color: var(--warning);">0 days</div>
+                        <div id="stat-focus-streak" class="metric-value-display">0 days</div>
                     </div>
                 </div>
                 <div class="quota-settings" style="margin-top:16px;">
@@ -2413,7 +2413,7 @@
 
         <!-- Events Container: the add form and list are rendered by modules/events.js -->
         <div id="events-container" class="events-container" style="display: none;">
-            <form id="eventForm" class="form-card event-form" novalidate aria-label="Add an event"></form>
+            <form id="eventForm" class="form-card event-form" novalidate aria-label="Add an event" hidden></form>
             <div class="events-toolbar">
                 <div class="events-filter" role="group" aria-label="Which events to show">
                     <button type="button" class="events-filter-button active" data-event-filter="upcoming" aria-pressed="true">Upcoming <span class="events-filter-count" data-event-count="upcoming"></span></button>
@@ -2424,6 +2424,7 @@
                 <input type="search" id="eventSearch" class="events-search" placeholder="Search events…" autocomplete="off">
                 <button type="button" class="btn-small" id="eventsExport" title="Download the events shown as a calendar (.ics) file">Export .ics</button>
                 <button type="button" class="btn-small btn-danger" id="eventsClearPast" hidden>Clear past</button>
+                <button type="button" class="events-new-button" id="eventsNewToggle" aria-expanded="false" aria-controls="eventForm"><span data-icon="plus"></span> New event</button>
             </div>
             <div id="events-list" class="events-list"></div>
         </div>
@@ -2434,31 +2435,56 @@
         <!-- FINANCE TRACKER CONTAINER -->
         <div id="finance-container" class="finance-container" style="display: none; margin-bottom: 24px;">
             <div class="finance-command-shell">
+                <!-- Recording a transaction is the main action, so it leads the page. -->
+                <section class="finance-panel finance-quick-entry" aria-labelledby="financeQuickEntryTitle">
+                    <div class="finance-panel-header"><div><h3 id="financeQuickEntryTitle">Record a transaction</h3></div></div>
+                    <div class="finance-form-grid finance-capture-grid">
+                        <input type="text" id="financePayee" class="wide" placeholder="Merchant or payee" required>
+                        <label class="finance-amount-field wide" for="financeAmount"><span aria-hidden="true">₱</span><input type="number" id="financeAmount" placeholder="0.00" step="0.01" required><small>Transaction amount</small></label>
+                        <input type="date" id="financeDate">
+                        <div class="finance-segment-field wide"><span>Flow</span><div class="finance-segments" role="group" aria-label="Transaction flow"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeType','expense',this)">Expense</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeType','income',this)">Income</button></div><select id="financeType" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="expense">Expense (-)</option><option value="income">Income (+)</option></select></div>
+                        <input type="text" id="financeCategory" list="financeCategoryList" placeholder="Category" required>
+                        <datalist id="financeCategoryList"><option value="Food & Dining"><option value="PC Parts & Electronics"><option value="Vehicle & Transport"><option value="Living & Utilities"><option value="Server Hosting & Cloud"><option value="Subscriptions"><option value="Savings & Investments"><option value="Debt Paydown"><option value="Musical Instruments"><option value="Real Estate & Properties"><option value="Vehicle Mods"></datalist>
+                        <details class="task-advanced-fields finance-advanced-fields">
+                            <summary>More details</summary>
+                            <div class="task-advanced-drawer"><div class="task-advanced-inner">
+                                <div class="finance-form-grid">
+                                    <div class="finance-segment-field wide"><span>Cost profile</span><div class="finance-segments" role="group" aria-label="Cost profile"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeSpendingType','Discretionary',this)">Discretionary</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeSpendingType','Fixed',this)">Fixed</button></div><select id="financeSpendingType" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="Discretionary">Discretionary</option><option value="Fixed">Fixed Cost</option></select></div>
+                                    <div class="finance-segment-field wide"><span>50 / 30 / 20 allocation</span><div class="finance-segments finance-segments-three" role="group" aria-label="Allocation class"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeAllocationClass','needs',this)">Needs 50%</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeAllocationClass','wants',this)">Wants 30%</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeAllocationClass','savings',this)">Savings 20%</button></div><select id="financeAllocationClass" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="needs">Needs (50%)</option><option value="wants">Wants (30%)</option><option value="savings">Savings &amp; Assets (20%)</option></select></div>
+                                    <div class="finance-segment-field wide"><span>Transaction nature</span><div class="finance-segments" role="group" aria-label="Transaction nature"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeTransactionNature','expense',this)">Consumer expense</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeTransactionNature','asset',this)">Asset acquisition</button></div><select id="financeTransactionNature" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="expense">Consumer Expense</option><option value="asset">Asset Acquisition</option></select></div>
+                                    <div class="finance-segment-field wide"><span>Frequency</span><div class="finance-segments" role="group" aria-label="Transaction frequency"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeFrequency','one-time',this)">One-time</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeFrequency','recurring',this)">Recurring</button></div><select id="financeFrequency" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="one-time">One-Time</option><option value="recurring">Recurring</option></select></div>
+                                </div>
+                            </div></div>
+                        </details>
+                        <button class="wide finance-record-button" onclick="addFinanceTransaction()">Record transaction</button>
+                    </div>
+                </section>
+
                 <div class="finance-toolbar" aria-label="Financial analytics filters">
                     <div class="finance-control">
                         <label for="financeRangePreset">Reporting period</label>
                         <select id="financeRangePreset" onchange="updateFinanceFilters()">
-                            <option value="month">This Month</option>
-                            <option value="30d">Last 30 Days</option>
-                            <option value="qtd">Quarter-to-Date (QTD)</option>
-                            <option value="ytd">Year-to-Date (YTD)</option>
-                            <option value="custom">Custom Range</option>
+                            <option value="month">This month</option>
+                            <option value="30d">Last 30 days</option>
+                            <option value="qtd">Quarter to date</option>
+                            <option value="ytd">Year to date</option>
+                            <option value="custom">Custom range</option>
                         </select>
                     </div>
                     <div class="finance-control">
-                        <label for="financeNatureFilter">Expense / asset</label>
+                        <label for="financeNatureFilter">Type</label>
                         <select id="financeNatureFilter" onchange="updateFinanceFilters()">
-                            <option value="all">All Activity</option>
-                            <option value="expense">Consumer Expenses</option>
-                            <option value="asset">Asset Acquisitions</option>
+                            <option value="all">All activity</option>
+                            <option value="expense">Expenses</option>
+                            <option value="asset">Asset purchases</option>
                         </select>
                     </div>
                     <div class="finance-control">
                         <label for="financeFrequencyFilter">Frequency</label>
                         <select id="financeFrequencyFilter" onchange="updateFinanceFilters()">
-                            <option value="all">Recurring + One-Time</option>
-                            <option value="recurring">Recurring Only</option>
-                            <option value="one-time">One-Time Only</option>
+                            <option value="all">All frequencies</option>
+                            <option value="recurring">Recurring only</option>
+                            <option value="one-time">One-time only</option>
                         </select>
                     </div>
                     <div class="finance-control">
@@ -2485,19 +2511,19 @@
 
                 <div class="finance-panel-grid">
                     <section class="finance-panel">
-                        <div class="finance-panel-header"><div><span class="finance-section-kicker">Allocation analytics</span><h3>Top spending categories</h3></div><span id="finance-period-label" class="badge">This Month</span></div>
+                        <div class="finance-panel-header"><div><h3>Spending by category</h3></div><span id="finance-period-label" class="badge">This Month</span></div>
                         <div id="finance-category-bars" class="finance-bar-list"></div>
                     </section>
                     <section class="finance-panel">
-                        <div class="finance-panel-header"><div><span class="finance-section-kicker">Merchant intelligence</span><h3>Top 5 merchants</h3></div></div>
+                        <div class="finance-panel-header"><div><h3>Top merchants</h3></div></div>
                         <div id="finance-merchant-rank" class="rank-list"></div>
                     </section>
                     <section class="finance-panel">
-                        <div class="finance-panel-header"><div><span class="finance-section-kicker">50 / 30 / 20 health</span><h3>Allocation balance</h3></div></div>
+                        <div class="finance-panel-header"><div><h3>Needs, wants &amp; savings</h3><p class="finance-panel-sub">Against a 50 / 30 / 20 split</p></div></div>
                         <div id="finance-rule-health" class="rule-list"></div>
                     </section>
-                    <section class="finance-panel">
-                        <div class="finance-panel-header"><div><span class="finance-section-kicker">Budget intelligence</span><h3>Spend, pace &amp; forecast</h3></div></div>
+                    <section class="finance-panel finance-budgets-panel">
+                        <div class="finance-panel-header"><div><h3>Budgets</h3><p class="finance-panel-sub">Spend, pace and forecast by category</p></div></div>
                         <div id="finance-budget-progress" class="budget-list"></div>
                         <div class="finance-form-grid finance-budget-form">
                             <input id="budgetCategory" list="financeCategoryList" placeholder="Category">
@@ -2515,44 +2541,19 @@
                     </div>
 
                     <div id="finance-view-transactions" class="command-view active">
-                        <div class="finance-panel-grid" style="margin-top: 18px; grid-template-columns: .9fr 1.1fr;">
-                            <div>
-                                <div class="finance-panel-header"><div><span class="finance-section-kicker">Quick capture</span><h3>Record transaction</h3></div></div>
-                                <div class="finance-form-grid finance-capture-grid">
-                                    <input type="text" id="financePayee" class="wide" placeholder="Merchant or payee" required>
-                                    <label class="finance-amount-field wide" for="financeAmount"><span aria-hidden="true">₱</span><input type="number" id="financeAmount" placeholder="0.00" step="0.01" required><small>Transaction amount</small></label>
-                                    <input type="date" id="financeDate">
-                                    <div class="finance-segment-field wide"><span>Flow</span><div class="finance-segments" role="group" aria-label="Transaction flow"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeType','expense',this)">Expense</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeType','income',this)">Income</button></div><select id="financeType" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="expense">Expense (-)</option><option value="income">Income (+)</option></select></div>
-                                    <input type="text" id="financeCategory" list="financeCategoryList" placeholder="Category" required>
-                                    <datalist id="financeCategoryList"><option value="Food & Dining"><option value="PC Parts & Electronics"><option value="Vehicle & Transport"><option value="Living & Utilities"><option value="Server Hosting & Cloud"><option value="Subscriptions"><option value="Savings & Investments"><option value="Debt Paydown"><option value="Musical Instruments"><option value="Real Estate & Properties"><option value="Vehicle Mods"></datalist>
-                                    <details class="task-advanced-fields finance-advanced-fields">
-                                        <summary>More details</summary>
-                                        <div class="task-advanced-drawer"><div class="task-advanced-inner">
-                                            <div class="finance-form-grid">
-                                                <div class="finance-segment-field wide"><span>Cost profile</span><div class="finance-segments" role="group" aria-label="Cost profile"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeSpendingType','Discretionary',this)">Discretionary</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeSpendingType','Fixed',this)">Fixed</button></div><select id="financeSpendingType" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="Discretionary">Discretionary</option><option value="Fixed">Fixed Cost</option></select></div>
-                                                <div class="finance-segment-field wide"><span>50 / 30 / 20 allocation</span><div class="finance-segments finance-segments-three" role="group" aria-label="Allocation class"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeAllocationClass','needs',this)">Needs 50%</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeAllocationClass','wants',this)">Wants 30%</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeAllocationClass','savings',this)">Savings 20%</button></div><select id="financeAllocationClass" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="needs">Needs (50%)</option><option value="wants">Wants (30%)</option><option value="savings">Savings &amp; Assets (20%)</option></select></div>
-                                                <div class="finance-segment-field wide"><span>Transaction nature</span><div class="finance-segments" role="group" aria-label="Transaction nature"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeTransactionNature','expense',this)">Consumer expense</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeTransactionNature','asset',this)">Asset acquisition</button></div><select id="financeTransactionNature" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="expense">Consumer Expense</option><option value="asset">Asset Acquisition</option></select></div>
-                                                <div class="finance-segment-field wide"><span>Frequency</span><div class="finance-segments" role="group" aria-label="Transaction frequency"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeFrequency','one-time',this)">One-time</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeFrequency','recurring',this)">Recurring</button></div><select id="financeFrequency" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="one-time">One-Time</option><option value="recurring">Recurring</option></select></div>
-                                            </div>
-                                        </div></div>
-                                    </details>
-                                    <button class="wide" onclick="addFinanceTransaction()">Record Transaction</button>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="finance-panel-header finance-ledger-titlebar"><div><span class="finance-section-kicker">Filtered ledger</span><h3>Transactions</h3></div><div class="finance-ledger-title-actions"><span id="finance-tx-count" class="badge">0 Records</span><button id="financeLedgerToggle" type="button" class="finance-ledger-toggle" aria-controls="financeLedgerCollapsible" aria-expanded="true" onclick="toggleFinanceLedger()"><span id="financeLedgerToggleIcon" aria-hidden="true">⌃</span><span class="sr-only">Collapse transaction ledger</span></button></div></div>
-                                <div id="financeLedgerCollapsible" class="finance-ledger-collapsible">
-                                    <div class="finance-ledger-shell">
-                                        <div class="finance-ledger-head" aria-hidden="true"><span>Transaction</span><span>Classification</span><span>Amount</span><span></span></div>
-                                        <div id="finance-list" class="finance-ledger-list"></div>
-                                    </div>
+                        <div class="finance-ledger-block">
+                            <div class="finance-panel-header finance-ledger-titlebar"><div><h3>Transactions</h3></div><div class="finance-ledger-title-actions"><span id="finance-tx-count" class="badge">0 Records</span><button id="financeLedgerToggle" type="button" class="finance-ledger-toggle" aria-controls="financeLedgerCollapsible" aria-expanded="true" onclick="toggleFinanceLedger()"><span id="financeLedgerToggleIcon" aria-hidden="true">⌃</span><span class="sr-only">Collapse transaction ledger</span></button></div></div>
+                            <div id="financeLedgerCollapsible" class="finance-ledger-collapsible">
+                                <div class="finance-ledger-shell">
+                                    <div class="finance-ledger-head" aria-hidden="true"><span>Transaction</span><span>Classification</span><span>Amount</span><span></span></div>
+                                    <div id="finance-list" class="finance-ledger-list"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div id="finance-view-assets" class="command-view">
-                        <div class="finance-panel-header" style="margin-top:18px;"><div><span class="finance-section-kicker">Net-position tracking</span><h3>Capital &amp; asset ledger</h3></div></div>
+                        <div class="finance-panel-header" style="margin-top:18px;"><div><h3>Capital &amp; assets</h3></div></div>
                         <div class="finance-form-grid">
                             <input id="assetName" class="wide" placeholder="Asset / vehicle / gear name">
                             <input id="assetCategory" placeholder="Category">
@@ -2567,7 +2568,7 @@
                     </div>
 
                     <div id="finance-view-projects" class="command-view">
-                        <div class="finance-panel-header" style="margin-top:18px;"><div><span class="finance-section-kicker">Isolated capital plans</span><h3>One-off project budgets</h3></div></div>
+                        <div class="finance-panel-header" style="margin-top:18px;"><div><h3>Project budgets</h3></div></div>
                         <div class="finance-form-grid">
                             <input id="projectName" class="wide" placeholder="Project name">
                             <input id="projectMilestone" placeholder="Current milestone">
@@ -4222,7 +4223,7 @@
                     <div class="performance-hero">
                         <section class="performance-panel">
                             <span class="finance-section-kicker">Focus time today</span>
-                            <div class="focus-quota-value" style="color:${metrics.quotaPercent >= 100 ? 'var(--success)' : 'var(--primary)'}">${formatFocusDuration(metrics.dailyFocusSeconds)}</div>
+                            <div class="focus-quota-value${metrics.quotaPercent >= 100 ? ' is-good' : ''}">${formatFocusDuration(metrics.dailyFocusSeconds)}</div>
                             <div class="focus-quota-copy">Goal ${goalHours.toFixed(goalHours % 1 ? 1 : 0)}h · ${metrics.quotaPercent.toFixed(0)}% done · ${metrics.streak}-day streak</div>
                             <div class="prod-progress-bar-bg"><div class="prod-progress-bar-fill" style="width:${metrics.quotaPercent}%"></div></div>
                             <div class="quota-settings" style="margin-top:14px"><label style="font-size:11px;font-weight:700">Daily goal <input id="productivityHubGoal" type="number" min=".25" max="24" step=".25" value="${goalHours}" style="width:90px;margin-left:6px" onchange="document.getElementById('productivityDailyGoalHours').value=this.value;updateProductivityGoal()"></label></div>
@@ -4234,10 +4235,10 @@
                     </div>
 
                     <div class="performance-kpis">
-                        <article class="performance-kpi"><span class="finance-section-kicker">Finished this week</span><div class="performance-kpi-value" style="color:var(--success)">${metrics.recentCompleted.length}</div><div class="performance-kpi-meta">${metrics.throughputRate.toFixed(0)}% of what you took on this week</div></article>
-                        <article class="performance-kpi"><span class="finance-section-kicker">Tasks finished per day</span><div class="performance-kpi-value" style="color:var(--primary)">${metrics.velocity.toFixed(2)}/day</div><div class="performance-kpi-meta">Daily average over the last week</div></article>
-                        <article class="performance-kpi"><span class="finance-section-kicker">Avg. time to finish a task</span><div class="performance-kpi-value" style="color:var(--warning)">${metrics.averageCycleDays.toFixed(1)}d</div><div class="performance-kpi-meta">From the day you start it to the day it is done</div></article>
-                        <article class="performance-kpi"><span class="finance-section-kicker">Focused hours per task</span><div class="performance-kpi-value" style="color:#8b5cf6">${metrics.focusOutputHours.toFixed(1)}h</div><div class="performance-kpi-meta">Timer hours logged per finished task</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Finished this week</span><div class="performance-kpi-value">${metrics.recentCompleted.length}</div><div class="performance-kpi-meta">${metrics.throughputRate.toFixed(0)}% of what you took on this week</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Tasks finished per day</span><div class="performance-kpi-value">${metrics.velocity.toFixed(2)}<small>/day</small></div><div class="performance-kpi-meta">Daily average over the last week</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Avg. time to finish a task</span><div class="performance-kpi-value">${metrics.averageCycleDays.toFixed(1)}<small>days</small></div><div class="performance-kpi-meta">From the day you start it to the day it is done</div></article>
+                        <article class="performance-kpi"><span class="finance-section-kicker">Focused hours per task</span><div class="performance-kpi-value">${metrics.focusOutputHours.toFixed(1)}<small>h</small></div><div class="performance-kpi-meta">Timer hours logged per finished task</div></article>
                     </div>
 
                     <div class="performance-grid">
@@ -5709,7 +5710,7 @@
             document.getElementById('finance-period-label').innerText = analytics.range.label;
             const balance = document.getElementById('finance-balance');
             balance.innerText = `${analytics.net < 0 ? '-' : ''}${financeMoney(analytics.net)}`;
-            balance.style.color = analytics.net >= 0 ? 'var(--success)' : 'var(--danger)';
+            balance.style.color = analytics.net > 0 ? 'var(--success-text)' : analytics.net < 0 ? 'var(--danger-text)' : '';
             document.getElementById('finance-income').innerText = financeMoney(analytics.inflow);
             document.getElementById('finance-expenses').innerText = financeMoney(analytics.outflow);
             document.getElementById('finance-net-meta').innerText = `${financeMoney(analytics.inflow)} in · ${financeMoney(analytics.outflow)} out`;
@@ -5717,13 +5718,13 @@
             burn.innerText = `${financeMoney(analytics.dailyBurn)} / day`;
             const target = preferences.dailyTargetCents || 0;
             const burnDelta = target ? analytics.dailyBurn - target : 0;
-            burn.style.color = target && burnDelta > 0 ? 'var(--danger)' : 'var(--warning)';
+            burn.style.color = target ? (burnDelta > 0 ? 'var(--danger-text)' : 'var(--success-text)') : '';
             document.getElementById('finance-burn-meta').innerText = target ? `${burnDelta > 0 ? financeMoney(burnDelta) + ' above' : financeMoney(Math.abs(burnDelta)) + ' below'} ${financeMoney(target)} target` : `${analytics.daysElapsed} elapsed day${analytics.daysElapsed === 1 ? '' : 's'} · set a daily target`;
             document.getElementById('finance-runway').innerText = `${analytics.runway.toFixed(1)} mo`;
-            document.getElementById('finance-runway').style.color = analytics.runway >= 6 ? 'var(--success)' : analytics.runway >= 3 ? 'var(--warning)' : 'var(--danger)';
+            document.getElementById('finance-runway').style.color = !preferences.liquidCashCents ? '' : analytics.runway >= 6 ? 'var(--success-text)' : analytics.runway >= 3 ? 'var(--warning-text)' : 'var(--danger-text)';
             document.getElementById('finance-runway-meta').innerText = `${financeMoney(preferences.liquidCashCents)} liquid · ${financeMoney(analytics.monthlyOutflow)}/mo avg`;
             document.getElementById('finance-savings-rate').innerText = `${analytics.savingsRate.toFixed(1)}%`;
-            document.getElementById('finance-savings-rate').style.color = analytics.savingsRate >= 20 ? 'var(--success)' : analytics.savingsRate >= 0 ? 'var(--warning)' : 'var(--danger)';
+            document.getElementById('finance-savings-rate').style.color = !analytics.inflow ? '' : analytics.savingsRate >= 20 ? 'var(--success-text)' : analytics.savingsRate >= 0 ? 'var(--warning-text)' : 'var(--danger-text)';
             document.getElementById('finance-savings-meta').innerText = analytics.inflow ? `${financeMoney(analytics.net)} retained in period` : 'Add inflow to calculate rate';
 
             const categoryEntries = Object.entries(analytics.categories).sort((a,b) => b[1] - a[1]);
@@ -5747,7 +5748,9 @@
                 const classification = classifyFinanceTransaction(tx);
                 const income = tx.amountCents > 0;
                 return `<div class="finance-ledger-row"><div class="finance-ledger-payee"><strong>${financeEscape(tx.payee)}</strong><time>${new Date(tx.date).toLocaleDateString()}</time></div><div class="finance-ledger-tags"><span class="badge">${financeEscape(tx.category)}</span><span>${financeEscape(classification.allocationClass)}</span><span>${financeEscape(classification.nature)}</span><span>${financeEscape(classification.frequency)}</span></div><strong class="finance-ledger-amount ${income ? 'income' : 'expense'}">${income ? '+' : '-'}${financeMoney(tx.amountCents)}</strong><button class="btn-small btn-danger finance-row-action" onclick="deleteFinanceTransaction('${tx.id}')" aria-label="Delete ${financeEscape(tx.payee)} transaction">✕</button></div>`;
-            }).join('') : window.emptyStateHTML('No matching transactions', 'Change the reporting filters or capture the first record for this view.', 'Log your first transaction', "setFinanceCommandView('transactions');document.getElementById('financePayee').focus()");
+            }).join('') : (window.financeTransactions || []).length
+                ? window.emptyStateHTML('No matching transactions', 'Change the reporting filters to see more.', '', '')
+                : window.emptyStateHTML('No transactions yet', 'Record your first one above. Cash flow, spending by category, top merchants and budgets will appear here.', 'Record a transaction', "document.getElementById('financePayee').focus()");
 
             renderFinanceBudgets(analytics);
             renderFinanceAssets();
