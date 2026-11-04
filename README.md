@@ -18,6 +18,7 @@ Open `http://localhost:8080/index.html`.
 - `Cmd/Ctrl + K` or `/`: open the global command palette
 - `F`: focus the Kanban search field
 - `Space` or `P`: toggle focus timer
+- `T`: show or hide the floating Pomodoro button (the timer keeps running while hidden)
 - `1`–`6`: Kanban, Focus, Backlog, Schedule, Productivity, Finance
 - `Escape`: close overlays and clear batch selection
 

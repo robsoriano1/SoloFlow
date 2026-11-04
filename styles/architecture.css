@@ -1829,6 +1829,7 @@ details.customize-menu[open] {
 /* Keep the bottom-right stack clear of the button. */
 .toast-deck { bottom: 122px; }
 .offline-banner { bottom: 122px; }
+body.pomodoro-fab-hidden .toast-deck, body.pomodoro-fab-hidden .offline-banner { bottom: 22px; }
 
 .pomodoro-dialog {
   width: min(430px, calc(100vw - 28px)); padding: 0; color: var(--card-text);
@@ -1841,6 +1842,10 @@ details.customize-menu[open] {
 .pomodoro-title { margin: 0; font: 700 17px/1.2 var(--font-display); letter-spacing: -.02em; }
 .pomodoro-close { width: 30px; height: 30px; padding: 0; font-size: 13px; color: inherit; background: transparent; border: 1px solid var(--surface-border); border-radius: var(--radius-sm); cursor: pointer; }
 .pomodoro-close:hover { background: var(--surface-border); }
+.pomodoro-head-actions { display: flex; align-items: center; gap: 6px; }
+.pomodoro-hide { height: 30px; padding: 0 10px; font-size: 12px; font-weight: 600; color: inherit; background: transparent; border: 1px solid var(--surface-border); border-radius: var(--radius-sm); cursor: pointer; }
+.pomodoro-hide:hover { background: var(--surface-border); }
+.pomodoro-fab[hidden] { display: none !important; }
 
 .pomodoro-stage { position: relative; display: grid; place-items: center; width: 212px; height: 212px; margin: 0 auto; }
 .pomodoro-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
@@ -1852,6 +1857,9 @@ details.customize-menu[open] {
 .pomodoro-phase { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .62; }
 .pomodoro-clock { font: 700 50px/1 var(--font-display); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
 .pomodoro-cycles { font-size: 11px; opacity: .62; }
+.pomodoro-count-reset { padding: 2px 8px; font-size: 11px; font-weight: 600; color: inherit; background: transparent; border: 1px solid var(--surface-border); border-radius: 999px; cursor: pointer; opacity: .75; }
+.pomodoro-count-reset:hover { opacity: 1; background: var(--surface-border); }
+.pomodoro-count-reset[hidden] { display: none; }
 
 .pomodoro-task { display: flex; flex-direction: column; gap: 5px; }
 .pomodoro-task label { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .66; }
@@ -1878,6 +1886,7 @@ details.customize-menu[open] {
   .pomodoro-fab-time { font-size: 15px; }
   .pomodoro-fab-phase { font-size: 11px; }
   .toast-deck, .offline-banner { bottom: calc(182px + env(safe-area-inset-bottom, 0px)); }
+  body.pomodoro-fab-hidden .toast-deck, body.pomodoro-fab-hidden .offline-banner { bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
   .pomodoro-stage { width: 182px; height: 182px; }
   .pomodoro-clock { font-size: 42px; }
 }
