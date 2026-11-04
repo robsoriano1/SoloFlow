@@ -1568,8 +1568,9 @@ details.customize-menu[open] {
    header on mobile so they do not compete for tab width.
    ========================================================================== */
 @media (max-width: 900px) {
+  /* Bottom space clears the tab bar and the docked Pomodoro pill (v10). */
   body.app-shell,
-  body.app-shell.sidebar-collapsed { padding: 14px 14px 104px !important; }
+  body.app-shell.sidebar-collapsed { padding: 14px 14px var(--content-bottom-space) !important; }
 
   .app-sidebar,
   body.sidebar-collapsed .app-sidebar {
@@ -2275,4 +2276,102 @@ body.sidebar-collapsed .sidebar-toggle svg { rotate: 180deg; }
   width: calc((100% - 12px) / var(--lanes, 1) - 2px);
   margin-left: calc(2px + (100% - 12px) * var(--lane, 0) / var(--lanes, 1));
   padding-inline: 0;
+}
+
+/* ============================================================================
+   v10 — Desktop and phone UI pass
+   ----------------------------------------------------------------------------
+   Layout and presentation only. IDs, handlers, window.* functions and storage
+   keys are untouched; colours come from the theme tokens so every preset,
+   custom palette and font pairing keeps working. Appended last so it wins on
+   source order; !important appears only where it answers an earlier one.
+   ========================================================================== */
+
+:root {
+  /* Phone shell geometry. The tab bar, the docked Pomodoro pill and the main
+     content's bottom space are all derived from these, so they cannot drift. */
+  --bottom-nav-h: 66px;
+  --fab-pill-h: 44px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --content-bottom-space: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--fab-pill-h) + 28px);
+  --tap-min: 44px;
+}
+body.pomodoro-fab-hidden { --content-bottom-space: calc(var(--bottom-nav-h) + var(--safe-bottom) + 20px); }
+
+/* --- Phase 1 · Finance budget row ------------------------------------------
+   It used an inline 1fr 1fr auto grid that ignored every breakpoint, so on a
+   phone the amount field and Set Budget ran ~220px off screen. */
+.finance-form-grid.finance-budget-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 14px;
+}
+.finance-budget-form > input { flex: 1 1 150px; min-width: 0; }
+.finance-budget-form > button { flex: 0 0 auto; }
+@media (max-width: 560px) {
+  .finance-budget-form > * { flex-basis: 100%; }
+}
+
+/* --- Phase 1 · Pomodoro button on phones ------------------------------------
+   An 68px disc sat over Quick Capture, calendar cells and card buttons. On the
+   phone shell it becomes a compact pill docked just above the tab bar. */
+@media (max-width: 900px) {
+  .pomodoro-fab,
+  .app-shell .pomodoro-fab {
+    right: 12px;
+    bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 10px);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    height: var(--fab-pill-h);
+    min-height: var(--fab-pill-h);
+    padding: 0 14px 0 11px;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px -12px var(--primary), 0 2px 8px -4px rgba(0, 0, 0, .45);
+  }
+  .pomodoro-fab:hover { transform: translateY(-1px); }
+  .pomodoro-fab-ring { position: static; flex: none; width: 20px; height: 20px; }
+  .pomodoro-fab-ring circle { stroke-width: 12; }
+  .pomodoro-fab-face { flex-direction: row; align-items: baseline; gap: 6px; }
+  .pomodoro-fab-time { font-size: 15px; }
+  .pomodoro-fab-phase { font-size: 11px; letter-spacing: .02em; text-transform: none; }
+  .toast-deck,
+  .offline-banner { bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--fab-pill-h) + 20px); }
+  body.pomodoro-fab-hidden .toast-deck,
+  body.pomodoro-fab-hidden .offline-banner { bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 12px); }
+}
+
+/* The pre-boot toast (index.html's first showToast) sat at bottom: 24px, on
+   top of the Pomodoro button and, on phones, the tab bar. It now shares the
+   toast stack's position. */
+.toast { right: 18px; bottom: 122px; max-width: min(370px, calc(100vw - 28px)); }
+body.pomodoro-fab-hidden .toast { bottom: 22px; }
+@media (max-width: 900px) {
+  .toast { right: 14px; bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--fab-pill-h) + 20px); }
+  body.pomodoro-fab-hidden .toast { bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 12px); }
+}
+
+/* --- Phase 1 · Tap targets on phones ----------------------------------------
+   Every control a finger has to hit is at least 44px in both directions.
+   Grid geometry that encodes time (event blocks and chips inside schedule
+   rows) is exempt; the cell underneath is the larger target there. */
+@media (max-width: 900px) {
+  .app-shell :is(button, .btn-small, .btn-alt, a.btn-small, summary, select):not(:where(.schedule-event-block, .schedule-chip-stack .schedule-chip, .calendar-day)) {
+    min-height: var(--tap-min);
+  }
+  .app-shell :is(button, .btn-small, a.btn-small, summary.btn-small):not(:where(.schedule-event-block, .schedule-chip, .calendar-day, .view-tab)) {
+    min-width: var(--tap-min);
+  }
+  .app-shell input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]):not([type="hidden"]) { min-height: var(--tap-min); }
+  .app-shell :is(.btn-small, a.btn-small, summary.btn-small) { display: inline-flex; align-items: center; justify-content: center; }
+  .app-shell .shell-quick-action { width: var(--tap-min); height: var(--tap-min); }
+  .app-shell .event-location { min-height: var(--tap-min); }
+  .app-shell .finance-row-action { width: var(--tap-min); opacity: 1; transform: none; }
+  .app-shell #btn-clear-done { min-height: var(--tap-min); padding-inline: 12px; }
+  .app-shell .schedule-header-chips .schedule-chip { min-height: var(--tap-min); }
+}
+@media (max-width: 680px) {
+  .app-shell .finance-ledger-row { grid-template-columns: minmax(0, 1fr) auto var(--tap-min); }
 }

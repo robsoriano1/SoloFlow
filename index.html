@@ -2103,6 +2103,15 @@
         <!-- Editable Workspace Subtitle/Title -->
         <h2 id="pageTitle" contenteditable="true" role="textbox" aria-label="Editable dashboard title" aria-multiline="false" spellcheck="false" title="Click to edit workspace name">My Workspace</h2>
 
+        <!-- ACTIVE VIEW HEADER -->
+        <div id="viewHeader" class="view-header">
+            <div class="view-header-copy">
+                <h2 id="viewHeaderTitle" class="view-header-title">Kanban Board</h2>
+                <p id="viewHeaderSub" class="view-header-sub">Every task, grouped by status.</p>
+            </div>
+            <span id="viewHeaderCount" class="view-header-count" hidden></span>
+        </div>
+
         <!-- Floating Rich Text Toolbar -->
         <div id="formatToolbar" class="format-toolbar" role="toolbar" aria-label="Inline text formatting" style="display: none;">
             <button type="button" onmousedown="event.preventDefault(); formatText('bold')" title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button>
@@ -2495,7 +2504,7 @@
                     <section class="finance-panel">
                         <div class="finance-panel-header"><div><span class="finance-section-kicker">Budget intelligence</span><h3>Spend, pace &amp; forecast</h3></div></div>
                         <div id="finance-budget-progress" class="budget-list"></div>
-                        <div class="finance-form-grid" style="grid-template-columns: 1fr 1fr auto; margin-top: 14px;">
+                        <div class="finance-form-grid finance-budget-form">
                             <input id="budgetCategory" list="financeCategoryList" placeholder="Category">
                             <input id="budgetAmount" type="number" min="0" step="100" placeholder="Monthly allocation (₱)">
                             <button onclick="upsertFinanceBudget()">Set Budget</button>
@@ -2576,15 +2585,6 @@
                     </div>
                 </section>
             </div>
-        </div>
-
-        <!-- ACTIVE VIEW HEADER -->
-        <div id="viewHeader" class="view-header">
-            <div class="view-header-copy">
-                <h2 id="viewHeaderTitle" class="view-header-title">Kanban Board</h2>
-                <p id="viewHeaderSub" class="view-header-sub">Every task, grouped by status.</p>
-            </div>
-            <span id="viewHeaderCount" class="view-header-count" hidden></span>
         </div>
 
         <!-- SEARCH BAR -->
