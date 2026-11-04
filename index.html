@@ -3840,12 +3840,22 @@
                 window.expandedCards.delete(taskId);
                 expandArea.classList.remove('expanded');
                 if (card) card.classList.remove('is-expanded');
-                if (btn) btn.innerHTML = `${ICONS.chevronDown} See More`;
+                if (btn) {
+                    btn.innerHTML = ICONS.chevronDown;
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.setAttribute('aria-label', 'Show details and actions');
+                    btn.title = 'Details and more actions';
+                }
             } else {
                 window.expandedCards.add(taskId);
                 expandArea.classList.add('expanded');
                 if (card) card.classList.add('is-expanded');
-                if (btn) btn.innerHTML = `${ICONS.chevronUp} See Less`;
+                if (btn) {
+                    btn.innerHTML = ICONS.chevronUp;
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.setAttribute('aria-label', 'Hide details and actions');
+                    btn.title = 'Hide details and actions';
+                }
             }
         };
 
@@ -4509,53 +4519,49 @@
                     const blockingTask = window.tasks.find(t => t.id === task.blockedBy);
                     if (blockingTask && blockingTask.status !== 'done') {
                         isBlocked = true;
-                        blockedBadgeHtml = `<div style="background: rgba(231, 76, 60, 0.1); color: var(--danger); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px dashed var(--danger);">🔒 Blocked by: ${taskEscape(blockingTask.title)}</div>`;
+                        blockedBadgeHtml = `<div class="task-blocked-note">${ICONS.lock}<span>Blocked by ${taskEscape(blockingTask.title)}</span></div>`;
                     }
                 }
 
                 card.draggable = !isBlocked;
-                if (isBlocked) card.style.opacity = '0.65';
+                if (isBlocked) card.classList.add('is-blocked');
                 card.ondragstart = (e) => window.handleDragStart(e, task.id);
-                
-                let actionBtns = '';
+
+                // One main action per card; everything else lives behind the chevron.
+                let mainAction = '';
+                let backAction = '';
                 if (isBlocked) {
-                    actionBtns = `<span style="font-size: 12px; color: var(--danger); font-weight: bold; padding: 5px 0;">🔒 Locked</span>`;
+                    mainAction = `<span class="task-locked">${ICONS.lock} Blocked</span>`;
+                } else if (task.status === 'todo') {
+                    mainAction = `<button type="button" class="task-main-action" onclick="moveTask('${task.id}', 'inprogress')">Start ${ICONS.arrowRight}</button>`;
+                } else if (task.status === 'inprogress') {
+                    mainAction = `<button type="button" class="task-main-action" onclick="moveTask('${task.id}', 'done')">${ICONS.check} Complete</button>`;
+                    backAction = `<button type="button" class="task-card-action" onclick="moveTask('${task.id}', 'todo')">${ICONS.arrowLeft} Back to To Do</button>`;
                 } else {
-                    if (task.status === 'todo') {
-                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">Start ${ICONS.arrowRight}</button>`;
-                    } else if (task.status === 'inprogress') {
-                        actionBtns = `
-                            <button class="btn-small" onclick="moveTask('${task.id}', 'todo')">${ICONS.arrowLeft} Back</button>
-                            <button class="btn-small" onclick="moveTask('${task.id}', 'done')">Complete ${ICONS.arrowRight}</button>
-                        `;
-                    } else {
-                        actionBtns = `<button class="btn-small" onclick="moveTask('${task.id}', 'inprogress')">${ICONS.arrowLeft} Reopen</button>`;
-                    }
+                    mainAction = `<button type="button" class="task-main-action" onclick="moveTask('${task.id}', 'inprogress')">${ICONS.refresh} Reopen</button>`;
                 }
 
                 const safePhotoUrl = taskSafeUrl(task.photoUrl, true);
                 const photoHtml = safePhotoUrl ? `<img src="${taskEscape(safePhotoUrl)}" class="task-photo" alt="Attached photo" onerror="this.style.display='none'">` : '';
                 const photoThumbHtml = safePhotoUrl ? `<img src="${taskEscape(safePhotoUrl)}" class="task-photo-thumb" alt="Task attachment thumbnail" onerror="this.style.display='none'">` : '';
-                
+
                 let linksContainerHtml = '';
-                if (task.linkUrl || task.workspaceUrl) {
+                const safeLink = taskSafeUrl(task.linkUrl);
+                const safeWorkspace = taskSafeUrl(task.workspaceUrl);
+                if (safeLink || safeWorkspace) {
                     linksContainerHtml = `<div class="task-links-container">`;
-                    if (taskSafeUrl(task.linkUrl)) {
-                        linksContainerHtml += `<a href="${taskEscape(taskSafeUrl(task.linkUrl))}" target="_blank" rel="noopener noreferrer" class="task-link">🔗 Reference Link</a>`;
-                    }
-                    if (taskSafeUrl(task.workspaceUrl)) {
-                        linksContainerHtml += `<a href="${taskEscape(taskSafeUrl(task.workspaceUrl))}" target="_blank" rel="noopener noreferrer" class="task-link doc-link">📄 Workspace / Doc</a>`;
-                    }
+                    if (safeLink) linksContainerHtml += `<a href="${taskEscape(safeLink)}" target="_blank" rel="noopener noreferrer" class="task-link">${ICONS.link} Reference link</a>`;
+                    if (safeWorkspace) linksContainerHtml += `<a href="${taskEscape(safeWorkspace)}" target="_blank" rel="noopener noreferrer" class="task-link doc-link">${ICONS.file} Workspace doc</a>`;
                     linksContainerHtml += `</div>`;
                 }
 
                 const financeTypeLabel = task.financeType || 'Profit';
                 const financeClass = financeTypeLabel === 'Budget' ? 'metric-budget' : 'metric-profit';
                 const budgetHtml = task.budget ? `<div class="task-metric ${financeClass}">${financeTypeLabel}: ₱${parseFloat(task.budget).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>` : '';
-                
+
                 const descText = task.description || '';
-                const descHtml = `<div class="task-desc editable" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${taskSanitizeRichText(descText)}</div>`;
-                
+                const descHtml = `<div class="task-desc editable${descText ? '' : ' is-empty'}" contenteditable="true" spellcheck="false" onblur="updateTaskField('${task.id}', 'description', this)" data-placeholder="Add description...">${taskSanitizeRichText(descText)}</div>`;
+
                 let subtasksHtml = '<div class="subtasks-list">';
                 if(task.subtasks && task.subtasks.length > 0) {
                     task.subtasks.forEach((st, idx) => {
@@ -4563,7 +4569,7 @@
                         const strikeClass = st.completed ? 'completed' : '';
                         subtasksHtml += `
                             <div class="subtask-item ${strikeClass}">
-                                <input type="checkbox" ${checked} onchange="toggleSubtask('${task.id}', ${idx})">
+                                <input type="checkbox" ${checked} onchange="toggleSubtask('${task.id}', ${idx})" aria-label="Subtask done">
                                 <div class="subtask-text-container editable" contenteditable="true" spellcheck="false" 
                                     onkeydown="preventEnter(event)" 
                                     onblur="updateTaskField('${task.id}', 'subtasks', this, ${idx})">${taskSanitizeRichText(st.text)}</div>
@@ -4571,42 +4577,45 @@
                         `;
                     });
                 }
-                subtasksHtml += `<button class="btn-small" style="margin-top: 4px; align-self: flex-start; color: var(--primary); border-color: rgba(var(--primary-rgb, 217, 119, 6), 0.4); font-weight: bold;" onclick="addSubtask('${task.id}')">+ Add Subtask</button>`;
+                subtasksHtml += `<button type="button" class="task-add-subtask" onclick="addSubtask('${task.id}')">${ICONS.plus} Add subtask</button>`;
                 subtasksHtml += '</div>';
 
-                let dueBadgeHtml = '';
+                // Due date as one quiet line. Colour only marks today and overdue.
+                let dueLineHtml = '';
                 if (task.dueDate && task.status !== 'done') {
-                    const due = new Date(task.dueDate);
+                    const due = new Date(`${task.dueDate}T00:00:00`);
                     const today = new Date();
-                    due.setHours(0,0,0,0); today.setHours(0,0,0,0); 
-                    
-                    const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-                    
-                    if (diffDays < 0) {
-                        dueBadgeHtml = `<p style="color: var(--danger); font-weight: bold; width: 100%;">⚠️ Overdue by ${Math.abs(diffDays)} days</p>`;
-                    } else if (diffDays === 0) {
-                        dueBadgeHtml = `<p style="color: var(--warning); font-weight: bold; width: 100%;">⏰ Due Today</p>`;
-                    } else {
-                        dueBadgeHtml = `<p style="opacity: 0.8; width: 100%;">⏳ ${diffDays} days left</p>`;
+                    today.setHours(0,0,0,0);
+                    const diffDays = Math.round((due - today) / (1000 * 60 * 60 * 24));
+                    const timeLabel = task.dueTime && window.formatTime ? `, ${window.formatTime(task.dueTime)}` : '';
+                    const plural = (n) => `${n} day${n === 1 ? '' : 's'}`;
+                    let dueText = '';
+                    let dueState = '';
+                    if (Number.isNaN(diffDays)) dueText = '';
+                    else if (diffDays < 0) { dueText = `Overdue by ${plural(Math.abs(diffDays))}`; dueState = 'is-overdue'; }
+                    else if (diffDays === 0) { dueText = `Due today${timeLabel}`; dueState = 'is-today'; }
+                    else if (diffDays === 1) dueText = `Due tomorrow${timeLabel}`;
+                    else {
+                        const options = { weekday: 'short', month: 'short', day: 'numeric' };
+                        if (due.getFullYear() !== today.getFullYear()) options.year = 'numeric';
+                        dueText = `Due ${due.toLocaleDateString('en-US', options)}${timeLabel}`;
                     }
+                    if (dueText) dueLineHtml = `<span class="task-due ${dueState}">${dueState === 'is-overdue' ? ICONS.alert : ICONS.clock}<span>${dueText}</span></span>`;
                 }
 
                 let metaHtml = `<div class="task-meta">`;
-                if (task.assignee) metaHtml += `<p><strong>Assigned to:</strong> ${taskEscape(task.assignee)}</p>`;
-                
+                if (task.assignee) metaHtml += `<p><strong>Assigned to</strong> <span>${taskEscape(task.assignee)}</span></p>`;
                 metaHtml += `
                     <p>
-                        <strong>Assigned:</strong> 
-                        <input type="date" class="meta-input-date" value="${task.dateAssigned || ''}" onchange="updateTaskDate('${task.id}', 'dateAssigned', this.value)" title="Change assigned date">
+                        <strong>Assigned</strong>
+                        <input type="date" class="meta-input-date" value="${task.dateAssigned || ''}" onchange="updateTaskDate('${task.id}', 'dateAssigned', this.value)" title="Change assigned date" aria-label="Assigned date">
                     </p>
                     <p>
-                        <strong>Due:</strong> 
-                        <input type="date" class="meta-input-date" value="${task.dueDate || ''}" onchange="updateTaskDate('${task.id}', 'dueDate', this.value)" title="Change due date">
-                        <input type="time" class="meta-input-time" value="${task.dueTime || ''}" onchange="updateTaskDate('${task.id}', 'dueTime', this.value)" title="Change due time">
+                        <strong>Due</strong>
+                        <input type="date" class="meta-input-date" value="${task.dueDate || ''}" onchange="updateTaskDate('${task.id}', 'dueDate', this.value)" title="Change due date" aria-label="Due date">
+                        <input type="time" class="meta-input-time" value="${task.dueTime || ''}" onchange="updateTaskDate('${task.id}', 'dueTime', this.value)" title="Change due time" aria-label="Due time">
                     </p>
                 `;
-                
-                if (dueBadgeHtml) metaHtml += dueBadgeHtml;
                 metaHtml += `</div>`;
 
                 const totalSeconds = task.timeSpent || 0;
@@ -4614,7 +4623,7 @@
                 const mins = Math.floor((totalSeconds % 3600) / 60);
                 const secs = totalSeconds % 60;
                 const timeString = `${hrs > 0 ? hrs + 'h ' : ''}${mins}m ${secs}s`;
-                
+
                 const isTimerActive = (window.activeTaskId === task.id);
                 const timerBtnClass = isTimerActive ? 'btn-timer active' : 'btn-timer';
                 const timerBtnText = isTimerActive ? `${ICONS.stop} Stop` : `${ICONS.play} Pomodoro`;
@@ -4624,36 +4633,34 @@
                     timerHtml = `
                         <div class="timer-container">
                             <button class="${timerBtnClass}" onclick="toggleTimer('${task.id}')" id="btn-timer-${task.id}">${timerBtnText}</button>
-                            <span class="timer-display" id="display-timer-${task.id}">⏱ ${timeString}</span>
+                            <span class="timer-time">${ICONS.timer}<span class="timer-display" id="display-timer-${task.id}">${timeString}</span></span>
                         </div>
                     `;
                 }
 
                 const isExpanded = window.expandedCards.has(task.id);
-                const expandBtnText = isExpanded ? `${ICONS.chevronUp} See Less` : `${ICONS.chevronDown} See More`;
                 const expandClass = isExpanded ? "task-expand-area expanded" : "task-expand-area";
                 if (isExpanded) card.classList.add('is-expanded');
                 if (task.photoUrl) card.classList.add('has-photo');
 
+                // .badges keeps priority first and category second: tasks.js edits them by position.
                 card.innerHTML = `
                     ${photoThumbHtml}
                     <div class="task-title editable" contenteditable="true" spellcheck="false" 
                         onkeydown="preventEnter(event)" 
                         onblur="updateTaskField('${task.id}', 'title', this)">${taskEscape(task.title)}</div>
                     ${budgetHtml}
-                    ${dueBadgeHtml && !isExpanded ? `<div style="font-size: 11px; margin-bottom: 8px;">${dueBadgeHtml}</div>` : ''}
                     <div class="badges">
                         <span class="badge ${taskEscape(task.priority.toLowerCase())}">${taskEscape(task.priority)}</span>
-                        <span class="badge">${taskEscape(task.category)}</span>
-                        ${task.financeSynced ? `<span class="badge" style="border-color: var(--success); color: var(--success);">✓ Finance Logged</span>` : ''}
+                        <span class="badge category-chip">${taskEscape(task.category)}</span>
+                        ${task.financeSynced ? `<span class="badge finance-logged-chip">${ICONS.check} Finance logged</span>` : ''}
+                        ${dueLineHtml}
                     </div>
                     ${descHtml}
 
-                    <div class="actions" style="margin-top: 8px;">
-                        <div style="display: flex; gap: 5px;">
-                            ${actionBtns}
-                        </div>
-                        <button class="btn-small btn-expand" id="btn-expand-${task.id}" onclick="toggleCardExpand('${task.id}')">${expandBtnText}</button>
+                    <div class="actions task-card-footer">
+                        <div class="task-main-action-slot">${mainAction}</div>
+                        <button type="button" class="btn-expand task-expand-toggle" id="btn-expand-${task.id}" onclick="toggleCardExpand('${task.id}')" aria-controls="expand-${task.id}" aria-expanded="${isExpanded}" aria-label="${isExpanded ? 'Hide details and actions' : 'Show details and actions'}" title="${isExpanded ? 'Hide details and actions' : 'Details and more actions'}">${isExpanded ? ICONS.chevronUp : ICONS.chevronDown}</button>
                     </div>
 
                     <div class="${expandClass}" id="expand-${task.id}">
@@ -4664,11 +4671,12 @@
                         ${metaHtml}
                         ${timerHtml}
                         <div class="actions task-card-action-strip">
-                           <button class="btn-small task-card-action" title="Upload or link a photo" onclick="editTaskPhoto('${task.id}')"><span aria-hidden="true">▧</span> Photo</button>
-                           <button class="btn-small task-card-action" title="Edit reference or workspace links" onclick="editTaskLinks('${task.id}')">${ICONS.arrowUpRight} Links</button>
-                           <button class="btn-small task-card-action task-action-email" title="Send a progress update to the assignee or target email" onclick="emailTaskUpdate('${task.id}')"><span aria-hidden="true">✉</span> Email Update</button>
-                           <button class="btn-small task-card-action" title="${task.dueDate ? 'Export an iCalendar file' : 'Add a due date to export an iCalendar file'}" onclick="syncTaskToCalendarFile('${task.id}')"><span aria-hidden="true">⇩</span> .ics</button>
-                           <button class="btn-small btn-danger task-card-action task-action-delete" onclick="deleteTask('${task.id}')"><span aria-hidden="true">×</span> Delete</button>
+                           ${backAction}
+                           <button type="button" class="task-card-action" title="Upload or link a photo" onclick="editTaskPhoto('${task.id}')">${ICONS.image} Photo</button>
+                           <button type="button" class="task-card-action" title="Edit reference or workspace links" onclick="editTaskLinks('${task.id}')">${ICONS.link} Links</button>
+                           <button type="button" class="task-card-action task-action-email" title="Send a progress update to the assignee or target email" onclick="emailTaskUpdate('${task.id}')">${ICONS.mail} Email update</button>
+                           <button type="button" class="task-card-action" title="${task.dueDate ? 'Export an iCalendar file' : 'Add a due date to export an iCalendar file'}" onclick="syncTaskToCalendarFile('${task.id}')">${ICONS.calendar} .ics</button>
+                           <button type="button" class="task-card-action task-action-delete" onclick="deleteTask('${task.id}')">${ICONS.trash} Delete</button>
                         </div>
                     </div>
                 `;

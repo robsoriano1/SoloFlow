@@ -194,28 +194,12 @@ export function installTaskModule(store) {
     });
   }
 
-  function decorateDates(card, task) {
-    if (card.querySelector('.inline-date-cluster')) return;
-    const meta = card.querySelector('.task-meta');
-    if (!meta) return;
-    const dueParagraph = [...meta.querySelectorAll('p')].find((paragraph) => paragraph.textContent.includes('Due:'));
-    if (dueParagraph) dueParagraph.hidden = true;
-    const cluster = document.createElement('div');
-    cluster.className = 'inline-date-cluster';
-    const label = document.createElement('span');
-    label.textContent = 'Due';
-    label.className = 'badge';
-    const date = document.createElement('time');
-    date.className = 'inline-date-value';
-    date.textContent = task.dueDate || '';
-    const time = document.createElement('time');
-    time.className = 'inline-date-value';
-    time.textContent = task.dueTime || '';
-    decorateInlineField(date, task, 'dueDate', 'YYYY-MM-DD');
-    decorateInlineField(time, task, 'dueTime', 'HH:MM');
-    cluster.append(label, date, time);
-    const topActions = card.querySelector(':scope > .actions');
-    if (topActions) topActions.before(cluster); else card.append(cluster);
+  // The card header shows the due date as one line ("Due Thu, Nov 5", "Due
+  // today", "Overdue by 2 days") and the card's details hold the date and time
+  // fields, so there is no separate inline date cluster with empty
+  // YYYY-MM-DD / HH:MM placeholders any more.
+  function decorateDates(card) {
+    card.querySelector('.inline-date-cluster')?.remove();
   }
 
   function decorateProgress(card, task) {
@@ -231,8 +215,8 @@ export function installTaskModule(store) {
     const text = document.createElement('span');
     text.textContent = `${completed}/${task.subtasks.length}`;
     pill.append(ring, text);
-    const actions = card.querySelector(':scope > .actions');
-    actions?.before(pill);
+    const chips = card.querySelector(':scope > .badges');
+    if (chips) chips.append(pill); else card.querySelector(':scope > .actions')?.before(pill);
   }
 
   function decorateCards() {
@@ -263,7 +247,8 @@ export function installTaskModule(store) {
           const badge = document.createElement('span');
           badge.className = 'badge project-epic-badge';
           badge.textContent = `Epic · ${project.name}`;
-          title?.after(badge);
+          const chips = card.querySelector(':scope > .badges');
+          if (chips) chips.append(badge); else title?.after(badge);
         }
       }
     });
