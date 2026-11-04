@@ -45,6 +45,8 @@ export function installShortcutManager(taskModule) {
       const taskId = window.SoloFlowTimer?.activeTaskId || window.SoloFlowStore?.state.selection?.[0] || window.tasks?.find((task) => task.status === 'inprogress')?.id || window.tasks?.find((task) => task.status !== 'done')?.id;
       if (taskId) window.toggleTimer?.(taskId); else window.showToast?.('No active task is available.', 'info');
     } },
+    { icon: '◷', title: '> Show / Hide Pomodoro Button', detail: 'Toggle the floating timer button (T)', kind: 'Command', keywords: 'pomodoro timer hide show toggle button fab t', run: () => window.SoloFlowPomodoro?.toggleHidden() },
+    { icon: '↺', title: '> Reset Pomodoro Count', detail: 'Set completed focus blocks back to 0', kind: 'Command', keywords: 'pomodoro timer reset count cycles clear', run: () => window.SoloFlowPomodoro?.resetCount() },
     { icon: '₱', title: '> Go to Finance', detail: 'Open the Financial Command Center', kind: 'Command', keywords: 'money ledger budget cash', run: () => window.setView('finance') },
     { icon: '◐', title: '> Toggle Theme', detail: 'Cycle through accessible colorways', kind: 'Command', keywords: 'appearance palette dark light', run: () => window.cycleSoloFlowTheme?.() },
     { icon: '⚙', title: '> Open Settings', detail: 'Customize appearance, accounts, and data', kind: 'Command', keywords: 'settings customize theme backup account', run: () => { const settings = document.getElementById('workspaceSettings'); if (settings) settings.open = true; } },
@@ -162,6 +164,7 @@ export function installShortcutManager(taskModule) {
     if (event.key === '/') { event.preventDefault(); openPalette(); return; }
     if (views[event.key]) { event.preventDefault(); window.setView?.(views[event.key]); return; }
     if (event.key.toLowerCase() === 'n') { event.preventDefault(); window.setView?.('all'); document.getElementById('taskTitle')?.focus(); return; }
+    if (event.key.toLowerCase() === 't') { event.preventDefault(); window.SoloFlowPomodoro?.toggleHidden(); return; }
     if (event.key.toLowerCase() === 'f') { event.preventDefault(); document.getElementById('searchInput')?.focus(); return; }
     if (event.code === 'Space' || event.key.toLowerCase() === 'p') {
       event.preventDefault();

@@ -2,8 +2,9 @@ import { createHeartbeat } from './timer.js';
 
 const STORAGE_KEY = 'soloflow_pomodoro';
 const DEVICE_KEY = 'soloflow_device_id';
-const DEFAULT_SETTINGS = { work: 25, short: 5, long: 15, longEvery: 4, autoStart: true, sound: true };
-// Shared with the user's other devices; the chime stays a per-device choice.
+const DEFAULT_SETTINGS = { work: 25, short: 5, long: 15, longEvery: 4, autoStart: true, sound: true, hidden: false };
+// Shared with the user's other devices; the chime and hiding the floating
+// button stay per-device choices.
 const SYNCED_SETTINGS = ['work', 'short', 'long', 'longEvery', 'autoStart'];
 // An interval noticed later than this ended while SoloFlow wasn't running
 // (closed, asleep, or a frozen background tab). It stops there rather than
@@ -270,6 +271,31 @@ export function installPomodoroModule(store) {
     paint();
   }
 
+  // Clears the completed-block count, which also restarts the long-break
+  // cadence. The current interval keeps running.
+  function resetCount() {
+    if (!cycles) return;
+    if (!window.confirm(`Reset your ${cycles} completed focus block${cycles === 1 ? '' : 's'} to 0?`)) return;
+    cycles = 0;
+    publish();
+    paint();
+    store.bus.emit('pomodoro:count-reset', {});
+    window.showToast?.('Focus block count reset.', 'info');
+  }
+
+  // Hides or shows the floating timer button. The timer itself keeps running.
+  function setHidden(hidden) {
+    settings.hidden = Boolean(hidden);
+    persist();
+    paintVisibility();
+    paintSettings();
+    if (settings.hidden && dialog.open) dialog.close();
+    window.showToast?.(settings.hidden
+      ? 'Timer button hidden. Press T or use the command palette to show it again.'
+      : 'Timer button shown.', 'info');
+  }
+  const toggleHidden = () => setHidden(!settings.hidden);
+
   function toggle() {
     if (isRunning()) return pause();
     if (session && session.remaining > 0) return resume();
@@ -357,7 +383,10 @@ export function installPomodoroModule(store) {
     <div class="pomodoro-shell">
       <div class="pomodoro-head">
         <h2 id="pomodoroDialogTitle" class="pomodoro-title">Pomodoro</h2>
-        <button type="button" class="pomodoro-close" data-action="close" aria-label="Close the Pomodoro timer">✕</button>
+        <div class="pomodoro-head-actions">
+          <button type="button" class="pomodoro-hide" data-action="hide" title="Hide the floating timer button (press T to show it again)">Hide button</button>
+          <button type="button" class="pomodoro-close" data-action="close" aria-label="Close the Pomodoro timer">✕</button>
+        </div>
       </div>
 
       <div class="pomodoro-stage">
@@ -368,7 +397,8 @@ export function installPomodoroModule(store) {
         <div class="pomodoro-readout">
           <span class="pomodoro-phase" data-role="phase">Focus</span>
           <strong class="pomodoro-clock" data-role="clock" role="timer" aria-live="off">25:00</strong>
-          <span class="pomodoro-cycles" data-role="cycles">0 completed today</span>
+          <span class="pomodoro-cycles" data-role="cycles">0 focus blocks completed</span>
+          <button type="button" class="pomodoro-count-reset" data-action="reset-count">Reset count</button>
         </div>
       </div>
 
@@ -394,6 +424,7 @@ export function installPomodoroModule(store) {
         </div>
         <label class="pomodoro-check"><input type="checkbox" data-setting="autoStart"> Start the next interval automatically</label>
         <label class="pomodoro-check"><input type="checkbox" data-setting="sound"> Play a chime when an interval ends</label>
+        <label class="pomodoro-check"><input type="checkbox" data-setting="visible"> Show the floating timer button</label>
       </details>
     </div>`;
 
@@ -402,6 +433,7 @@ export function installPomodoroModule(store) {
   const el = (role) => dialog.querySelector(`[data-role="${role}"]`);
   const taskSelect = el('task');
   const primaryButton = dialog.querySelector('[data-action="toggle"]');
+  const resetCountButton = dialog.querySelector('[data-action="reset-count"]');
   const fabProgress = fab.querySelector('.pomodoro-fab-progress');
   const ringProgress = dialog.querySelector('.pomodoro-ring-progress');
   const FAB_CIRCUMFERENCE = 2 * Math.PI * 44;
@@ -447,6 +479,7 @@ export function installPomodoroModule(store) {
     el('phase').textContent = PHASES[phase].label;
     el('clock').textContent = clock;
     el('cycles').textContent = `${cycles} focus block${cycles === 1 ? '' : 's'} completed`;
+    resetCountButton.hidden = !cycles;
     ringProgress.style.strokeDasharray = String(RING_CIRCUMFERENCE);
     ringProgress.style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - progress));
     primaryButton.textContent = running ? 'Pause' : (session && session.remaining < total ? 'Resume' : `Start ${PHASES[phase].label.toLowerCase()}`);
@@ -454,10 +487,16 @@ export function installPomodoroModule(store) {
     document.title = running ? `${clock} · ${PHASES[phase].label} — ${baseTitle}` : baseTitle;
   }
 
+  function paintVisibility() {
+    fab.hidden = Boolean(settings.hidden);
+    document.body.classList.toggle('pomodoro-fab-hidden', Boolean(settings.hidden));
+  }
+
   function paintSettings() {
     dialog.querySelectorAll('[data-setting]').forEach((input) => {
       const key = input.dataset.setting;
-      if (input.type === 'checkbox') input.checked = Boolean(settings[key]);
+      if (key === 'visible') input.checked = !settings.hidden;
+      else if (input.type === 'checkbox') input.checked = Boolean(settings[key]);
       else input.value = settings[key];
     });
   }
@@ -479,6 +518,8 @@ export function installPomodoroModule(store) {
   primaryButton.addEventListener('click', () => { toggle(); paint(); });
   dialog.querySelector('[data-action="reset"]').addEventListener('click', () => reset());
   dialog.querySelector('[data-action="skip"]').addEventListener('click', () => skip());
+  resetCountButton.addEventListener('click', () => resetCount());
+  dialog.querySelector('[data-action="hide"]').addEventListener('click', () => setHidden(true));
 
   taskSelect.addEventListener('change', () => {
     taskId = taskSelect.value || null;
@@ -490,6 +531,7 @@ export function installPomodoroModule(store) {
   dialog.querySelectorAll('[data-setting]').forEach((input) => {
     input.addEventListener('change', () => {
       const key = input.dataset.setting;
+      if (key === 'visible') { setHidden(!input.checked); return; }
       if (input.type === 'checkbox') settings[key] = input.checked;
       else settings[key] = clampMinutes(input.value, DEFAULT_SETTINGS[key]);
       paintSettings();
@@ -510,6 +552,7 @@ export function installPomodoroModule(store) {
 
   paintTaskSelect();
   paintSettings();
+  paintVisibility();
   paint();
 
   // Schedule chips hand a task straight to the timer, without cutting a running break short.
@@ -521,7 +564,8 @@ export function installPomodoroModule(store) {
 
   window.openPomodoro = open;
   window.SoloFlowPomodoro = {
-    open, toggle, reset, skip, receive,
+    open, toggle, reset, skip, receive, resetCount, setHidden, toggleHidden,
+    get hidden() { return Boolean(settings.hidden); },
     get phase() { return currentPhase(); },
     get running() { return isRunning(); },
     get taskId() { return taskId; },
