@@ -10,6 +10,7 @@ import { installProductivityModule } from './modules/productivity.js';
 import { installFinanceModule } from './modules/finance.js';
 import { installShortcutManager } from './modules/shortcuts.js';
 import { installReportModule } from './modules/reports.js';
+import { installLayoutModule } from './modules/layout.js';
 
 function bridgeLegacyPersistence(store) {
   const bindings = {
@@ -161,6 +162,7 @@ function start() {
   installFinanceModule(store);
   installShortcutManager(taskModule);
   installReportModule();
+  installLayoutModule(store);
   installNetworkStatus(store);
   registerServiceWorker();
   window.renderTasks?.();

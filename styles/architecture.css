@@ -2375,3 +2375,263 @@ body.pomodoro-fab-hidden .toast { bottom: 22px; }
 @media (max-width: 680px) {
   .app-shell .finance-ledger-row { grid-template-columns: minmax(0, 1fr) auto var(--tap-min); }
 }
+
+/* --- Phase 2 · Icons --------------------------------------------------------
+   One icon system: Phosphor in the nav, modules/icons.js everywhere else.
+   Static markup marks a slot with [data-icon]; the slot keeps its size before
+   the module fills it so nothing shifts. */
+[data-icon] { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 14px; height: 14px; }
+[data-icon] .btn-icon { width: 100%; height: 100%; }
+/* Buttons are flex boxes, where the space between an icon and its label
+   collapses. Zero specificity: any component that sets its own gap wins. */
+:where(.app-shell) :where(button, .btn-small, .btn-alt, a.btn-small, .active-task-badge, .badge) { gap: 6px; }
+.btn-icon { flex: none; }
+
+/* --- Phase 2 · Page heading --------------------------------------------------
+   "My Workspace" no longer repeats above every view; the view title is the
+   page's h1. The brand stays in the sidebar and the phone top bar. */
+.soloflow-title-group .soloflow-brand-name {
+  margin: 0;
+  color: var(--card-text);
+  font: 700 16px/1.15 var(--font-display);
+  letter-spacing: -.02em;
+  font-synthesis-weight: none;
+}
+.app-shell .view-header {
+  align-items: flex-end;
+  gap: 16px;
+  margin: 6px 0 18px;
+  padding: 0 2px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+}
+.app-shell .view-header-title {
+  margin: 0;
+  color: var(--text);
+  font: 700 clamp(24px, 2.3vw, 32px)/1.1 var(--font-display);
+  letter-spacing: -.03em;
+  font-synthesis-weight: none;
+}
+.app-shell .view-header-sub { margin-top: 6px; color: color-mix(in srgb, var(--text) 70%, transparent); font-size: 13px; opacity: 1; }
+.app-shell .view-header-count {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font: 600 12px/1 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* The workspace name now lives in Settings as an ordinary text field. */
+.settings-field-label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 12px; font-weight: 600; }
+.settings-hint { margin: 8px 0 0; color: var(--text-muted); font-size: 12px; }
+.app-shell .settings-workspace #pageTitle,
+.app-shell .settings-workspace #pageTitle:hover,
+.app-shell .settings-workspace #pageTitle:focus {
+  display: block;
+  width: min(100%, 460px);
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 13px;
+  color: var(--card-text);
+  -webkit-text-fill-color: currentColor;
+  background: var(--surface-sunken);
+  background-clip: border-box;
+  -webkit-background-clip: border-box;
+  border: 1px solid color-mix(in srgb, var(--card-text) 14%, transparent);
+  border-radius: var(--radius-sm);
+  font: 600 15px/1.4 var(--font-body);
+  letter-spacing: 0;
+  text-wrap: nowrap;
+  overflow: hidden;
+}
+.app-shell .settings-workspace #pageTitle:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--focus-ring); }
+.app-shell .settings-workspace #pageTitle::before { display: none; }
+.app-shell .settings-group h4 { display: flex; align-items: center; gap: 8px; }
+.app-shell .settings-group h4 [data-icon] { color: var(--primary); width: 15px; height: 15px; }
+.app-shell details.customize-menu > summary > span:first-child { display: inline-flex; align-items: center; gap: 9px; }
+
+/* --- Phase 2 · Board toolbar ------------------------------------------------
+   Search, filters and view options on one line, without a panel around them.
+   setView() shows this row with an inline display:flex, so it is laid out as
+   a wrapping flex row. */
+.app-shell .control-panel {
+  position: relative;
+  z-index: 30; /* its menu opens over Quick Capture and the board */
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.app-shell .control-panel .search-input-wrapper { flex: 1 1 260px; min-width: 0; }
+.app-shell .control-panel .search-logo-icon { left: 13px; width: 16px; height: 16px; color: var(--text-muted); }
+.app-shell .control-panel select { flex: 0 1 180px; min-width: 0; }
+.app-shell .control-panel :is(input, select) { min-height: 42px; }
+.toolbar-overflow { display: contents; }
+.toolbar-more-toggle { display: none; }
+.toolbar-more-menu { display: contents; }
+.app-shell .control-panel .density-switcher { flex: none; align-self: stretch; align-items: stretch; }
+.app-shell .control-panel .density-button { min-height: 34px; padding: 6px 12px; font-size: 12px; }
+.app-shell .control-panel .report-launcher {
+  flex: none;
+  align-self: stretch;
+  margin: 0;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+/* --- Phase 2 · Quick Capture --------------------------------------------------
+   One line: the field and Add. Priority, due date and paste-from-email appear
+   while the card has focus (or once something is set); "Add details" opens the
+   full drawer, which replaces the old "Add Details / Options" toggle. */
+.app-shell #kanban-task-form {
+  gap: 0;
+  margin-bottom: 18px;
+  padding: 5px 5px 5px 14px;
+  border-radius: var(--radius-md);
+  overflow: visible;
+  transition: border-color var(--motion-fast, .15s) ease, box-shadow var(--motion-fast, .15s) ease;
+}
+.app-shell #kanban-task-form:focus-within {
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  box-shadow: 0 0 0 3px var(--focus-ring), var(--shadow-card);
+}
+#kanban-task-form .task-quick-row { display: flex; align-items: center; gap: 8px; }
+#kanban-task-form .task-quick-row > * { width: auto; grid-column: auto; }
+#kanban-task-form .quick-capture-icon { width: 18px; height: 18px; color: var(--primary); }
+#kanban-task-form #taskTitle {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 4px;
+  color: var(--card-text);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-size: 15px;
+}
+#kanban-task-form #taskTitle:focus { background: transparent; border: 0; box-shadow: none; }
+.app-shell .quick-capture-details-toggle {
+  flex: none;
+  min-height: 36px;
+  padding: 0 10px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.app-shell .quick-capture-details-toggle:hover,
+.app-shell .quick-capture-details-toggle[aria-expanded="true"] { color: var(--primary); background: color-mix(in srgb, var(--primary) 9%, transparent); transform: none; }
+.app-shell #kanban-task-form .quick-add-submit { flex: none; min-height: 36px; padding: 0 18px; border-radius: var(--radius-sm); }
+.task-quick-extras { display: none; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 9px 9px 26px; }
+#kanban-task-form.is-expanded .task-quick-extras { display: flex; }
+.task-quick-extras select,
+.task-quick-extras input[type="date"] { flex: 0 1 170px; min-width: 0; min-height: 38px; padding-block: 6px; font-size: 13px; }
+.app-shell .task-quick-extras .btn-email { min-height: 38px; padding: 0 12px; font-size: 13px; }
+#kanban-task-form details.task-advanced-fields { display: none; margin: 0 9px 9px 26px; padding-top: 0; border-top: 0; }
+#kanban-task-form.is-expanded details.task-advanced-fields[open] { display: block; }
+#kanban-task-form details.task-advanced-fields > summary { display: none; }
+#kanban-task-form details.task-advanced-fields[open] .task-advanced-inner { padding-top: 4px; }
+
+/* --- Phase 2 · Case and type --------------------------------------------------
+   Uppercase, letter-spaced text is kept for section labels (finance and
+   settings kickers, column titles). Form labels, badges and stat labels read
+   in normal case, and counts use the body face with tabular figures. */
+.app-shell .finance-control label,
+.app-shell .finance-segment-field > span,
+.app-shell .finance-amount-field small,
+.app-shell .event-field-label,
+.app-shell .pomodoro-task label,
+.app-shell .batch-field,
+.app-shell .micro-label,
+.app-shell .metric-label,
+.app-shell .sidebar-brand-copy small,
+.app-shell .finance-ledger-head,
+.app-shell .finance-table th,
+.app-shell .finance-kpi .finance-section-kicker,
+.app-shell .performance-kpi .finance-section-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.app-shell .badge,
+.app-shell .task-card .badge,
+.app-shell .badge.high,
+.app-shell .badge.medium,
+.app-shell .badge.low,
+.app-shell .active-task-badge,
+.app-shell .project-epic-badge {
+  letter-spacing: 0;
+  text-transform: none;
+}
+.app-shell .nav-badge,
+.app-shell .col-total,
+.app-shell .subtask-progress-pill,
+.app-shell .events-filter-count,
+.app-shell .events-group-title span,
+.app-shell .calendar-blocks {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.app-shell .calendar-blocks { display: inline-flex; align-items: center; gap: 3px; }
+.app-shell .calendar-blocks .btn-icon { width: 11px; height: 11px; }
+.app-shell .active-task-badge { display: inline-flex; align-items: center; }
+
+@media (max-width: 900px) {
+  /* Phone top bar: brand on the left, search and settings on the right. */
+  .app-shell .soloflow-header { padding: 6px 6px 6px 8px; margin-bottom: 12px; }
+  .app-shell .soloflow-logo-badge { width: 34px; height: 34px; }
+  .app-shell .shell-quick-action { border-radius: var(--radius-sm); }
+  .app-shell .view-header { margin-top: 2px; }
+
+  /* Board toolbar: search and a "⋯" menu on one line, filters on the next.
+     The density switch and Generate summary move into the menu. */
+  .app-shell .control-panel .search-input-wrapper { order: 0; flex: 1 1 calc(100% - 52px); }
+  .app-shell .control-panel .toolbar-overflow { order: 1; position: relative; display: block; flex: none; }
+  .app-shell .control-panel select { order: 2; flex: 1 1 calc(50% - 4px); }
+  .toolbar-more-toggle {
+    display: inline-flex;
+    width: var(--tap-min);
+    color: var(--card-text);
+    background: var(--surface-sunken);
+    border: 1px solid color-mix(in srgb, var(--card-text) 12%, transparent);
+    box-shadow: none;
+  }
+  .toolbar-overflow.is-open .toolbar-more-toggle { border-color: var(--primary); color: var(--primary); }
+  .toolbar-more-toggle [data-icon] { width: 18px; height: 18px; }
+  .toolbar-more-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 70;
+    display: none;
+    width: min(280px, calc(100vw - 28px));
+    padding: 10px;
+    background: var(--surface);
+    border: 1px solid var(--surface-border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-overlay, 0 24px 60px -24px rgba(0, 0, 0, .7));
+  }
+  .toolbar-overflow.is-open .toolbar-more-menu { display: grid; gap: 8px; }
+  .app-shell .control-panel .toolbar-more-menu .density-switcher { width: 100%; }
+  .app-shell .control-panel .toolbar-more-menu .report-launcher { width: 100%; min-height: var(--tap-min); }
+
+  #kanban-task-form .task-quick-row { gap: 4px; }
+  .app-shell #kanban-task-form .quick-add-submit,
+  .app-shell .quick-capture-details-toggle { min-height: var(--tap-min); }
+  .app-shell .quick-capture-details-toggle { padding: 0 8px; }
+  #kanban-task-form #taskTitle { min-height: var(--tap-min); font-size: 16px; }
+  .task-quick-extras { padding-left: 0; }
+  .task-quick-extras select,
+  .task-quick-extras input[type="date"] { flex: 1 1 calc(50% - 4px); min-height: var(--tap-min); }
+  .app-shell .task-quick-extras .btn-email { flex: 1 1 100%; min-height: var(--tap-min); }
+  #kanban-task-form details.task-advanced-fields { margin-left: 0; }
+}

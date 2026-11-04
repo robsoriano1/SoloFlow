@@ -130,9 +130,9 @@ export function installTaskModule(store) {
     const task = window.tasks.find((item) => item.id === taskId);
     if (!task) return;
     contextMenu.replaceChildren();
-    addContextAction('✓', 'Move to Done', () => window.moveTask(taskId, 'done'));
+    addContextAction(ICONS.check, 'Move to Done', () => window.moveTask(taskId, 'done'));
     addContextAction(ICONS.play, 'Start Focus Timer', () => window.toggleTimer?.(taskId));
-    addContextAction('⧉', 'Duplicate Task', () => {
+    addContextAction(ICONS.copy, 'Duplicate Task', () => {
       const copy = clone(task);
       copy.id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       copy.title = `${task.title} (Copy)`;
@@ -159,7 +159,7 @@ export function installTaskModule(store) {
       try { await navigator.clipboard.writeText(url.href); window.showToast?.('Task link copied', 'success'); }
       catch { window.showToast?.('Clipboard permission was unavailable', 'error'); }
     });
-    addContextAction('⌫', 'Delete Task', () => window.deleteTask(taskId), true);
+    addContextAction(ICONS.trash, 'Delete Task', () => window.deleteTask(taskId), true);
     contextMenu.hidden = false;
     const bounds = contextMenu.getBoundingClientRect();
     contextMenu.style.left = `${Math.min(x, innerWidth - bounds.width - 10)}px`;

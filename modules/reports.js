@@ -130,5 +130,6 @@ export function installReportModule() {
   button.className = 'btn-alt report-launcher';
   button.textContent = 'Generate summary';
   button.addEventListener('click', window.openSummaryReport);
-  document.querySelector('.control-panel')?.append(button);
+  // Folds into the board toolbar's overflow menu on phones; inline on desktop.
+  (document.getElementById('boardToolbarMenu') || document.querySelector('.control-panel'))?.append(button);
 }
