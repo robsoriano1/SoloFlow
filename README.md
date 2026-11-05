@@ -46,6 +46,10 @@ Hover or tab to any chart for exact figures. **Table** shows the same data as ro
 
 `docs/production-readiness/ASSESSMENT.md` lists what still stands between SoloFlow and a production launch. `docs/production-readiness/CLAUDE_CODE_PROMPT.md` is a phased brief for Claude Code to build it.
 
+## Product roadmap
+
+`docs/product-roadmap/CLAUDE_CODE_PROMPT.md` is a build-by-build brief for Claude Code covering product and UX work: a real Today view, one-line smart capture, the phone layout, tasks on the weekly schedule, a restructured Finance page, productivity trends with a weekly review, and motion.
+
 ## PDF reports
 
 Use **Generate summary**, then **Print / Save PDF**. The browser print dialog provides the platform-native PDF export while keeping the app dependency-free.
