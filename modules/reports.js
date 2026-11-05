@@ -107,7 +107,7 @@ export function installReportModule() {
   const print = document.createElement('button');
   print.className = 'btn-small';
   print.textContent = 'Print / Save PDF';
-  print.addEventListener('click', () => printReport());
+  print.addEventListener('click', () => window.printReport());
   const close = document.createElement('button');
   close.className = 'btn-small';
   close.textContent = 'Close';
