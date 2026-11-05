@@ -15,7 +15,9 @@ concurrency:
 jobs:
   test:
     name: Lint and test
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moves to Ubuntu 26, and Playwright installs
+    # Chromium's system packages per distribution.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
