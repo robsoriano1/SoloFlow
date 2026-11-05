@@ -1869,7 +1869,6 @@
         .budget-fill.warning { background: #f59e0b; } .budget-fill.danger { background: #ef4444; }
         .budget-meta { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; font-size: 11px; opacity: .68; }
         .finance-alert { padding: 9px 11px; margin-top: 10px; border: 1px solid rgba(245,158,11,.3); border-radius: var(--radius-md); background: rgba(245,158,11,.08); color: var(--warning); font-size: 11px; }
-        .sparkline { width: 72px; height: 24px; overflow: visible; }
         .command-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 5px; border: 1px solid rgba(var(--primary-rgb), .14); border-radius: var(--radius-lg); background: rgba(var(--surface-rgb), .48); }
         .command-tab { flex: 0 0 auto; min-height: 36px; padding: 7px 13px; background: transparent; color: var(--card-text); box-shadow: none; font-size: 12px; }
         .command-tab.active { background: var(--primary); color: var(--primary-contrast-text); }
@@ -2024,7 +2023,7 @@
         @media(max-width: 620px) { .task-quick-row { grid-template-columns: 1fr; } .task-quick-row > *, .task-quick-row .quick-add-submit { grid-column: auto; width: 100%; } details.task-advanced-fields > summary { width: 100%; } .column h3 { top: 122px; } }
         @media(max-width: 390px) { .task-card.has-photo:not(.is-expanded) { padding-right: 70px; } .task-photo-thumb { right: 11px; top: 12px; } }
     </style>
-    <link rel="stylesheet" href="./styles/architecture.css?v=18">
+    <link rel="stylesheet" href="./styles/architecture.css?v=19">
 </head>
 <body>
     <aside id="appSidebar" class="app-sidebar" aria-label="Primary workspace navigation">
@@ -2453,7 +2452,7 @@
                     <div class="finance-form-grid finance-capture-grid">
                         <input type="text" id="financePayee" class="wide" placeholder="Merchant or payee" required>
                         <label class="finance-amount-field wide" for="financeAmount"><span aria-hidden="true">₱</span><input type="number" id="financeAmount" placeholder="0.00" step="0.01" required><small>Transaction amount</small></label>
-                        <input type="date" id="financeDate">
+                        <input type="date" id="financeDate" aria-label="Transaction date">
                         <div class="finance-segment-field wide"><span>Flow</span><div class="finance-segments" role="group" aria-label="Transaction flow"><button type="button" class="active" aria-pressed="true" onclick="setFinanceSegment('financeType','expense',this)">Expense</button><button type="button" aria-pressed="false" onclick="setFinanceSegment('financeType','income',this)">Income</button></div><select id="financeType" class="segmented-source" tabindex="-1" aria-hidden="true"><option value="expense">Expense (-)</option><option value="income">Income (+)</option></select></div>
                         <input type="text" id="financeCategory" list="financeCategoryList" placeholder="Category" required>
                         <datalist id="financeCategoryList"><option value="Food & Dining"><option value="PC Parts & Electronics"><option value="Vehicle & Transport"><option value="Living & Utilities"><option value="Server Hosting & Cloud"><option value="Subscriptions"><option value="Savings & Investments"><option value="Debt Paydown"><option value="Musical Instruments"><option value="Real Estate & Properties"><option value="Vehicle Mods"></datalist>
@@ -2528,7 +2527,7 @@
 
                 <div class="finance-panel-grid">
                     <section class="finance-panel">
-                        <div class="finance-panel-header"><div><h3>Spending by category</h3></div><span id="finance-period-label" class="badge">This Month</span></div>
+                        <div class="finance-panel-header"><div><h3>Spending by category</h3><p class="finance-panel-sub" id="finance-category-sub"></p></div><span id="finance-period-label" class="badge">This Month</span></div>
                         <div id="finance-category-bars" class="finance-bar-list"></div>
                     </section>
                     <section class="finance-panel">
@@ -5446,19 +5445,71 @@
             return { nature, frequency, allocationClass };
         }
 
+        // Days between two dates, rounded so a 23- or 25-hour DST day still counts as one.
+        const financeDayCount = (from, to) => Math.round((financeStartOfDay(to) - financeStartOfDay(from)) / DAY_MS);
+        // Compact only from ₱1,000 up, so small amounts never show a stray decimal.
+        const financeMoneyCompact = (cents) => Math.abs(cents || 0) < 100000
+            ? financeMoney(cents, 0)
+            : new Intl.NumberFormat(undefined, { style: 'currency', currency: 'PHP', notation: 'compact', maximumFractionDigits: 1 }).format(Math.abs(cents || 0) / 100);
+
+        // The Type and Frequency filters, without the date range.
+        function financeMatchesFilters(tx, preferences = window.financePreferences) {
+            const classification = classifyFinanceTransaction(tx);
+            const natureMatch = preferences.natureFilter === 'all' || (tx.amountCents < 0 && classification.nature === preferences.natureFilter);
+            const frequencyMatch = preferences.frequencyFilter === 'all' || classification.frequency === preferences.frequencyFilter;
+            return natureMatch && frequencyMatch;
+        }
+
+        // The period before the selected one: last month, last quarter, last year,
+        // or the same number of days just before a rolling or custom range.
+        function getPreviousFinanceRange(range, preferences = window.financePreferences) {
+            const preset = preferences.rangePreset || 'month';
+            const s = range.start;
+            let start;
+            let end;
+            if (preset === 'month' || preset === 'qtd') {
+                start = new Date(s.getFullYear(), s.getMonth() - (preset === 'month' ? 1 : 3), 1);
+                end = financeEndOfDay(new Date(s.getFullYear(), s.getMonth(), 0));
+            } else if (preset === 'ytd') {
+                start = new Date(s.getFullYear() - 1, 0, 1);
+                end = financeEndOfDay(new Date(s.getFullYear() - 1, 11, 31));
+            } else {
+                const days = financeDayCount(range.start, range.end) + 1;
+                start = new Date(s.getFullYear(), s.getMonth(), s.getDate() - days);
+                end = financeEndOfDay(new Date(s.getFullYear(), s.getMonth(), s.getDate() - 1));
+            }
+            const noun = ({ month: 'last month', '30d': 'in the previous 30 days', qtd: 'last quarter', ytd: 'last year' })[preset] || 'in the previous period';
+            return { start, end, noun };
+        }
+
+        function summarizeFinancePeriod(start, end) {
+            let inflow = 0;
+            let outflow = 0;
+            const categories = {};
+            window.financeTransactions.forEach(tx => {
+                const date = new Date(tx.date);
+                if (Number.isNaN(date.getTime()) || date < start || date > end || !financeMatchesFilters(tx)) return;
+                if (tx.amountCents > 0) inflow += tx.amountCents;
+                else {
+                    const amount = Math.abs(tx.amountCents);
+                    outflow += amount;
+                    const category = tx.category || 'Uncategorized';
+                    categories[category] = (categories[category] || 0) + amount;
+                }
+            });
+            return { inflow, outflow, net: inflow - outflow, categories };
+        }
+
         function deriveFinanceAnalytics() {
             const now = new Date();
             const range = getFinanceRange(window.financePreferences, now);
             const elapsedEnd = range.end < now ? range.end : now;
-            const daysElapsed = Math.max(1, Math.floor((financeStartOfDay(elapsedEnd) - financeStartOfDay(range.start)) / DAY_MS) + 1);
-            const periodDays = Math.max(1, Math.floor((financeStartOfDay(range.end) - financeStartOfDay(range.start)) / DAY_MS) + 1);
+            const daysElapsed = Math.max(1, financeDayCount(range.start, elapsedEnd) + 1);
+            const periodDays = Math.max(1, financeDayCount(range.start, range.end) + 1);
             const filtered = window.financeTransactions.filter(tx => {
                 const date = new Date(tx.date);
                 if (Number.isNaN(date.getTime()) || date < range.start || date > range.end) return false;
-                const classification = classifyFinanceTransaction(tx);
-                const natureMatch = window.financePreferences.natureFilter === 'all' || (tx.amountCents < 0 && classification.nature === window.financePreferences.natureFilter);
-                const frequencyMatch = window.financePreferences.frequencyFilter === 'all' || classification.frequency === window.financePreferences.frequencyFilter;
-                return natureMatch && frequencyMatch;
+                return financeMatchesFilters(tx);
             });
             let inflow = 0;
             let outflow = 0;
@@ -5480,18 +5531,64 @@
             });
             const net = inflow - outflow;
             const dailyBurn = outflow / daysElapsed;
-            const monthlyOutflow = dailyBurn * 30.4375;
-            const runway = monthlyOutflow > 0 ? window.financePreferences.liquidCashCents / monthlyOutflow : 0;
             const savingsRate = inflow > 0 ? (net / inflow) * 100 : 0;
-            return { now, range, daysElapsed, periodDays, filtered, inflow, outflow, net, dailyBurn, monthlyOutflow, runway, savingsRate, categories, merchants, allocation };
+
+            // The same stretch of the previous period (e.g. the 1st–5th of last
+            // month on the 5th), so early-month numbers compare like with like.
+            const previousRange = getPreviousFinanceRange(range);
+            const previousCutoff = financeEndOfDay(new Date(previousRange.start.getFullYear(), previousRange.start.getMonth(), previousRange.start.getDate() + daysElapsed - 1));
+            const previousEnd = previousCutoff < previousRange.end ? previousCutoff : previousRange.end;
+            const previous = summarizeFinancePeriod(previousRange.start, previousEnd);
+            previous.dailyBurn = previous.outflow / Math.max(1, financeDayCount(previousRange.start, previousEnd) + 1);
+            previous.savingsRate = previous.inflow > 0 ? (previous.net / previous.inflow) * 100 : null;
+            previous.noun = previousRange.noun;
+            previous.hasData = window.financeTransactions.some(tx => { const date = new Date(tx.date); return date >= previousRange.start && date <= previousRange.end; });
+
+            // Runway uses a trailing average (up to 90 days) instead of this period
+            // alone, so rent paid on the 3rd does not read as a month's burn.
+            const trailingStart = financeStartOfDay(new Date(now.getTime() - 89 * DAY_MS));
+            const earliest = window.financeTransactions.reduce((min, tx) => {
+                const date = new Date(tx.date);
+                return !Number.isNaN(date.getTime()) && date <= now && financeMatchesFilters(tx) && (!min || date < min) ? date : min;
+            }, null);
+            const windowStart = earliest && earliest > trailingStart ? financeStartOfDay(earliest) : trailingStart;
+            const trailingDays = Math.min(90, Math.max(30, financeDayCount(windowStart, now) + 1));
+            const trailingOutflow = summarizeFinancePeriod(windowStart, financeEndOfDay(now)).outflow;
+            const monthlyOutflow = trailingOutflow / trailingDays * 30.4375;
+            const runway = monthlyOutflow > 0 ? window.financePreferences.liquidCashCents / monthlyOutflow : 0;
+            return { now, range, daysElapsed, periodDays, filtered, inflow, outflow, net, dailyBurn, monthlyOutflow, trailingDays, runway, savingsRate, categories, merchants, allocation, previous };
         }
 
-        function financeSparkline(current, previous) {
-            const max = Math.max(current, previous, 1);
-            const y1 = 21 - (previous / max * 17);
-            const y2 = 21 - (current / max * 17);
-            const color = current > previous * 1.03 ? '#ef4444' : current < previous * .97 ? '#10b981' : '#94a3b8';
-            return `<svg class="sparkline" viewBox="0 0 72 24" role="img" aria-label="Month-over-month trend"><path d="M3 ${y1.toFixed(1)} C24 ${y1.toFixed(1)}, 48 ${y2.toFixed(1)}, 69 ${y2.toFixed(1)}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><circle cx="69" cy="${y2.toFixed(1)}" r="3" fill="${color}"/></svg>`;
+        window.SoloFlowFinance = {
+            getRange: getFinanceRange,
+            getPreviousRange: getPreviousFinanceRange,
+            matchesFilters: financeMatchesFilters,
+            classify: classifyFinanceTransaction,
+            derive: deriveFinanceAnalytics
+        };
+
+        // "▲ ₱5.2K vs. this point last month". The arrow and words carry the
+        // direction; colour only reinforces whether that direction is good.
+        function renderFinanceDelta(container, { current, previous, goodWhenUp, format, noun, hasData }) {
+            if (!container) return;
+            let delta = container.querySelector('.finance-kpi-delta');
+            if (!delta) {
+                delta = document.createElement('div');
+                delta.className = 'finance-kpi-delta';
+                container.append(delta);
+            }
+            if (!hasData || previous == null) { delta.hidden = true; return; }
+            delta.hidden = false;
+            const diff = current - previous;
+            const flat = Math.abs(diff) < 0.5;
+            delta.dataset.tone = flat ? 'flat' : (diff > 0) === goodWhenUp ? 'good' : 'bad';
+            delta.replaceChildren();
+            const arrow = document.createElement('span');
+            arrow.className = 'finance-delta-arrow';
+            arrow.setAttribute('aria-hidden', 'true');
+            arrow.textContent = flat ? '–' : diff > 0 ? '▲' : '▼';
+            const words = flat ? `Same as this point ${noun}` : `${diff > 0 ? 'Up' : 'Down'} ${format(Math.abs(diff))} vs. this point ${noun}`;
+            delta.append(arrow, document.createTextNode(` ${words}`));
         }
 
         window.updateFinanceFilters = function() {
@@ -5571,7 +5668,7 @@
                 date: dateValue ? new Date(`${dateValue}T12:00:00`).toISOString() : new Date().toISOString()
             });
             ['financePayee','financeAmount','financeCategory'].forEach(id => get(id).value = '');
-            get('financeDate').value = new Date().toISOString().slice(0, 10);
+            get('financeDate').value = localISODate();
             window.saveFinance();
             window.showToast('Transaction recorded!', 'success');
         };
@@ -5678,11 +5775,24 @@
                     if (date >= monthStart && date < nextMonth) spent += Math.abs(tx.amountCents);
                     else if (date >= previousStart && date < monthStart) previous += Math.abs(tx.amountCents);
                 });
-                const pct = budget.allocatedCents ? (spent / budget.allocatedCents) * 100 : 0;
+                const allocated = budget.allocatedCents || 0;
+                const pct = allocated ? (spent / allocated) * 100 : 0;
                 const projected = dayOfMonth ? (spent / dayOfMonth) * daysInMonth : spent;
+                // Where spending would sit today if the budget were spread evenly.
+                const pacePct = Math.min(100, (dayOfMonth / daysInMonth) * 100);
                 const barClass = pct > 100 ? 'danger' : pct >= 80 ? 'warning' : '';
-                const forecast = projected > budget.allocatedCents ? `<div class="finance-alert">Projected ${financeMoney(projected - budget.allocatedCents)} over budget by month-end.</div>` : '';
-                return `<div class="budget-row"><div class="budget-row-head"><strong>${financeEscape(budget.category)}</strong><span>${financeMoney(spent)} / ${financeMoney(budget.allocatedCents)}</span></div><div class="budget-track"><div class="budget-fill ${barClass}" style="width:${Math.min(pct, 100)}%"></div></div><div class="budget-meta"><span>${pct.toFixed(0)}% used · forecast ${financeMoney(projected)}</span>${financeSparkline(spent, previous)}<button class="btn-small btn-danger" onclick="deleteFinanceBudget('${budget.id}')" aria-label="Delete ${financeEscape(budget.category)} budget">✕</button></div>${forecast}</div>`;
+                let status;
+                // A straight-line forecast from the first few days mostly reflects one
+                // early bill, so until day 7 the status compares against even pace instead.
+                if (spent > allocated) status = { tone: 'bad', icon: '!', text: `Over budget by ${financeMoney(spent - allocated, 0)}` };
+                else if (dayOfMonth >= 7 && projected > allocated) status = { tone: 'warn', icon: '!', text: `On track to go ${financeMoney(projected - allocated, 0)} over by month-end` };
+                else if (dayOfMonth < 7 && pct > pacePct + 10) status = { tone: 'warn', icon: '!', text: `Ahead of even pace · ${financeMoney(allocated - spent, 0)} left` };
+                else status = { tone: 'good', icon: '✓', text: `On pace · ${financeMoney(allocated - spent, 0)} left` };
+                const name = financeEscape(budget.category);
+                const meterLabel = `${name}: ${financeMoney(spent, 0)} of ${financeMoney(allocated, 0)} spent, ${pct.toFixed(0)}%. Even pace for today is ${pacePct.toFixed(0)}%.`;
+                return `<div class="budget-row"><div class="budget-row-head"><strong>${name}</strong><span>${financeMoney(spent, 0)} / ${financeMoney(allocated, 0)}</span></div>`
+                    + `<div class="budget-track budget-meter" role="meter" aria-valuemin="0" aria-valuemax="${Math.round(allocated / 100)}" aria-valuenow="${Math.round(spent / 100)}" aria-label="${meterLabel}"><div class="budget-fill ${barClass}" style="width:${Math.min(pct, 100)}%"></div><span class="budget-pace-mark" style="left:${pacePct}%" title="Even pace for today"></span></div>`
+                    + `<div class="budget-meta"><span class="budget-status" data-tone="${status.tone}"><span class="budget-status-icon" aria-hidden="true">${status.icon}</span>${status.text}</span><span class="budget-previous">${pct.toFixed(0)}% used · last month ${financeMoney(previous, 0)}</span><button class="btn-small btn-danger" onclick="deleteFinanceBudget('${budget.id}')" aria-label="Delete ${name} budget">✕</button></div></div>`;
             }).join('');
         }
 
@@ -5728,7 +5838,8 @@
             controls.end.value = preferences.endDate || '';
             document.getElementById('financeCustomDates').classList.toggle('visible', preferences.rangePreset === 'custom');
             const dateInput = document.getElementById('financeDate');
-            if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
+            // Local date, not UTC: in Manila toISOString() is still "yesterday" until 8 AM.
+            if (dateInput && !dateInput.value) dateInput.value = localISODate();
 
             const analytics = deriveFinanceAnalytics();
             document.getElementById('finance-period-label').innerText = analytics.range.label;
@@ -5746,25 +5857,63 @@
             document.getElementById('finance-burn-meta').innerText = target ? `${burnDelta > 0 ? financeMoney(burnDelta) + ' above' : financeMoney(Math.abs(burnDelta)) + ' below'} ${financeMoney(target)} target` : `${analytics.daysElapsed} elapsed day${analytics.daysElapsed === 1 ? '' : 's'} · set a daily target`;
             document.getElementById('finance-runway').innerText = `${analytics.runway.toFixed(1)} mo`;
             document.getElementById('finance-runway').style.color = !preferences.liquidCashCents ? '' : analytics.runway >= 6 ? 'var(--success-text)' : analytics.runway >= 3 ? 'var(--warning-text)' : 'var(--danger-text)';
-            document.getElementById('finance-runway-meta').innerText = `${financeMoney(preferences.liquidCashCents)} liquid · ${financeMoney(analytics.monthlyOutflow)}/mo avg`;
+            document.getElementById('finance-runway-meta').innerText = `${financeMoney(preferences.liquidCashCents, 0)} liquid · ${financeMoney(analytics.monthlyOutflow, 0)}/mo avg over the last ${analytics.trailingDays} days`;
             document.getElementById('finance-savings-rate').innerText = `${analytics.savingsRate.toFixed(1)}%`;
             document.getElementById('finance-savings-rate').style.color = !analytics.inflow ? '' : analytics.savingsRate >= 20 ? 'var(--success-text)' : analytics.savingsRate >= 0 ? 'var(--warning-text)' : 'var(--danger-text)';
             document.getElementById('finance-savings-meta').innerText = analytics.inflow ? `${financeMoney(analytics.net)} retained in period` : 'Add inflow to calculate rate';
 
+            const prior = analytics.previous;
+            const kpiCard = (id) => document.getElementById(id)?.closest('.finance-kpi');
+            renderFinanceDelta(kpiCard('finance-balance'), { current: analytics.net, previous: prior.net, goodWhenUp: true, format: financeMoneyCompact, noun: prior.noun, hasData: prior.hasData });
+            renderFinanceDelta(kpiCard('finance-burn-rate'), { current: analytics.dailyBurn, previous: prior.dailyBurn, goodWhenUp: false, format: (cents) => `${financeMoneyCompact(cents)}/day`, noun: prior.noun, hasData: prior.hasData });
+            renderFinanceDelta(kpiCard('finance-savings-rate'), { current: analytics.inflow ? analytics.savingsRate : null, previous: analytics.inflow ? prior.savingsRate : null, goodWhenUp: true, format: (points) => `${points.toFixed(1)} pts`, noun: prior.noun, hasData: prior.hasData && analytics.inflow > 0 });
+
+            // One hue for every category bar (it is one series); the change against
+            // the same point last period sits beside each amount.
+            const categorySub = document.getElementById('finance-category-sub');
+            if (categorySub) categorySub.textContent = prior.hasData ? `Change vs. this point ${prior.noun}` : '';
             const categoryEntries = Object.entries(analytics.categories).sort((a,b) => b[1] - a[1]);
+            const categoryMax = categoryEntries.length ? categoryEntries[0][1] : 0;
             document.getElementById('finance-category-bars').innerHTML = categoryEntries.length ? categoryEntries.map(([category, amount]) => {
                 const pct = analytics.outflow ? amount / analytics.outflow * 100 : 0;
-                return `<div class="finance-bar-row"><strong>${financeEscape(category)}</strong><div class="finance-bar-track"><div class="finance-bar-fill" style="width:${pct}%"></div></div><span>${financeMoney(amount)} · ${pct.toFixed(1)}%</span></div>`;
+                const before = prior.categories[category] || 0;
+                let change = '';
+                if (prior.hasData) {
+                    if (!before) change = `<small class="finance-delta" data-tone="flat" title="Nothing spent here at this point ${prior.noun}">new</small>`;
+                    else {
+                        const diffPct = (amount - before) / before * 100;
+                        const tone = Math.abs(diffPct) < 1 ? 'flat' : diffPct > 0 ? 'bad' : 'good';
+                        if (tone === 'flat') change = `<small class="finance-delta" data-tone="flat" title="About the same as this point ${prior.noun} (${financeMoney(before, 0)})">same</small>`;
+                        else {
+                            const words = `${Math.abs(diffPct).toFixed(0)}% ${diffPct > 0 ? 'more' : 'less'} than this point ${prior.noun} (${financeMoney(before, 0)})`;
+                            change = `<small class="finance-delta" data-tone="${tone}" title="${words}"><span aria-hidden="true">${diffPct > 0 ? '▲' : '▼'}</span>${Math.abs(diffPct).toFixed(0)}%<span class="sr-only"> ${diffPct > 0 ? 'more' : 'less'} than this point ${prior.noun}</span></small>`;
+                        }
+                    }
+                }
+                return `<div class="finance-bar-row"><strong>${financeEscape(category)}</strong><div class="finance-bar-track"><div class="finance-bar-fill" style="width:${categoryMax ? amount / categoryMax * 100 : 0}%"></div></div><span class="finance-bar-value">${financeMoney(amount, 0)} · ${pct.toFixed(0)}%${change}</span></div>`;
             }).join('') : window.emptyStateHTML('No spending in this view', 'Adjust the filters or log an expense to build a category breakdown.', 'Log a transaction', "setFinanceCommandView('transactions');document.getElementById('financePayee').focus()");
 
             const merchantEntries = Object.entries(analytics.merchants).sort((a,b) => b[1] - a[1]).slice(0,5);
             document.getElementById('finance-merchant-rank').innerHTML = merchantEntries.length ? merchantEntries.map(([merchant, amount], index) => `<div class="rank-row"><span class="rank-number">${index + 1}</span><span class="rank-name">${financeEscape(merchant)}</span><span class="rank-amount">${financeMoney(amount)}</span></div>`).join('') : window.emptyStateHTML('No merchant activity yet', 'Merchant rankings appear after outflows are recorded in the selected period.', 'Log an expense', "setFinanceCommandView('transactions');document.getElementById('financePayee').focus()");
 
+            // One whole (outflow) split three ways: a segmented bar for the actual
+            // split above a thinner one for the 50/30/20 target. The rows below carry
+            // every figure, so the bars stay text-free.
             const ruleConfig = [{ key:'needs', label:'Needs', target:50 }, { key:'wants', label:'Wants', target:30 }, { key:'savings', label:'Savings & Assets', target:20 }];
-            document.getElementById('finance-rule-health').innerHTML = ruleConfig.map(rule => {
-                const pct = analytics.outflow ? analytics.allocation[rule.key] / analytics.outflow * 100 : 0;
-                return `<div class="rule-row"><strong>${rule.label} <small>(${rule.target}%)</small></strong><div class="rule-track"><div class="rule-fill ${rule.key}" style="width:${Math.min(pct,100)}%"></div></div><span>${pct.toFixed(1)}% · ${financeMoney(analytics.allocation[rule.key])}</span></div>`;
-            }).join('');
+            const ruleShares = ruleConfig.map(rule => ({ ...rule, amount: analytics.allocation[rule.key], pct: analytics.outflow ? analytics.allocation[rule.key] / analytics.outflow * 100 : 0 }));
+            const splitLabel = ruleShares.map(rule => `${rule.label} ${rule.pct.toFixed(0)}%`).join(', ');
+            const actualBar = analytics.outflow
+                ? `<div class="rule-split" role="img" aria-label="Actual split: ${splitLabel}">${ruleShares.filter(rule => rule.pct > 0).map(rule => `<span class="rule-segment ${rule.key}" style="flex-grow:${rule.pct.toFixed(3)}" title="${rule.label}: ${rule.pct.toFixed(1)}% · ${financeMoney(rule.amount, 0)}"></span>`).join('')}</div>`
+                : `<div class="rule-split is-empty" role="img" aria-label="No spending in this period yet"></div>`;
+            const targetBar = `<div class="rule-split rule-split-target" role="img" aria-label="Target split: needs 50%, wants 30%, savings 20%">${ruleShares.map(rule => `<span class="rule-segment ${rule.key}" style="flex-grow:${rule.target}"></span>`).join('')}</div>`;
+            document.getElementById('finance-rule-health').innerHTML = `<div class="rule-split-stack"><div class="rule-split-caption"><span>Actual</span>${actualBar}</div><div class="rule-split-caption"><span>Target</span>${targetBar}</div></div>`
+                + ruleShares.map(rule => {
+                    const gap = rule.pct - rule.target;
+                    const verdict = !analytics.outflow ? 'No spending yet'
+                        : Math.abs(gap) < 2 ? 'On target'
+                        : `${Math.abs(gap).toFixed(0)} pts ${gap > 0 ? 'over' : 'under'} target`;
+                    return `<div class="rule-row"><span class="rule-swatch ${rule.key}" aria-hidden="true"></span><strong>${rule.label}</strong><span class="rule-figures"><b>${rule.pct.toFixed(0)}%</b> · ${financeMoney(rule.amount, 0)}</span><span class="rule-verdict">${rule.target}% target · ${verdict}</span></div>`;
+                }).join('');
 
             const sorted = [...analytics.filtered].sort((a,b) => new Date(b.date) - new Date(a.date));
             document.getElementById('finance-tx-count').innerText = `${sorted.length} Record${sorted.length === 1 ? '' : 's'}`;
