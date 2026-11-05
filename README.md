@@ -32,6 +32,20 @@ The **Events** tab groups events into Today, Tomorrow, Next 7 days, Later and Pa
 
 Right-click a task for completion, focus, duplicate, link, and delete actions. Task deletions and status changes provide a five-second Undo notification. Use the control-bar switcher to alternate between Comfortable cards and Compact spreadsheet-style rows.
 
+## Finance
+
+The **Finance Tracker** charts follow the reporting period and type filters:
+
+- **Cash flow by month:** income against spending for the last six months.
+- **Spending pace:** this period's running total against the same point last period and your daily target.
+- **Spending calendar:** a daily heatmap with no-spend days, your biggest day and your priciest weekday.
+
+Hover or tab to any chart for exact figures. **Table** shows the same data as rows. KPI tiles and category bars compare against the same point in the previous period. Budgets mark where an even pace would put you today. Runway averages up to 90 days of spending.
+
+## Production readiness
+
+`docs/production-readiness/ASSESSMENT.md` lists what still stands between SoloFlow and a production launch. `docs/production-readiness/CLAUDE_CODE_PROMPT.md` is a phased brief for Claude Code to build it.
+
 ## PDF reports
 
 Use **Generate summary**, then **Print / Save PDF**. The browser print dialog provides the platform-native PDF export while keeping the app dependency-free.
