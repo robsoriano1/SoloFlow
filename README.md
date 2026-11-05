@@ -12,6 +12,31 @@ python3 -m http.server 8080 --directory .
 
 Open `http://localhost:8080/index.html`.
 
+## Development
+
+The app itself has no build step and no runtime dependencies. `package.json` only holds development tools: Playwright, axe, ESLint, and the Firebase SDK (pinned to the 11.6.1 build the app loads from the CDN, so tests can serve it locally).
+
+```bash
+npm install
+npx playwright install chromium
+```
+
+- `npm run serve`: serve the app at `http://127.0.0.1:8080/index.html` (`--port` to change it).
+- `npm run lint`: ESLint over `bootstrap.js`, `core/`, `modules/`, the service worker, scripts and tests. The inline script in `index.html` isn't linted yet.
+- `npm test`: unit tests (`node --test`), then the end-to-end tests.
+- `npm run test:e2e`: only the Playwright tests. Add `--project=desktop` or `--project=phone`, or `--ui` to watch them run.
+- `npm run test:a11y:update`: re-record `tests/a11y-baseline.json` after fixing accessibility issues.
+
+What the tests cover:
+
+- **Hermetic runs.** The tests never reach production. The Firebase SDK is served from `node_modules/firebase`, and every other outside request (Firebase APIs, reCAPTCHA, Google Fonts) is blocked. The clock is frozen at 10:30 on Thursday, 5 November 2026, in `Asia/Manila`. Shared fixtures are in `tests/e2e/fixtures.js`, and seed data in `tests/support/seed.js`.
+- **Two devices.** Each test runs at desktop size (1440×900) and on iPhone 13. Any uncaught page error fails the test.
+- **Smoke tests** (`tests/e2e/smoke.spec.js`): boot; a task's full lifecycle with Undo; adding an event and a transaction; every view; no sideways scrolling on phones; the `N` and `Cmd/Ctrl+K` shortcuts; and each finance chart with its Table view.
+- **Known bugs** (`tests/e2e/regressions.spec.js`): each one is reproduced and marked `test.fail`, named by its finding ID in `docs/production-readiness/ASSESSMENT.md`. When a fix makes one pass, Playwright reports it, and the fix removes the marker.
+- **Accessibility** (`tests/e2e/a11y.spec.js`): axe checks WCAG 2.0 A/AA and 2.1 AA on all eight views. Known violations are listed in `tests/a11y-baseline.json`, and the test fails on anything new.
+
+CI (`.github/workflows/ci.yml`) runs lint and `npm test` on every pull request and on pushes to `main`, and uploads the Playwright report as an artifact.
+
 ## Keyboard shortcuts
 
 - `N`: new task capture
