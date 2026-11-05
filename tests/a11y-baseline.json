@@ -1,0 +1,56 @@
+{
+  "about": "Known axe violations (WCAG 2.0 A/AA, 2.1 AA) per project/view: rule id -> number of failing elements. tests/e2e/a11y.spec.js fails on anything new or larger. Regenerate with `npm run test:a11y:update` after fixing violations. Production-readiness A1 tracks emptying this file.",
+  "views": {
+    "desktop/all": {
+      "aria-required-parent": 12,
+      "color-contrast": 1,
+      "nested-interactive": 12
+    },
+    "desktop/backlog": {
+      "aria-required-parent": 2,
+      "color-contrast": 1,
+      "nested-interactive": 2
+    },
+    "desktop/calendar": {
+      "color-contrast": 7
+    },
+    "desktop/events": {
+      "color-contrast": 1
+    },
+    "desktop/finance": {
+      "aria-required-children": 1,
+      "color-contrast": 2
+    },
+    "desktop/productivity": {},
+    "desktop/schedule": {},
+    "desktop/today": {
+      "aria-required-parent": 4,
+      "color-contrast": 1,
+      "nested-interactive": 4
+    },
+    "phone/all": {
+      "aria-required-parent": 7,
+      "nested-interactive": 7
+    },
+    "phone/backlog": {
+      "aria-required-parent": 2,
+      "nested-interactive": 2
+    },
+    "phone/calendar": {
+      "color-contrast": 6
+    },
+    "phone/events": {
+      "color-contrast": 1
+    },
+    "phone/finance": {
+      "aria-required-children": 1,
+      "color-contrast": 2
+    },
+    "phone/productivity": {},
+    "phone/schedule": {},
+    "phone/today": {
+      "aria-required-parent": 4,
+      "nested-interactive": 4
+    }
+  }
+}

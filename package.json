@@ -1,0 +1,25 @@
+{
+  "name": "soloflow",
+  "private": true,
+  "type": "module",
+  "description": "Local-first workspace for tasks, events, schedule, focus timing and finance. Deployed as static files; these tools are for development only.",
+  "scripts": {
+    "serve": "node scripts/serve.mjs",
+    "lint": "eslint .",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test \"tests/unit/**/*.test.js\"",
+    "test:e2e": "playwright test",
+    "test:a11y:update": "UPDATE_A11Y_BASELINE=1 playwright test tests/e2e/a11y.spec.js --workers=1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "eslint": "10.1.0",
+    "firebase": "11.6.1",
+    "globals": "17.13.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
